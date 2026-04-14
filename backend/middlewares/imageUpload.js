@@ -1,4 +1,4 @@
-const multer = requite("multer");
+const multer = require("multer");
 const path = require("path");
 
 // Destination to store image
