@@ -7,6 +7,8 @@ const imageStorage = multer.diskStorage({
     let folder = "";
     if (req.baseUrl.includes("users")) {
       folder = "users";
+    } else if (req.baseUrl.includes("products")) {
+      folder = "products";
     } else if (req.baseUrl.includes("photos")) {
       folder = "photos";
     }

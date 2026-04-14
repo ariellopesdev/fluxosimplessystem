@@ -7,6 +7,8 @@ const mongoose = require("mongoose");
 
 const jwtSecret = process.env.JWT_SECRET;
 
+const Company = require("../models/Company");
+
 // Generate user token
 
 const generateToken = (id) => {
@@ -17,7 +19,7 @@ const generateToken = (id) => {
 
 // Register user and sign in
 const register = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, companyName, cnpj } = req.body;
 
   // Check if user exists
   const user = await User.findOne({ email });
@@ -29,6 +31,15 @@ const register = async (req, res) => {
     return;
   }
 
+  // Verify if company exists
+  let company = await Company.findOne({ cnpj });
+  if (!company) {
+    company = await Company.create({
+      name: companyName,
+      cnpj,
+    });
+  }
+
   // Generate password hase
   const salt = await bcrypt.genSalt();
   const passwordHash = await bcrypt.hash(password, salt);
@@ -38,6 +49,7 @@ const register = async (req, res) => {
     name,
     email,
     password: passwordHash,
+    company: company._id,
   });
 
   // If user was created successfully, return the token
