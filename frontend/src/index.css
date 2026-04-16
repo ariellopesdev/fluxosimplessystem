@@ -1,8 +1,42 @@
-body{
-    font-family: "Roboto", sans-serif;
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    background-color: #fafafa;
-    color: #121212;
+* {
+  font-family: "Roboto", sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--web-wash);
+  color: #121212;
+}
+
+:root {
+  /* cor principal */
+  --primary: #059669;
+  --primary-hover: #047857;
+  --primary-light: #10b981;
+
+  /* fundo */
+  --background: #f9fafb;
+  --surface: #ffffff;
+
+  /* texto */
+  --text: #111827;
+  --text-light: #6b7280;
+
+  /* borda */
+  --border: #e5e7eb;
+
+  /* estados */
+  --success: #16a34a;
+  --danger: #dc2626;
+  --warning: #d97706;
+
+  /* espaçamento */
+  --spacing-large: 2px;
+  --spacing-medium: 1px;
+  --spacing-small: 0.5px;
+
+  /* letter wheight*/
+  --weight-200: 200;
 }

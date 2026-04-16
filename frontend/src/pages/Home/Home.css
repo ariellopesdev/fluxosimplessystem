@@ -9,13 +9,60 @@
 .block-home{
     width: 40%;
     height: fit-content;
-    background-color: red;
+}
+
+.block-home h1{
+    color: var(--primary);
+    font-size: 4rem;
+    letter-spacing: var(--spacing-small);
+    margin-bottom: 1.2rem;
+}
+
+.block-home span{
+    font-size: .5em;
+    color: var(--gray-text);
+    font-weight:var(--weight-200);
+}
+
+.block-home p{
+    font-size: 1.5em;
+    color: var(--text);
 }
 
 .container-home form{
     width: fit-content;
     height: fit-content;
-    background-color: yellow;
     display: flex;
     flex-direction: column;
+}
+
+footer{
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    bottom: -45px;
+    left: 0;
+    height: fit-content;
+    width: 100%;
+    padding: 10px;
+    border-top: 1px solid var(--border);
+}
+
+footer a,
+footer p{
+    color: var(--text-light);
+    font-size: .95rem;
+    text-decoration: none;
+    background-color: transparent;
+    margin: 0 5px;
+}
+
+footer a:hover{
+    cursor: pointer;
+    color: var(--text);
+}
+
+footer div{
+    padding: 10px;
 }
