@@ -88,6 +88,9 @@
 }
 
 .form__login .auth__btn--secondary {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   height: 48px;
   background-color: var(--primary-light);
   color: var(--surface);
@@ -96,6 +99,7 @@
   font-size: clamp(0.9rem, 1.5vw, 1rem);
   font-weight: bold;
   cursor: pointer;
+  text-decoration: none;
 }
 
 .form__login .auth__btn--secondary:hover {

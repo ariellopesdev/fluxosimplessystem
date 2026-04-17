@@ -2,42 +2,82 @@
 import "./Register.css";
 
 //Components
-import Footer from "../../components/Footer/Footer";
+import { Link } from "react-router-dom";
+import Navbar from "../../components/Navbar/Navbar";
+
+//Hooks
+import { useState, useEffect } from "react";
 
 const Register = () => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [cnpj, setCnpj] = useState("");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const user = {
+      name,
+      email,
+      password,
+      confirmPassword,
+      companyName,
+      cnpj,
+    };
+
+    console.log(user);
+  };
+
   return (
     <div id="register">
-      <header id="register__header">
-        <button className="register__header--company">
-          fluxo simples <span id="register__header--highlight">system</span>
-        </button>
-        <form className="form__register--login">
-          <input type="email" placeholder="E-mail" />
-          <input type="password" placeholder="Senha" />
-          <button type="submit" className="register__btn--primary">
-            Entrar
-          </button>
-        </form>
-      </header>
+      <Navbar />
       <main id="register__main">
-        <form className="form__register">
-          <h2>Criar conta</h2>
-          <input type="text" placeholder="Nome completo" name="name" />
-          <input type="email" placeholder="E-mail" name="email" />
-          <input type="password" placeholder="Senha" name="password" />
+        <form onSubmit={handleSubmit} className="form__register">
+          <h2>Cadastre-se</h2>
+          <input
+            type="text"
+            placeholder="Nome completo"
+            onChange={(e) => setName(e.target.value)}
+            value={name || ""}
+          />
+          <input
+            type="email"
+            placeholder="E-mail"
+            onChange={(e) => setEmail(e.target.value)}
+            value={email || ""}
+          />
           <input
             type="password"
-            placeholder="Confirmar senha"
-            name="confirmPassword"
+            placeholder="Senha"
+            onChange={(e) => setPassword(e.target.value)}
+            value={password || ""}
           />
-          <input type="text" placeholder="Nome da empresa" name="companyName" />
-          <input type="text" placeholder="CNPJ da empresa" name="cnpj" />
+          <input
+            type="password"
+            placeholder="Confirme sua senha"
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            value={confirmPassword || ""}
+          />
+          <input
+            type="text"
+            placeholder="Nome da empresa"
+            onChange={(e) => setCompanyName(e.target.value)}
+            value={companyName || ""}
+          />
+          <input
+            type="text"
+            placeholder="CNPJ da empresa"
+            onChange={(e) => setCnpj(e.target.value)}
+            value={cnpj || ""}
+          />
           <button type="submit" className="register__btn--primary">
             Criar conta
           </button>
         </form>
       </main>
-      <Footer />
     </div>
   );
 };

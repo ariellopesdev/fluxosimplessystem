@@ -9,6 +9,9 @@ import Home from "./pages/Home/Home";
 import Painel from "./pages/Painel/Painel";
 import Register from "./pages/Register/Register";
 
+//Components
+import Footer from "./components/Footer/Footer";
+
 function App() {
   return (
     <div className="App">
@@ -18,6 +21,7 @@ function App() {
           <Route path="/painel" element={<Painel />} />
           <Route path="/register" element={<Register />} />
         </Routes>
+        <Footer />
       </BrowserRouter>
     </div>
   );

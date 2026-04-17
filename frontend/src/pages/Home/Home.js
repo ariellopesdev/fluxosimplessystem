@@ -2,7 +2,7 @@
 import "./Home.css";
 
 //Components
-import Footer from "../../components/Footer/Footer";
+import { NavLink, Link } from "react-router-dom";
 
 const Home = () => {
   return (
@@ -26,11 +26,10 @@ const Home = () => {
           Esqueceu sua senha?
         </a>
         <hr />
-        <button type="button" className="auth__btn--secondary">
+        <Link to="/register" className="auth__btn--secondary">
           Criar uma conta
-        </button>
+        </Link>
       </form>
-      <Footer />
     </div>
   );
 };
