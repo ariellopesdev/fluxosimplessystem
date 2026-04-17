@@ -6,7 +6,7 @@
   justify-content: space-between;
   padding: 0 40px;
   border-bottom: 1px solid var(--border);
-  background-color: var(--surface);
+  background-color: var(--primary);
 }
 
 /* logo */
@@ -15,7 +15,7 @@
   border: none;
   font-size: clamp(1.5rem, 2.5vw, 2rem);
   font-weight: var(--weight-700);
-  color: var(--primary);
+  color: var(--surface);
   cursor: pointer;
 }
 
@@ -35,7 +35,7 @@
   height: 36px;
   padding: 0 10px;
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 4px;
   font-size: clamp(0.75rem, 1vw, 0.9rem);
   transition:
     border-color 0.2s ease,
@@ -57,7 +57,7 @@
 .form__register--login button {
   height: 36px;
   padding: 0 16px;
-  background-color: var(--primary);
+  background-color: var(--primary-hover);
   color: var(--surface);
   border: none;
   border-radius: 6px;
@@ -144,15 +144,25 @@
     height: auto;
     gap: 10px;
     padding: 20px;
+    margin-bottom: 40px;
+  }
+
+  .register__header--company {
+    margin-bottom: 20px;
   }
 
   .form__register--login {
     width: 100%;
-    flex-direction: column;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
   }
 
-  .form__register--login input,
-  .form__register--login button {
-    width: 100%;
+  .form__register--login input {
+    width: 48%;
+  }
+  .form__register--login button{
+    width: 40%;
+    margin-top: 8px;
   }
 }
