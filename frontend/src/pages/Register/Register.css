@@ -1,0 +1,158 @@
+#register__header {
+  width: 100%;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  border-bottom: 1px solid var(--border);
+  background-color: var(--surface);
+}
+
+/* logo */
+.register__header--company {
+  background: none;
+  border: none;
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  font-weight: var(--weight-700);
+  color: var(--primary);
+  cursor: pointer;
+}
+
+#register__header--highlight {
+  font-size: clamp(0.6rem, 1vw, 0.75rem);
+  font-weight: var(--weight-200);
+}
+
+/************ LOGIN (HEADER) ************/
+
+.form__register--login{
+    display: flex;
+    gap: 12px;
+}
+
+.form__register--login input {
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: clamp(0.75rem, 1vw, 0.9rem);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/* hover */
+.form__register--login input:hover {
+  border-color: var(--primary);
+}
+
+/* focus */
+.form__register--login input:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.2); /* cor baseada no seu primary */
+}
+
+.form__register--login button {
+  height: 36px;
+  padding: 0 16px;
+  background-color: var(--primary);
+  color: var(--surface);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/************ MAIN (CENTRALIZAÇÃO REAL) ************/
+
+#register__main {
+  flex: 1; /* ocupa o espaço restante */
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+}
+
+/************ FORM REGISTER ************/
+
+.form__register {
+  width: 100%;
+  max-width: 420px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  background-color: var(--surface);
+  padding: 30px;
+
+  border: 1px solid var(--border);
+  border-radius: 10px;
+
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.08),
+    0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.form__register h2 {
+  text-align: center;
+  font-size: clamp(1.5rem, 2vw, 1.8rem);
+}
+
+.form__register input {
+  height: 50px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: clamp(0.9rem, 1.5vw, 1rem);
+}
+
+.form__register input:focus {
+  border-color: var(--primary);
+  outline: none;
+}
+
+.register__btn--primary {
+  height: 50px;
+  background-color: var(--primary);
+  color: var(--surface);
+  border: none;
+  border-radius: 6px;
+  font-weight: var(--weight-700);
+  cursor: pointer;
+  font-size: clamp(1rem, 1.8vw, 1.125rem);
+}
+
+.register__btn--primary:hover {
+  background-color: var(--primary-hover);
+}
+
+/************ FOOTER ************/
+
+#register footer {
+  border-top: 1px solid var(--border);
+}
+
+/************ RESPONSIVO ************/
+
+@media (max-width: 768px) {
+  #register__header {
+    flex-direction: column;
+    height: auto;
+    gap: 10px;
+    padding: 20px;
+  }
+
+  .form__register--login {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .form__register--login input,
+  .form__register--login button {
+    width: 100%;
+  }
+}

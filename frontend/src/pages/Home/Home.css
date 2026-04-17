@@ -25,7 +25,7 @@
 
 /************ AUTH-FORM ************/
 
-.auth__form {
+.form__login {
   width: 380px;
   height: fit-content;
   display: flex;
@@ -40,7 +40,7 @@
     0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
-.auth__form input {
+.form__login input {
   height: 50px;
   padding: 0 12px;
   border: 1px solid var(--border);
@@ -50,12 +50,12 @@
   background-color: var(--surface);
 }
 
-.auth__form input:focus {
+.form__login input:focus {
   border-color: var(--primary);
   outline: none;
 }
 
-.auth__form .auth__btn--primary {
+.form__login .auth__btn--primary {
   height: 48px;
   background-color: var(--primary);
   color: var(--surface);
@@ -66,28 +66,28 @@
   cursor: pointer;
 }
 
-.auth__form .auth__btn--primary:hover {
+.form__login .auth__btn--primary:hover {
   background-color: var(--primary-hover);
 }
 
-.auth__form .forgotPassword {
+.form__login .forgotPassword {
   text-align: center;
   font-size: clamp(0.75rem, 1.2vw, 0.875rem);
   color: var(--primary);
   text-decoration: none;
 }
 
-.auth__form .forgotPassword:hover {
+.form__login .forgotPassword:hover {
   text-decoration: underline;
 }
 
-.auth__form hr {
+.form__login hr {
   border: none;
   border-top: 1px solid var(--border);
   margin: 10px 0;
 }
 
-.auth__form .auth__btn--secondary {
+.form__login .auth__btn--secondary {
   height: 48px;
   background-color: var(--primary-light);
   color: var(--surface);
@@ -98,42 +98,8 @@
   cursor: pointer;
 }
 
-.auth__form .auth__btn--secondary:hover {
+.form__login .auth__btn--secondary:hover {
   background-color: var(--primary-hover);
-}
-
-/************ HOME-FOOTER ************/
-
-#home__footer {
-  position: absolute;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  bottom: -45px;
-  left: 0;
-  height: fit-content;
-  width: 100%;
-  padding: 10px;
-  border-top: 1px solid var(--border);
-}
-
-#home__footer a,
-#home__footer p {
-  color: var(--text-light);
-  font-size: clamp(0.75rem, 1.2vw, 0.95rem);
-  text-decoration: none;
-  background-color: transparent;
-  margin: 0 5px;
-}
-
-#home__footer a:hover {
-  cursor: pointer;
-  color: var(--text);
-}
-
-.home__footer--links,
-.home__footer--copyright {
-  padding: 10px;
 }
 
 @media (max-width: 768px) {
@@ -152,12 +118,8 @@
     margin-bottom: 10px;
   }
 
-  .auth__form {
+  .form__login {
     width: 100%;
     max-width: 400px;
-  }
-
-  #home__footer {
-    position: relative;
   }
 }

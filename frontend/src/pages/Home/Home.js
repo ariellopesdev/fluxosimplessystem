@@ -2,7 +2,7 @@
 import "./Home.css";
 
 //Components
-import Login from "../../components/Login/Login";
+import Footer from "../../components/Footer/Footer";
 
 const Home = () => {
   return (
@@ -16,7 +16,7 @@ const Home = () => {
           organiza agendamentos, prazos e entregas em um só lugar.
         </p>
       </div>
-      <form className="auth__form">
+      <form className="form__login">
         <input type="email" placeholder="E-mail" />
         <input type="password" placeholder="Senha" />
         <button type="submit" className="auth__btn--primary">
@@ -30,30 +30,7 @@ const Home = () => {
           Criar uma conta
         </button>
       </form>
-      <footer id="home__footer">
-        <div className="home__footer--links">
-          <a>Cadastre-se</a>
-          <a>Entrar</a>
-        </div>
-        <div className="home__footer--links">
-          <a>Política de Privacidade</a>
-          <a>Central de Privacidade</a>
-          <a>Sobre</a>
-        </div>
-        <div className="home__footer--copyright">
-          <p>
-            &copy;
-            <a
-              href="https://ariellopesdev.github.io/portfolio-professional/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              ariellopesdev
-            </a>
-            2026. Todos os direitos reservados.
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };
