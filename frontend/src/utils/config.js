@@ -5,7 +5,7 @@ export const requestConfig = (method, data, token = null, image = null) => {
   let config;
 
   if (image) {
-    config -
+    config =
       {
         method,
         body: data,

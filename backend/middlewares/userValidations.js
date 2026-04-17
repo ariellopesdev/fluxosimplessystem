@@ -26,6 +26,14 @@ const userCreateValidation = () => {
         }
         return true;
       }),
+    body("companyName")
+      .isString()
+      .withMessage("O nome da empresa é obrigatório."),
+    body("cnpj")
+      .isString()
+      .withMessage("O CNPJ da empresa é obrigatório.")
+      .isLength({ min: 14, max: 14 })
+      .withMessage("O CNPJ deve conter exatamente 14 caracteres."),
   ];
 };
 
