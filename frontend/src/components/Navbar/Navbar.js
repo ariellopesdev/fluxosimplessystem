@@ -22,10 +22,6 @@ const Navbar = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-  };
-
   const { auth } = useAuth();
   const { user } = useSelector((state) => state.auth);
 
@@ -81,25 +77,9 @@ const Navbar = () => {
         </>
       ) : (
         <>
-          <form onSubmit={handleSubmit} className="nav__form--login">
-            <input
-              type="email"
-              placeholder="E-mail"
-              onChange={(e) => setEmail(e.target.value)}
-              value={email || ""}
-            />
-            <input
-              type="password"
-              placeholder="Senha"
-              onChange={(e) => setPassword(e.target.value)}
-              value={password || ""}
-            />
-            <input
-              type="submit"
-              value="Entrar"
-              className="register__btn--primary"
-            />
-          </form>
+          <Link to="/" className="login__btn">
+            Login
+          </Link>
         </>
       )}
     </nav>

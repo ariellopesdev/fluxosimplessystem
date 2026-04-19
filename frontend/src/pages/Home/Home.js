@@ -2,7 +2,7 @@
 import "./Home.css";
 
 //Components
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import Message from "../../components/Message/Message";
 
 //Hooks
@@ -10,14 +10,40 @@ import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
 //Redux
+import { login, reset } from "../../slices/authSlice.js";
 
 const Home = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const { loading, error, user } = useSelector((state) => state.auth);
+
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    const user = {
+      email,
+      password,
+    };
+
+    console.log(user);
+
+    dispatch(login(user));
   };
+
+  useEffect(() => {
+    if (user) {
+      navigate("/painel");
+    }
+  }, [user, navigate]);
+
+  //Clean all auth states
+  useEffect(() => {
+    dispatch(reset());
+  }, [dispatch]);
   return (
     <div id="home">
       <div id="home__info">
@@ -43,7 +69,22 @@ const Home = () => {
             onChange={(e) => setPassword(e.target.value)}
             value={password || ""}
           />
-          <input type="submit" value="Entrar" className="auth__btn--primary" />
+          {!loading && (
+            <input
+              type="submit"
+              value="Entrar"
+              className="auth__btn--primary"
+            />
+          )}
+          {loading && (
+            <input
+              type="submit"
+              value="Aguarde..."
+              className="auth__btn--primary"
+              disabled
+            />
+          )}
+          {error && <Message msg={error} type="error" />}
         </form>
         <a href="#" className="forgotPassword">
           Esqueceu sua senha?

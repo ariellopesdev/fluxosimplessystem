@@ -1,6 +1,9 @@
 //CSS
 import "./App.css";
 
+//Hooks
+import { useAuth } from "./hooks/useAuth";
+
 //Router
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
@@ -11,9 +14,6 @@ import Register from "./pages/Register/Register";
 
 //Components
 import Footer from "./components/Footer/Footer";
-
-//Hooks
-import { useAuth } from "./hooks/useAuth";
 
 function App() {
   const { auth, loading } = useAuth();
@@ -28,9 +28,12 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route
             path="/painel"
-            element={!auth ? <Painel /> : <Navigate to="/" />}
+            element={auth ? <Painel /> : <Navigate to="/" />}
           />
-          <Route path="/register" element={<Register />} />
+          <Route
+            path="/register"
+            element={!auth ? <Register /> : <Navigate to="/painel" />}
+          />
         </Routes>
         <Footer />
       </BrowserRouter>
