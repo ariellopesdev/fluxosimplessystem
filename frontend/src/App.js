@@ -13,9 +13,6 @@ import Painel from "./pages/Painel/Painel";
 import Register from "./pages/Register/Register";
 import EditProfile from "./pages/EditProfile/EditProfile";
 
-//Components
-import Footer from "./components/Footer/Footer";
-
 function App() {
   const { auth, loading } = useAuth();
 
@@ -40,7 +37,6 @@ function App() {
             element={auth ? <EditProfile /> : <Navigate to="/" />}
           />
         </Routes>
-        <Footer />
       </BrowserRouter>
     </div>
   );

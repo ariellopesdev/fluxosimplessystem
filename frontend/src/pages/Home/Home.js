@@ -4,6 +4,7 @@ import "./Home.css";
 //Components
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import Message from "../../components/Message/Message";
+import Footer from "../../components/Footer/Footer";
 
 //Hooks
 import { useState, useEffect } from "react";
@@ -94,6 +95,7 @@ const Home = () => {
           Criar uma conta
         </Link>
       </div>
+      <Footer />
     </div>
   );
 };

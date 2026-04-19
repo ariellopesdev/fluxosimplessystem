@@ -5,6 +5,7 @@ import "./Register.css";
 import { Link } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar";
 import Message from "../../components/Message/Message";
+import Footer from "../../components/Footer/Footer";
 
 //Hooks
 import { useState, useEffect } from "react";
@@ -107,6 +108,7 @@ const Register = () => {
           {error && <Message msg={error} type="error" />}
         </form>
       </main>
+      <Footer />
     </div>
   );
 };
