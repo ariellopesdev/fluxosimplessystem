@@ -8,7 +8,7 @@ const initialState = {
   message: null,
 };
 
-//Funcoes
+//
 
 export const userSlice = createSlice({
   name: "user",
