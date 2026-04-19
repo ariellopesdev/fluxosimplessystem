@@ -4,6 +4,7 @@ import "./Register.css";
 //Components
 import { Link } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar";
+import Message from "../../components/Message/Message";
 
 //Hooks
 import { useState, useEffect } from "react";
@@ -88,9 +89,22 @@ const Register = () => {
             onChange={(e) => setCnpj(e.target.value)}
             value={cnpj || ""}
           />
-          <button type="submit" className="register__btn--primary">
-            Criar conta
-          </button>
+          {!loading && (
+            <input
+              type="submit"
+              value="Criar conta"
+              className="register__btn--primary"
+            />
+          )}
+          {loading && (
+            <input
+              type="submit"
+              value="Aguarde..."
+              className="register__btn--primary"
+              disabled
+            />
+          )}
+          {error && <Message msg={error} type="error" />}
         </form>
       </main>
     </div>
