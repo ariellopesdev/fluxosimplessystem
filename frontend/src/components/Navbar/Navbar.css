@@ -5,8 +5,9 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 40px;
-  border-bottom: 1px solid var(--border);
   background-color: var(--primary);
+  position: fixed;
+  z-index: 2;
 }
 
 .nav--company {
