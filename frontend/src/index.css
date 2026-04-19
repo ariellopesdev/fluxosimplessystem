@@ -31,7 +31,7 @@ body {
   --success: #16a34a;
   --successBackground: #d4edda;
   --danger: #dc2626;
-  --dangerBackground: #ebc9cb; 
+  --dangerBackground: #ebc9cb;
   --warning: #d97706;
 
   /* espaçamento */
@@ -65,4 +65,13 @@ body {
   display: flex;
   flex-direction: column;
   background-color: var(--background);
+}
+
+.main__container {
+  background-color: var(--background);
+  height: calc(100% - 80px);
+  width: calc(100% - 250px);
+  float: right;
+  margin-top: 80px;
+  padding: 40px;
 }

@@ -6,10 +6,10 @@ const EditProfile = () => {
   };
   return (
     <div id="editProfile">
-      <h2>Edite seus dados</h2>
-      <p className="subtitle">Adicione uma imagem de perfil.</p>
+      <h2 className="editProfile__title">Edite seus dados</h2>
+      <p className="editProfile__subtitle">Adicione uma imagem de perfil.</p>
       {/* preview da imagem */}
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="editProfile__data">
         <input type="text" placeholder="Nome completo" />
         <input type="email" placeholder="Email" disabled />
         <input type="text" placeholder="Nome da Empresa" disabled />

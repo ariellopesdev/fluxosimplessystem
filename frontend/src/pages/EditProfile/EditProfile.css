@@ -1,0 +1,118 @@
+#editProfile {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.editProfile__title {
+  color: var(--text);
+  font-size: clamp(1.3rem, 2.5vw, 1.6rem);
+  font-weight: var(--weight-700);
+}
+
+.editProfile__subtitle {
+  color: var(--text-light);
+  font-size: clamp(0.85rem, 1.5vw, 1rem);
+  font-weight: var(--weight-400);
+}
+
+.editProfile__data {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 500px;
+  background-color: var(--surface);
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.05),
+    0 6px 12px rgba(0, 0, 0, 0.05);
+}
+
+.editProfile__data input {
+  height: 50px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: clamp(0.9rem, 1.5vw, 1rem);
+}
+
+.editProfile__data input:hover {
+  border-color: var(--primary-light);
+}
+
+.editProfile__data input:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.15);
+}
+
+.editProfile__data input:disabled {
+  background-color: var(--background);
+  color: var(--text-light);
+  cursor: not-allowed;
+}
+
+.editProfile__data input[type="submit"] {
+  margin-top: 10px;
+  background: var(--primary);
+  color: var(--surface);
+  border: none;
+  font-weight: var(--weight-700);
+  font-size: clamp(1rem, 1.8vw, 1.125rem);
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    filter 0.2s ease;
+}
+
+.editProfile__data input[type="submit"]:hover {
+  background-color: var(--primary-light);
+}
+
+.editProfile__data input[type="submit"]:active {
+  transform: scale(0.98);
+}
+
+.editProfile__data label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 12px;
+  font-size: clamp(0.8rem, 1.2vw, 0.9rem);
+  color: var(--text);
+}
+
+.editProfile__data label span {
+  font-weight: var(--weight-400);
+  color: var(--text-light);
+}
+
+.editProfile__data label input {
+  height: 50px;
+  padding: 0 12px;
+
+  border: 1px solid var(--border);
+  border-radius: 6px;
+
+  font-size: clamp(0.9rem, 1.5vw, 1rem);
+  background-color: var(--surface);
+  color: var(--text);
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.editProfile__data label input:hover {
+  border-color: var(--primary);
+}
+
+.editProfile__data label input:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.2);
+}
