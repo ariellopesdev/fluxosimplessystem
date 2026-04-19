@@ -17,17 +17,27 @@ import { Navigate } from "react-router-dom";
 
 //Redux
 import { logout, reset } from "../../slices/authSlice";
+import { profile } from "../../slices/userSlice";
 
 const Navbar = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const { auth } = useAuth();
-  const { user } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.user);
 
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
+
+  const userCode = user?._id?.slice(-4).padStart(4, "0");
+
+  //Load user data
+  useEffect(() => {
+  if (auth) {
+    dispatch(profile());
+  }
+}, [dispatch, auth]);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -56,19 +66,19 @@ const Navbar = () => {
               className="nav__user--username tooltip"
               data-tooltip="Nome do usuário"
             >
-              Ariel Lopes
+              {user?.name}
             </li>
             <li
               className="nav__user--id tooltip"
               data-tooltip="Código do usuário"
             >
-              0049
+              {user?._id?.slice(-4)}
             </li>
             <li
               className="nav__user--companyName tooltip"
               data-tooltip="Empresa"
             >
-              Restaurante Rancho Alegre
+              {user?.company?.name}
             </li>
             <li className="nav__user--iconLogout tooltip" data-tooltip="Sair">
               <FiLogOut onClick={handleLogout} />

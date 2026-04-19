@@ -94,7 +94,9 @@ const login = async (req, res) => {
 
 // Get current logged in user
 const getCurrentUser = async (req, res) => {
-  const user = req.user;
+  const user = await User.findById(req.user._id)
+    .populate("company")
+    .select("-password");
 
   res.status(200).json(user);
 };

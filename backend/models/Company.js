@@ -4,7 +4,7 @@ const { Schema } = mongoose;
 const companySchema = new Schema(
   {
     name: String,
-    cnjp: String,
+    cnpj: String,
   },
   {
     timestamps: true,

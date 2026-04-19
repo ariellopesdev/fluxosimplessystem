@@ -5,7 +5,7 @@ import "./EditProfile.css";
 import { uploads } from "../../utils/config";
 
 //Hooks
-import { useState, useEffectEvent, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
 //Redux
@@ -24,7 +24,7 @@ const EditProfile = () => {
   const [password, setPassword] = useState("");
   const [profileImage, setProfileImage] = useState("");
   const [companyName, setCompanyName] = useState("");
-  const [cnjp, setCnpj] = useState("");
+  const [cnpj, setCnpj] = useState("");
   const [previewImage, setPreviewImage] = useState("");
 
   //Load user data
@@ -37,8 +37,8 @@ const EditProfile = () => {
     if (user) {
       setName(user.name);
       setEmail(user.email);
-      setCompanyName(user.companyName);
-      setCnpj(user.cnpj);
+      setCompanyName(user.company?.name);
+      setCnpj(user.company?.cnpj);
     }
   }, [user]);
 
