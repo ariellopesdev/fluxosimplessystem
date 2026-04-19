@@ -2,7 +2,7 @@
 import "./Navbar.css";
 
 //Components
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 
 //Icons
 import { FaCircle } from "react-icons/fa";
@@ -14,9 +14,23 @@ import { useAuth } from "../../hooks/useAuth";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 
+//Redux
+import { logout, reset } from "../../slices/authSlice";
+
 const Navbar = () => {
   const { auth } = useAuth();
   const { user } = useSelector((state) => state.auth);
+
+  const navigate = useNavigate();
+
+  const dispatch = useDispatch();
+
+  const handleLogout = () => {
+    dispatch(logout());
+    dispatch(reset());
+
+    navigate("/");
+  };
 
   return (
     <nav id="nav">
@@ -40,7 +54,10 @@ const Navbar = () => {
             >
               Ariel Lopes
             </li>
-            <li className="nav__user--id tooltip" data-tooltip="Código do usuário">
+            <li
+              className="nav__user--id tooltip"
+              data-tooltip="Código do usuário"
+            >
               0049
             </li>
             <li
@@ -50,7 +67,7 @@ const Navbar = () => {
               Restaurante Rancho Alegre
             </li>
             <li className="nav__user--iconLogout tooltip" data-tooltip="Sair">
-              <FiLogOut />
+              <FiLogOut onClick={handleLogout} />
             </li>
           </ul>
         </>
