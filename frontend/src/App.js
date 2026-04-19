@@ -12,13 +12,24 @@ import Register from "./pages/Register/Register";
 //Components
 import Footer from "./components/Footer/Footer";
 
+//Hooks
+import { useAuth } from "./hooks/useAuth";
+
 function App() {
+  const { auth, loading } = useAuth();
+
+  if (loading) {
+    return <p>Carregando...</p>;
+  }
   return (
     <div className="App">
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/painel" element={<Painel />} />
+          <Route
+            path="/painel"
+            element={!auth ? <Painel /> : <Navigate to="/" />}
+          />
           <Route path="/register" element={<Register />} />
         </Routes>
         <Footer />
