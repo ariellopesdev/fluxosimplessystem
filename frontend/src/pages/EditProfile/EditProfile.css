@@ -2,12 +2,20 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+  width: fit-content;
 }
 
 .editProfile__title {
   color: var(--text);
   font-size: clamp(1.3rem, 2.5vw, 1.6rem);
   font-weight: var(--weight-700);
+}
+
+.editProfile__image {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  margin: 0 auto;
 }
 
 .editProfile__subtitle {
@@ -115,4 +123,36 @@
   border-color: var(--primary);
   outline: none;
   box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.2);
+}
+
+.editProfile__data input[type="file"] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  background-color: var(--background);
+  cursor: pointer;
+}
+
+/* Botão "Escolher arquivo" */
+.editProfile__data input[type="file"]::file-selector-button {
+  background-color: var(--primary);
+  color: var(--surface);
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  margin-right: 12px;
+  cursor: pointer;
+  font-weight: var(--weight-500);
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease;
+}
+
+.editProfile__data input[type="file"]::file-selector-button:hover {
+  background-color: var(--primary-light);
+}
+
+.editProfile__data input[type="file"]::file-selector-button:active {
+  transform: scale(0.97);
 }

@@ -45,11 +45,30 @@ const EditProfile = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
   };
+
+  const handleFile = (e) => {
+    //Image preview
+    const image = e.target.files[0];
+
+    setPreviewImage(image);
+
+    //Update image state
+    setProfileImage(image);
+  };
   return (
     <div id="editProfile">
       <h2 className="editProfile__title">Edite seus dados</h2>
       <p className="editProfile__subtitle">Adicione uma imagem de perfil.</p>
-      {/* preview da imagem */}
+      {(user.profileImage || previewImage) && (
+        <img className="editProfile__image"
+          src={
+            previewImage
+              ? URL.createObjectURL(previewImage)
+              : `${uploads}/users/${user.profileImage}`
+          }
+          alt={user.name}
+        />
+      )}
       <form onSubmit={handleSubmit} className="editProfile__data">
         <input
           type="text"
@@ -72,7 +91,7 @@ const EditProfile = () => {
         />
         <label>
           <span>Imagem do Perfil:</span>
-          <input type="file" />
+          <input type="file" onChange={handleFile} />
         </label>
         <label>
           <span>Quer alterar sua senha?</span>
