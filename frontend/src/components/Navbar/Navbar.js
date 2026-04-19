@@ -3,13 +3,14 @@ import "./Navbar.css";
 
 //Components
 import { NavLink, Link, useNavigate } from "react-router-dom";
+import Message from "../Message/Message";
 
 //Icons
 import { FaCircle } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
 
 //Hooks
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
@@ -18,6 +19,13 @@ import { Navigate } from "react-router-dom";
 import { logout, reset } from "../../slices/authSlice";
 
 const Navbar = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+  };
+
   const { auth } = useAuth();
   const { user } = useSelector((state) => state.auth);
 
@@ -73,12 +81,24 @@ const Navbar = () => {
         </>
       ) : (
         <>
-          <form className="nav__form--login">
-            <input type="email" placeholder="E-mail" />
-            <input type="password" placeholder="Senha" />
-            <button type="submit" className="register__btn--primary">
-              Entrar
-            </button>
+          <form onSubmit={handleSubmit} className="nav__form--login">
+            <input
+              type="email"
+              placeholder="E-mail"
+              onChange={(e) => setEmail(e.target.value)}
+              value={email || ""}
+            />
+            <input
+              type="password"
+              placeholder="Senha"
+              onChange={(e) => setPassword(e.target.value)}
+              value={password || ""}
+            />
+            <input
+              type="submit"
+              value="Entrar"
+              className="register__btn--primary"
+            />
           </form>
         </>
       )}

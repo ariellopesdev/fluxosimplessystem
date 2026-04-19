@@ -25,9 +25,8 @@
 
 /************ AUTH-FORM ************/
 
-.form__login {
+.auth__container {
   width: 380px;
-  height: fit-content;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -38,6 +37,13 @@
   box-shadow:
     0 2px 4px rgba(0, 0, 0, 0.1),
     0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.form__login {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .form__login input {
@@ -70,24 +76,24 @@
   background-color: var(--primary-hover);
 }
 
-.form__login .forgotPassword {
+.auth__container .forgotPassword {
   text-align: center;
   font-size: clamp(0.75rem, 1.2vw, 0.875rem);
-  color: var(--primary);
+  color: var(--text-light);
   text-decoration: none;
 }
 
-.form__login .forgotPassword:hover {
+.auth__container .forgotPassword:hover {
   text-decoration: underline;
 }
 
-.form__login hr {
+.auth__container hr {
   border: none;
   border-top: 1px solid var(--border);
   margin: 10px 0;
 }
 
-.form__login .auth__btn--secondary {
+.auth__container .auth__btn--secondary {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -102,7 +108,7 @@
   text-decoration: none;
 }
 
-.form__login .auth__btn--secondary:hover {
+.auth__container .auth__btn--secondary:hover {
   background-color: var(--primary-hover);
 }
 
