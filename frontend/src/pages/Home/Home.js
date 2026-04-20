@@ -30,8 +30,6 @@ const Home = () => {
       password,
     };
 
-    console.log(user);
-
     dispatch(login(user));
   };
 

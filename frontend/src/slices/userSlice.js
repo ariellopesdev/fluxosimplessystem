@@ -9,7 +9,7 @@ const initialState = {
   message: null,
 };
 
-//Get user details
+//Get user details, for edit data
 export const profile = createAsyncThunk(
   "user/profile",
   async (user, thunkAPI) => {
@@ -38,6 +38,18 @@ export const updateProfile = createAsyncThunk(
   },
 );
 
+//Get user details
+export const getUserDetails = createAsyncThunk(
+  "user/get",
+  async (id, thunkAPI) => {
+    const token = thunkAPI.getState().auth.user.token;
+
+    const data = await userService.getUserDetails(id, token);
+
+    return data;
+  },
+);
+
 export const userSlice = createSlice({
   name: "user",
   initialState,
@@ -50,7 +62,7 @@ export const userSlice = createSlice({
     builder
       .addCase(profile.pending, (state) => {
         state.loading = true;
-        state.error = false;
+        state.error = null;
       })
       .addCase(profile.fulfilled, (state, action) => {
         state.loading = false;
@@ -58,21 +70,31 @@ export const userSlice = createSlice({
         state.error = null;
         state.user = action.payload;
       })
-      .addCase(update.pending, (state) => {
+      .addCase(updateProfile.pending, (state) => {
         state.loading = true;
-        state.error = false;
+        state.error = null;
       })
-      .addCase(update.fulfilled, (state, action) => {
+      .addCase(updateProfile.fulfilled, (state, action) => {
         state.loading = false;
         state.success = true;
         state.error = null;
         state.user = action.payload;
         state.message = "Usuário atualizado com sucesso!";
       })
-      .addCase(update.rejected, (state, action) => {
+      .addCase(updateProfile.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
         state.user = null;
+      })
+      .addCase(getUserDetails.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getUserDetails.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = true;
+        state.error = null;
+        state.user = action.payload;
       });
   },
 });

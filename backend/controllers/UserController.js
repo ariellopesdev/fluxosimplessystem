@@ -113,7 +113,8 @@ const update = async (req, res) => {
 
   const reqUser = req.user;
 
-  const user = await User.findById(mongoose.Types.ObjectId(reqUser._id)).select(
+  //I had to digit new before mongoose.Types to fix the bug about internal error 500.
+  const user = await User.findById(new mongoose.Types.ObjectId(reqUser._id)).select(
     "-password",
   );
 

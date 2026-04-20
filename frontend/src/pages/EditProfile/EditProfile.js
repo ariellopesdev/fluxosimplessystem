@@ -9,7 +9,7 @@ import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
 //Redux
-import { profile, resetMessage } from "../../slices/userSlice";
+import { profile, resetMessage, updateProfile } from "../../slices/userSlice";
 
 //Components
 import Message from "../../components/Message/Message";
@@ -42,8 +42,34 @@ const EditProfile = () => {
     }
   }, [user]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    //Gather user data from states
+    const userData = { name };
+
+    if (profileImage) {
+      userData.profileImage = profileImage;
+    }
+
+    if (password) {
+      userData.password = password;
+    }
+
+    // build form data
+    const formData = new FormData();
+
+    const userFormData = Object.keys(userData).forEach((key) =>
+      formData.append(key, userData[key]),
+    );
+
+    formData.append("user", userFormData);
+
+    await dispatch(updateProfile(formData));
+
+    setTimeout(() => {
+      dispatch(resetMessage());
+    }, 2000);
   };
 
   const handleFile = (e) => {
@@ -60,7 +86,8 @@ const EditProfile = () => {
       <h2 className="editProfile__title">Edite seus dados</h2>
       <p className="editProfile__subtitle">Adicione uma imagem de perfil.</p>
       {(user.profileImage || previewImage) && (
-        <img className="editProfile__image"
+        <img
+          className="editProfile__image"
           src={
             previewImage
               ? URL.createObjectURL(previewImage)
@@ -102,7 +129,23 @@ const EditProfile = () => {
             value={password || ""}
           />
         </label>
-        <input type="submit" value="Atualizar dados" />
+        {!loading && (
+          <input
+            type="submit"
+            value="Atualizar"
+            className="auth__btn--primary"
+          />
+        )}
+        {loading && (
+          <input
+            type="submit"
+            value="Aguarde..."
+            className="auth__btn--primary"
+            disabled
+          />
+        )}
+        {error && <Message msg={error} type="error" />}
+        {message && <Message msg={message} type="success" />}
       </form>
     </div>
   );
