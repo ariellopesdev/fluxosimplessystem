@@ -4,11 +4,12 @@ const { Schema } = mongoose;
 const productSchema = new Schema(
   {
     name: String,
-    image: String,
-    quantity: Number,
-    price: Number,
     description: String,
+    price: Number,
     category: String,
+    sku: String,
+    stock: Number,
+    image: String,
     company: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Company",
