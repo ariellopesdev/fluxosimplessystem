@@ -3,48 +3,87 @@ import "./Aside.css";
 
 //Icons
 import {
-  FiHome, 
-  FiUser, 
-  FiBox, 
-  FiPackage, 
+  FiHome,
+  FiUser,
+  FiBox,
+  FiPackage,
   FiCalendar,
-  FiBarChart2, 
-  FiSettings, 
-  FiHelpCircle, 
+  FiBarChart2,
+  FiSettings,
+  FiHelpCircle,
 } from "react-icons/fi";
 
 //Components
 import { NavLink } from "react-router-dom";
 
-const Aside = () => {
+const Aside = ({ setPage, page }) => {
   return (
-    <aside id="aside">      
+    <aside id="aside">
       <div className="dashboard__container--menu">
         <ul className="dashboard__menu">
-          <li className="dashboard__menu--item dashboard__menu--item--active">
-            <FiHome className="dashboard__icons"/>  Dashboard
+          <li
+            className={`dashboard__menu--item ${
+              page === "dashboard" ? "dashboard__menu--item--active" : ""
+            }`}
+            onClick={() => setPage("dashboard")}
+          >
+            <FiHome className="dashboard__icons" /> Dashboard
           </li>
-          <hr className="dashboard__divider" />
-          <li className="dashboard__menu--item">
-            <FiUser className="dashboard__icons"/>  Perfil
+          <li
+            className={`dashboard__menu--item ${
+              page === "profile" ? "dashboard__menu--item--active" : ""
+            }`}
+            onClick={() => setPage("profile")}
+          >
+            <FiUser className="dashboard__icons" /> Perfil
           </li>
-          <li className="dashboard__menu--item">
-            <FiBox className="dashboard__icons"/>  Estoque
+          <li
+            className={`dashboard__menu--item ${
+              page === "stock" ? "dashboard__menu--item--active" : ""
+            }`}
+            onClick={() => setPage("stock")}
+          >
+            <FiBox className="dashboard__icons" /> Estoque
           </li>
-          <li className="dashboard__menu--item">
-            <FiPackage className="dashboard__icons"/>  Produtos
+          <li
+            className={`dashboard__menu--item ${
+              page === "products" ? "dashboard__menu--item--active" : ""
+            }`}
+            onClick={() => setPage("products")}
+          >
+            <FiPackage className="dashboard__icons" /> Produtos
           </li>
-          <li className="dashboard__menu--item">
-            <FiCalendar className="dashboard__icons"/>  Agendamentos
+          <li
+            className={`dashboard__menu--item ${
+              page === "appointment" ? "dashboard__menu--item--active" : ""
+            }`}
+            onClick={() => setPage("appointment")}
+          >
+            <FiCalendar className="dashboard__icons" /> Agendamentos
           </li>
-          <li className="dashboard__menu--item">
-            <FiBarChart2 className="dashboard__icons"/>  Relatórios
+          <li
+            className={`dashboard__menu--item ${
+              page === "reports" ? "dashboard__menu--item--active" : ""
+            }`}
+            onClick={() => setPage("reports")}
+          >
+            <FiBarChart2 className="dashboard__icons" /> Relatórios
           </li>
-          <li className="dashboard__menu--item">
-            <FiSettings className="dashboard__icons"/>  Configurações
+          <li
+            className={`dashboard__menu--item ${
+              page === "settings" ? "dashboard__menu--item--active" : ""
+            }`}
+            onClick={() => setPage("settings")}
+          >
+            <FiSettings className="dashboard__icons" /> Configurações
           </li>
-          <li className="dashboard__menu--item">
-            <FiHelpCircle className="dashboard__icons"/>  Ajuda
+          <li
+            className={`dashboard__menu--item ${
+              page === "help" ? "dashboard__menu--item--active" : ""
+            }`}
+            onClick={() => setPage("help")}
+          >
+            <FiHelpCircle className="dashboard__icons" /> Ajuda
           </li>
         </ul>
       </div>

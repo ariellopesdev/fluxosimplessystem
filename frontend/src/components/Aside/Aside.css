@@ -12,10 +12,6 @@
   padding: 20px;
 }
 
-.dashboard__divider {
-    border: 1px solid var(--border);
-}
-
 .dashboard__menu {
   list-style-type: none;
   font-size: clamp(0.75rem, 2vw, 1.2rem);

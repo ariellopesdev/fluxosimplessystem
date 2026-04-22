@@ -6,12 +6,16 @@ import Navbar from "../../components/Navbar/Navbar";
 import Aside from "../../components/Aside/Aside";
 import Main from "../../components/Main/Main";
 
+//Hooks
+import { useState } from "react";
+
 const Painel = () => {
+  const [page, setPage] = useState("dashboard");
   return (
     <div>
       <Navbar />
-      <Aside />
-      <Main />
+      <Aside setPage={setPage} page={page} />
+      <Main page={page} />
     </div>
   );
 };
