@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 
 // 🔹 CREATE PRODUCT
 const createProduct = async (req, res) => {
-  const { name, quantity, price, description, category } = req.body;
+  const { name, description, price, category, sku, stock, image } = req.body;
 
   let image = null;
 
