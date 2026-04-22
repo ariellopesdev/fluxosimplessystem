@@ -8,16 +8,8 @@
   color: var(--border);
 }
 
-.dashboard__container--title,
 .dashboard__container--menu {
   padding: 20px;
-}
-
-.dashboard__container--title h1 {
-  font-size: clamp(0.75rem, 2vw, 1.3rem);
-  font-weight: var(--weight-400);
-  display: flex;
-  align-items: center;
 }
 
 .dashboard__divider {

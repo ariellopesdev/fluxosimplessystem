@@ -13,18 +13,19 @@ import {
   FiHelpCircle, 
 } from "react-icons/fi";
 
+//Components
+import { NavLink } from "react-router-dom";
+
 const Aside = () => {
   return (
-    <aside id="aside">
-      <div className="dashboard__container--title">
-        <h1>
-          <FiHome className="dashboard__icons"/>Dashboard
-        </h1>
-      </div>
-      <hr className="dashboard__divider" />
+    <aside id="aside">      
       <div className="dashboard__container--menu">
         <ul className="dashboard__menu">
           <li className="dashboard__menu--item dashboard__menu--item--active">
+            <FiHome className="dashboard__icons"/>  Dashboard
+          </li>
+          <hr className="dashboard__divider" />
+          <li className="dashboard__menu--item">
             <FiUser className="dashboard__icons"/>  Perfil
           </li>
           <li className="dashboard__menu--item">

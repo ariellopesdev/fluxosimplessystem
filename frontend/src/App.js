@@ -11,6 +11,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home/Home";
 import Painel from "./pages/Painel/Painel";
 import Register from "./pages/Register/Register";
+import Dashboard from "./pages/Dashboard/Dashboard";
 import EditProfile from "./pages/EditProfile/EditProfile";
 import Stock from "./pages/Stock/Stock";
 import Product from "./pages/Product/Product";
@@ -37,6 +38,10 @@ function App() {
           <Route
             path="/register"
             element={!auth ? <Register /> : <Navigate to="/painel" />}
+          />
+          <Route
+            path="/dashboard"
+            element={auth ? <Dashboard /> : <Navigate to="/" />}
           />
           <Route
             path="/profile"
