@@ -1,0 +1,52 @@
+.product__header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.product__btn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.product__cards {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.product__filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.product__filters input,
+.product__filters select {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.product__table table {
+  width: 100%;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.product__table th, td {
+  padding: 12px;
+}
+
+.status.active {
+  color: green;
+}
+
+.status.inactive {
+  color: red;
+}

@@ -11,35 +11,25 @@ import Reports from "../../pages/Reports/Reports";
 import Settings from "../../pages/Settings/Settings";
 import Help from "../../pages/Help/Help";
 
-//Components
-import UnderConstruction from "../UnderConstruction/UnderConstruction";
-
 const Main = ({ page }) => {
   const renderPage = () => {
     switch (page) {
       case "dashboard":
-        // return <Dashboard />;
-        return <UnderConstruction title="Dashboard" />;
+        return <Dashboard />;
       case "profile":
         return <EditProfile />;
       case "stock":
-        // return <Stock />;
-        return <UnderConstruction title="Estoque" />;
+        return <Stock />;
       case "products":
-        // return <Product />;
-        return <UnderConstruction title="Produtos" />;
+        return <Product />;
       case "appointment":
-        // return <Appointment />;
-        return <UnderConstruction title="Agendamentos" />;
+        return <Appointment />;
       case "reports":
-        // return <Reports />;
-        return <UnderConstruction title="Relatórios" />;
+        return <Reports />;
       case "settings":
-        // return <Settings />;
-        return <UnderConstruction title="Configurações" />;
+        return <Settings />;
       case "help":
-        // return <Help />;
-        return <UnderConstruction title="Ajuda" />;
+        return <Help />;
     }
   };
   return (

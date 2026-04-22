@@ -1,0 +1,73 @@
+.appointment__header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.appointment__btn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 6px;
+}
+
+.appointment__cards {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.appointment__content {
+  display: flex;
+  gap: 20px;
+}
+
+.calendar {
+  flex: 1;
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.calendar__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+}
+
+.calendar__day {
+  padding: 10px;
+  text-align: center;
+  background: #f5f5f5;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.calendar__day:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.appointment__list {
+  flex: 1;
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.appointment__item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 6px;
+}
+
+.pending {
+  background: #fff3cd;
+}
+
+.confirmed {
+  background: #d4edda;
+}

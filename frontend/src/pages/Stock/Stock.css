@@ -1,0 +1,47 @@
+.stock__header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.stock__btn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.stock__cards {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.card {
+  flex: 1;
+  padding: 20px;
+  border-radius: 10px;
+  color: white;
+}
+
+.green { background: #2ecc71; }
+.orange { background: #f39c12; }
+.blue { background: #3498db; }
+.teal { background: #1abc9c; }
+
+.stock__table table {
+  width: 100%;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.stock__table th, td {
+  padding: 12px;
+  text-align: left;
+}
+
+.status.ok { color: green; }
+.status.low { color: red; }

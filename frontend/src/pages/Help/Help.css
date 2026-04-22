@@ -1,0 +1,55 @@
+.help__header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.help__search {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.help__cards {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.card__item {
+  flex: 1;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.help__faq {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.faq__item {
+  border-bottom: 1px solid #eee;
+  padding: 10px 0;
+  cursor: pointer;
+}
+
+.help__support {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.help__support button {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+}
