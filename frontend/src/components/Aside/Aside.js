@@ -3,14 +3,14 @@ import "./Aside.css";
 
 //Icons
 import {
-  FiHome, // dashboard
-  FiUser, // perfil
-  FiBox, // estoque
-  FiPackage, // produtos
-  FiCalendar, // agendamentos
-  FiBarChart2, // relatórios
-  FiSettings, // configurações
-  FiHelpCircle, // ajuda
+  FiHome, 
+  FiUser, 
+  FiBox, 
+  FiPackage, 
+  FiCalendar,
+  FiBarChart2, 
+  FiSettings, 
+  FiHelpCircle, 
 } from "react-icons/fi";
 
 const Aside = () => {

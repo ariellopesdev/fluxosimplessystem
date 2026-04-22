@@ -140,7 +140,11 @@ const update = async (req, res) => {
 
   await user.save();
 
-  res.status(200).json(user);
+  const updatedUser = await User.findById(user._id)
+    .populate("company")
+    .select("-password");
+
+  res.status(200).json(updatedUser);
 };
 
 // Get user by id
