@@ -12,7 +12,6 @@ import Home from "./pages/Home/Home";
 import Painel from "./pages/Painel/Painel";
 import Register from "./pages/Register/Register";
 import Dashboard from "./pages/Dashboard/Dashboard";
-import EditProfile from "./pages/EditProfile/EditProfile";
 import Stock from "./pages/Stock/Stock";
 import Product from "./pages/Product/Product";
 import Appointment from "./pages/Appointment/Appointment";
@@ -42,10 +41,6 @@ function App() {
           <Route
             path="/dashboard"
             element={auth ? <Dashboard /> : <Navigate to="/" />}
-          />
-          <Route
-            path="/profile"
-            element={auth ? <EditProfile /> : <Navigate to="/" />}
           />
           <Route
             path="/stock"

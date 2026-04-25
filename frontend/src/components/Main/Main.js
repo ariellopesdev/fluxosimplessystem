@@ -3,7 +3,6 @@ import "./Main.css";
 
 //Pages
 import Dashboard from "../../pages/Dashboard/Dashboard";
-import EditProfile from "../../pages/EditProfile/EditProfile";
 import Stock from "../../pages/Stock/Stock";
 import Product from "../../pages/Product/Product";
 import Appointment from "../../pages/Appointment/Appointment";
@@ -16,8 +15,6 @@ const Main = ({ page }) => {
     switch (page) {
       case "dashboard":
         return <Dashboard />;
-      case "profile":
-        return <EditProfile />;
       case "stock":
         return <Stock />;
       case "products":
