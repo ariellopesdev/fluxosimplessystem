@@ -2,30 +2,27 @@ const Product = require("../models/Product");
 
 const mongoose = require("mongoose");
 
-// Insert a product
-const insertProduct = async (req, res) => {
+// Create a product
+const createProduct = async (req, res) => {
   const { name, description, price } = req.body;
 
-  let image = null;
+  let productImage = null;
 
   if (req.file) {
-    image = req.file.filename;
+    productImage = req.file.filename;
   }
 
   const reqUser = req.user;
 
-  // Get authenticated user
-  const user = reqUser;
-
-  // Check if product already exists in same company/cnpj
+  // Check if product already exists in same company
   const productExists = await Product.findOne({
     name,
-    cnpj: user.company.cnpj,
+    cnpj: reqUser.company.cnpj,
   });
 
   if (productExists) {
     res.status(422).json({
-      errors: ["Este produto já foi cadastrado para esta empresa."],
+      errors: ["Este produto já está cadastrado para esta empresa."],
     });
 
     return;
@@ -36,15 +33,15 @@ const insertProduct = async (req, res) => {
     name,
     description,
     price,
-    image,
-    company: user.company._id,
-    cnpj: user.company.cnpj,
+    productImage,
+    company: reqUser.company._id,
+    cnpj: reqUser.company.cnpj,
   });
 
   // Error handling
   if (!newProduct) {
     res.status(422).json({
-      errors: ["Houve um erro, por favor tente novamente mais tarde."],
+      errors: ["Houve um erro, tente novamente mais tarde."],
     });
 
     return;
@@ -55,7 +52,11 @@ const insertProduct = async (req, res) => {
 
 // Get all products
 const getAllProducts = async (req, res) => {
-  const products = await Product.find({})
+  const reqUser = req.user;
+
+  const products = await Product.find({
+    company: reqUser.company._id,
+  })
     .sort([["createdAt", -1]])
     .populate("company");
 
@@ -65,6 +66,8 @@ const getAllProducts = async (req, res) => {
 // Get product by id
 const getProductById = async (req, res) => {
   const { id } = req.params;
+
+  const reqUser = req.user;
 
   try {
     const product = await Product.findById(
@@ -80,13 +83,20 @@ const getProductById = async (req, res) => {
       return;
     }
 
+    // Check ownership
+    if (product.company._id.toString() !== reqUser.company._id.toString()) {
+      res.status(403).json({
+        errors: ["Acesso negado."],
+      });
+
+      return;
+    }
+
     res.status(200).json(product);
   } catch (error) {
     res.status(404).json({
       errors: ["Produto não encontrado."],
     });
-
-    return;
   }
 };
 
@@ -104,9 +114,7 @@ const updateProduct = async (req, res) => {
 
   const reqUser = req.user;
 
-  const product = await Product.findById(
-    new mongoose.Types.ObjectId(id),
-  );
+  const product = await Product.findById(new mongoose.Types.ObjectId(id));
 
   // Check if product exists
   if (!product) {
@@ -153,9 +161,7 @@ const deleteProduct = async (req, res) => {
 
   const reqUser = req.user;
 
-  const product = await Product.findById(
-    new mongoose.Types.ObjectId(id),
-  );
+  const product = await Product.findById(new mongoose.Types.ObjectId(id));
 
   // Check if product exists
   if (!product) {
