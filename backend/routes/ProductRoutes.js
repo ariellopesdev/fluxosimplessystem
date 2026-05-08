@@ -4,7 +4,7 @@ const router = express.Router();
 // Controller
 const {
   createProduct,
-  getProduct,
+  getAllProducts,
   getProductById,
   updateProduct,
   deleteProduct,
@@ -31,7 +31,7 @@ router.post(
   createProduct,
 );
 
-router.get("/", authGuard, getProduct);
+router.get("/", authGuard, getAllProducts);
 
 router.get("/:id", authGuard, getProductById);
 

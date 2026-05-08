@@ -190,7 +190,7 @@ const deleteProduct = async (req, res) => {
 };
 
 module.exports = {
-  insertProduct,
+  createProduct,
   getAllProducts,
   getProductById,
   updateProduct,
