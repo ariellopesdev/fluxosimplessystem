@@ -4,7 +4,9 @@ const mongoose = require("mongoose");
 
 // Create a product
 const createProduct = async (req, res) => {
-  const { name, description, price } = req.body;
+  const { name, stock, unityPrice } = req.body;
+
+  const totalPrice = Number(stock) * Number(unityPrice);
 
   let productImage = null;
 
@@ -31,11 +33,12 @@ const createProduct = async (req, res) => {
   // Create product
   const newProduct = await Product.create({
     name,
-    description,
-    price,
+    stock,
+    unityPrice,
+    totalPrice,
     productImage,
-    company: reqUser.company._id,
-    cnpj: reqUser.company.cnpj,
+    company: req.user.company,
+    cnpj: req.user.cnpj,
   });
 
   // Error handling
@@ -104,7 +107,9 @@ const getProductById = async (req, res) => {
 const updateProduct = async (req, res) => {
   const { id } = req.params;
 
-  const { name, description, price } = req.body;
+  const { name, stock, unityPrice } = req.body;
+
+  const totalPrice = Number(stock) * Number(unityPrice);
 
   let image = null;
 
@@ -134,48 +139,45 @@ const updateProduct = async (req, res) => {
     return;
   }
 
+  // UPDATE FIELDS
   if (name) {
     product.name = name;
   }
 
-  if (description) {
-    product.description = description;
+  if (stock !== undefined) {
+    product.stock = stock;
   }
 
-  if (price) {
-    product.price = price;
+  if (unityPrice !== undefined) {
+    product.unityPrice = unityPrice;
   }
 
+  // recalcula automaticamente
+  product.totalPrice = totalPrice;
+
+  // update image
   if (image) {
-    product.image = image;
+    product.productImage = image;
   }
 
   await product.save();
 
-  res.status(200).json(product);
+  const updatedProduct = await Product.findById(product._id).populate(
+    "company",
+  );
+
+  res.status(200).json(updatedProduct);
 };
 
 // Delete a product
 const deleteProduct = async (req, res) => {
   const { id } = req.params;
 
-  const reqUser = req.user;
+  const product = await Product.findById(id);
 
-  const product = await Product.findById(new mongoose.Types.ObjectId(id));
-
-  // Check if product exists
   if (!product) {
     res.status(404).json({
       errors: ["Produto não encontrado."],
-    });
-
-    return;
-  }
-
-  // Check if product belongs to company
-  if (product.company.toString() !== reqUser.company._id.toString()) {
-    res.status(403).json({
-      errors: ["Acesso negado."],
     });
 
     return;

@@ -6,37 +6,41 @@ const productCreateValidation = () => {
       .isString()
       .withMessage("O nome do produto é obrigatório.")
       .isLength({ min: 3 })
-      .withMessage("O nome do produto precisa ter no mínimo 3 caracteres."),
+      .withMessage("O nome precisa ter no mínimo 3 caracteres."),
 
-    body("description")
-      .optional()
-      .isString()
-      .withMessage("A descrição precisa ser um texto."),
-
-    body("price")
+    body("stock")
       .notEmpty()
-      .withMessage("O preço do produto é obrigatório.")
+      .withMessage("O estoque é obrigatório.")
+      .isInt({ min: 0 })
+      .withMessage("O estoque precisa ser um número válido."),
+
+    body("unityPrice")
+      .notEmpty()
+      .withMessage("O preço unitário é obrigatório.")
       .isFloat({ gt: 0 })
-      .withMessage("O preço precisa ser maior que zero."),
+      .withMessage("O preço unitário precisa ser maior que zero."),
   ];
 };
 
 const productUpdateValidation = () => {
   return [
     body("name")
-      .optional()
-      .isLength({ min: 3 })
-      .withMessage("O nome do produto precisa ter no mínimo 3 caracteres."),
-
-    body("description")
-      .optional()
       .isString()
-      .withMessage("A descrição precisa ser um texto."),
+      .withMessage("O nome do produto é obrigatório.")
+      .isLength({ min: 3 })
+      .withMessage("O nome precisa ter no mínimo 3 caracteres."),
 
-    body("price")
-      .optional()
+    body("stock")
+      .notEmpty()
+      .withMessage("O estoque é obrigatório.")
+      .isInt({ min: 0 })
+      .withMessage("O estoque precisa ser um número válido."),
+
+    body("unityPrice")
+      .notEmpty()
+      .withMessage("O preço unitário é obrigatório.")
       .isFloat({ gt: 0 })
-      .withMessage("O preço precisa ser maior que zero."),
+      .withMessage("O preço unitário precisa ser maior que zero."),
   ];
 };
 

@@ -95,12 +95,14 @@ export const productSlice = createSlice({
   reducers: {
     resetMessage: (state) => {
       state.message = null;
+      state.error = null;
     },
 
     reset: (state) => {
       state.loading = false;
       state.error = false;
       state.success = false;
+      state.message = null;
     },
   },
 
@@ -115,11 +117,14 @@ export const productSlice = createSlice({
         state.loading = false;
         state.success = true;
         state.error = null;
+
         state.products.unshift(action.payload);
+
         state.message = "Produto cadastrado com sucesso!";
       })
       .addCase(createProduct.rejected, (state, action) => {
         state.loading = false;
+        state.success = false;
         state.error = action.payload;
       })
 
@@ -132,7 +137,13 @@ export const productSlice = createSlice({
         state.loading = false;
         state.success = true;
         state.error = null;
+
         state.products = action.payload;
+      })
+      .addCase(getProducts.rejected, (state, action) => {
+        state.loading = false;
+        state.success = false;
+        state.error = action.payload;
       })
 
       // Get product by id
@@ -144,7 +155,13 @@ export const productSlice = createSlice({
         state.loading = false;
         state.success = true;
         state.error = null;
+
         state.product = action.payload;
+      })
+      .addCase(getProductById.rejected, (state, action) => {
+        state.loading = false;
+        state.success = false;
+        state.error = action.payload;
       })
 
       // Update product
@@ -169,6 +186,7 @@ export const productSlice = createSlice({
       })
       .addCase(updateProduct.rejected, (state, action) => {
         state.loading = false;
+        state.success = false;
         state.error = action.payload;
       })
 
@@ -190,6 +208,7 @@ export const productSlice = createSlice({
       })
       .addCase(deleteProduct.rejected, (state, action) => {
         state.loading = false;
+        state.success = false;
         state.error = action.payload;
       });
   },
