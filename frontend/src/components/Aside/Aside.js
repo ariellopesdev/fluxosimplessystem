@@ -17,7 +17,14 @@ import {
 //Components
 import { NavLink } from "react-router-dom";
 
+//Hooks
+import { useSelector } from "react-redux";
+
 const Aside = ({ setPage, page }) => {
+  const { user } = useSelector((state) => state.auth);
+
+  const canRegisterUsers =
+    user?.role === "SUPER_ADMIN" || user?.role === "ADMIN";
   return (
     <aside id="aside">
       <div className="dashboard__container--menu">
@@ -62,14 +69,16 @@ const Aside = ({ setPage, page }) => {
           >
             <FiBarChart2 className="dashboard__icons" /> Relatórios
           </li>
-          <li
-            className={`dashboard__menu--item ${
-              page === "register" ? "dashboard__menu--item--active" : ""
-            }`}
-            onClick={() => setPage("register")}
-          >
-            <FiUsers className="dashboard__icons" /> Acessos
-          </li>
+          {canRegisterUsers && (
+            <li
+              className={`dashboard__menu--item ${
+                page === "register" ? "dashboard__menu--item--active" : ""
+              }`}
+              onClick={() => setPage("register")}
+            >
+              <FiUsers className="dashboard__icons" /> Acessos
+            </li>
+          )}
           <li
             className={`dashboard__menu--item ${
               page === "settings" ? "dashboard__menu--item--active" : ""

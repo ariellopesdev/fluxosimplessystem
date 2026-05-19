@@ -76,9 +76,12 @@ const register = async (req, res) => {
   }
 
   res.status(201).json({
-    _id: newUser._id,
-    token: generateToken(newUser._id),
-  });
+  _id: newUser._id,
+  name: newUser.name,
+  email: newUser.email,
+  role: newUser.role,
+  token: generateToken(newUser),
+});
 };
 
 // Sign user in
@@ -101,10 +104,13 @@ const login = async (req, res) => {
 
   // Return user with token
   res.status(201).json({
-    _id: user._id,
-    profileImage: user.profileImage,
-    token: generateToken(user._id),
-  });
+  _id: user._id,
+  name: user.name,
+  email: user.email,
+  profileImage: user.profileImage,
+  role: user.role,
+  token: generateToken(user),
+});
 };
 
 // Get current logged in user
