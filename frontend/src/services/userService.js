@@ -1,5 +1,20 @@
 import { api, requestConfig } from "../utils/config";
 
+//Create user
+const createUser = async (data, token) => {
+  const config = requestConfig("POST", data, token);
+
+  try {
+    const res = await fetch(api + "/users/register", config)
+      .then((res) => res.json())
+      .catch((err) => err);
+
+    return res;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 //Get logged user details
 const profile = async (data, token) => {
   const config = requestConfig("GET", data, token);
@@ -49,6 +64,7 @@ const userService = {
   profile,
   updateProfile,
   getUserDetails,
+  createUser,
 };
 
 export default userService;

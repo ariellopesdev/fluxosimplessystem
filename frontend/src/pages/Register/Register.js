@@ -3,16 +3,16 @@ import "./Register.css";
 
 //Components
 import { Link } from "react-router-dom";
-import Navbar from "../../components/Navbar/Navbar";
 import Message from "../../components/Message/Message";
-import Footer from "../../components/Footer/Footer";
 
 //Hooks
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
 //Redux
-import { register, reset } from "../../slices/authSlice";
+import { reset } from "../../slices/authSlice";
+import { createUser } from "../../slices/userSlice";
+import { resetMessage } from "../../slices/userSlice";
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -21,10 +21,49 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [cnpj, setCnpj] = useState("");
+  const [role, setRole] = useState("USER");
 
   const dispatch = useDispatch();
 
-  const { loading, error } = useSelector((state) => state.auth);
+  const { loading, error, success, message } = useSelector(
+    (state) => state.user,
+  );
+  const { user: loggedUser } = useSelector((state) => state.auth);
+
+  //Clean all auth states
+  useEffect(() => {
+    dispatch(reset());
+  }, [dispatch]);
+
+  //Clean all register states
+  useEffect(() => {
+    if (success) {
+      setName("");
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
+      setCompanyName("");
+      setCnpj("");
+      setRole("USER");
+    }
+  }, [success]);
+
+  useEffect(() => {
+  if (error || message) {
+    const timer = setTimeout(() => {
+      dispatch(resetMessage());
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }
+}, [error, message, dispatch]);
+
+  const canAccess =
+    loggedUser?.role === "SUPER_ADMIN" || loggedUser?.role === "ADMIN";
+
+  if (!canAccess) {
+    return <Message msg="Acesso negado." type="error" />;
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -36,24 +75,23 @@ const Register = () => {
       confirmPassword,
       companyName,
       cnpj,
+      role,
     };
 
     console.log(user);
 
-    dispatch(register(user));
+    dispatch(createUser(user));
   };
-
-  //Clean all auth states
-  useEffect(() => {
-    dispatch(reset());
-  }, [dispatch]);
 
   return (
     <div id="register">
-      <Navbar />
       <main id="register__main">
         <form onSubmit={handleSubmit} className="form__register">
-          <h2>Cadastre-se</h2>
+          <h2>Cadastre um usuário</h2>
+          <select onChange={(e) => setRole(e.target.value)} value={role}>
+            <option value="USER">Usuário</option>
+            <option value="ADMIN">Administrador</option>
+          </select>
           <input
             type="text"
             placeholder="Nome completo"
@@ -93,7 +131,7 @@ const Register = () => {
           {!loading && (
             <input
               type="submit"
-              value="Criar conta"
+              value="Cadastrar usuário"
               className="register__btn--primary"
             />
           )}
@@ -106,9 +144,9 @@ const Register = () => {
             />
           )}
           {error && <Message msg={error} type="error" />}
+          {message && <Message msg={message} type="success" />}
         </form>
       </main>
-      <Footer />
     </div>
   );
 };

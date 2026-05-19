@@ -50,6 +50,22 @@ export const getUserDetails = createAsyncThunk(
   },
 );
 
+//Create user
+export const createUser = createAsyncThunk(
+  "user/create",
+  async (user, thunkAPI) => {
+    const token = thunkAPI.getState().auth.user.token;
+
+    const data = await userService.createUser(user, token);
+
+    if (data.errors) {
+      return thunkAPI.rejectWithValue(data.errors[0]);
+    }
+
+    return data;
+  },
+);
+
 export const userSlice = createSlice({
   name: "user",
   initialState,
@@ -95,6 +111,20 @@ export const userSlice = createSlice({
         state.success = true;
         state.error = null;
         state.user = action.payload;
+      })
+      .addCase(createUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createUser.fulfilled, (state) => {
+        state.loading = false;
+        state.success = true;
+        state.error = null;
+        state.message = "Usuário criado com sucesso!";
+      })
+      .addCase(createUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });

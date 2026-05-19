@@ -1,41 +1,42 @@
-/************ MAIN (CENTRALIZAÇÃO REAL) ************/
-
-#register__main {
-  flex: 1; /* ocupa o espaço restante */
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 20px;
-}
-
 /************ FORM REGISTER ************/
 
 .form__register {
   width: 100%;
   max-width: 420px;
-
   display: flex;
   flex-direction: column;
   gap: 12px;
-
-  background-color: var(--surface);
-  padding: 30px;
-
-  border: 1px solid var(--border);
-  border-radius: 10px;
-
-  box-shadow:
-    0 2px 4px rgba(0, 0, 0, 0.08),
-    0 8px 20px rgba(0, 0, 0, 0.08);
 }
 
 .form__register h2 {
-  text-align: center;
   font-size: clamp(1.5rem, 2vw, 1.8rem);
   color: var(--text);
+  margin-bottom: 20px;
 }
+
+.form__register select {
+  height: 50px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: clamp(0.9rem, 1.5vw, 1rem);
+  background-color: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+
+/* foco igual input */
+.form__register select:focus {
+  border-color: var(--primary);
+  outline: none;
+}
+
+/* opcional: melhora aparência da seta no Chrome */
+/* .form__register select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+} */
 
 .form__register input {
   height: 50px;
@@ -63,12 +64,6 @@
 
 .register__btn--primary:hover {
   background-color: var(--primary-hover);
-}
-
-/************ FOOTER ************/
-
-#register footer {
-  border-top: 1px solid var(--border);
 }
 
 /************ RESPONSIVO ************/
