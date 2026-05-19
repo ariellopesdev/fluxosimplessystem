@@ -88,10 +88,6 @@ const Home = () => {
         <a href="#" className="forgotPassword">
           Esqueceu sua senha?
         </a>
-        <hr />
-        <Link to="/register" className="auth__btn--secondary">
-          Criar uma conta
-        </Link>
       </div>
       <Footer />
     </div>

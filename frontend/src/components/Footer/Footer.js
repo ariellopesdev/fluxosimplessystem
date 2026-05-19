@@ -4,10 +4,6 @@ const Footer = () => {
   return (
     <footer id="footer">
       <div className="footer--links">
-        <a>Cadastre-se</a>
-        <a>Entrar</a>
-      </div>
-      <div className="footer--links">
         <a>Política de Privacidade</a>
         <a>Central de Privacidade</a>
         <a>Sobre</a>

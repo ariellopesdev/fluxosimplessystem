@@ -87,31 +87,6 @@
   text-decoration: underline;
 }
 
-.auth__container hr {
-  border: none;
-  border-top: 1px solid var(--border);
-  margin: 10px 0;
-}
-
-.auth__container .auth__btn--secondary {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 48px;
-  background-color: var(--primary-light);
-  color: var(--surface);
-  border: none;
-  border-radius: 6px;
-  font-size: clamp(0.9rem, 1.5vw, 1rem);
-  font-weight: bold;
-  cursor: pointer;
-  text-decoration: none;
-}
-
-.auth__container .auth__btn--secondary:hover {
-  background-color: var(--primary-hover);
-}
-
 @media (max-width: 768px) {
   #home {
     flex-direction: column;
