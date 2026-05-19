@@ -7,6 +7,11 @@ const userSchema = new Schema(
     email: String,
     password: String,
     profileImage: String,
+    role: {
+      type: String,
+      enum: ["SUPER_ADMIN", "ADMIN", "USER"],
+      default: "USER",
+    },
     company: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Company",
