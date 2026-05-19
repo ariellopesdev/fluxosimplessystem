@@ -11,15 +11,22 @@ const Company = require("../models/Company");
 
 // Generate user token
 
-const generateToken = (id) => {
-  return jwt.sign({ id }, jwtSecret, {
-    expiresIn: "7d",
-  });
+const generateToken = (user) => {
+  return jwt.sign(
+    {
+      id: user._id,
+      role: user.role,
+    },
+    jwtSecret,
+    {
+      expiresIn: "7d",
+    },
+  );
 };
 
 // Register user and sign in
 const register = async (req, res) => {
-  const { name, email, password, companyName, cnpj } = req.body;
+  const { name, email, password, companyName, cnpj, role } = req.body;
 
   // Check if user exists
   const user = await User.findOne({ email });
@@ -40,6 +47,13 @@ const register = async (req, res) => {
     });
   }
 
+  // Prevent unauthorized SUPER_ADMIN creation
+  if (role === "SUPER_ADMIN" && req.user.role !== "SUPER_ADMIN") {
+    return res.status(403).json({
+      errors: ["You do not have permission to create SUPER_ADMIN users."],
+    });
+  }
+
   // Generate password hase
   const salt = await bcrypt.genSalt();
   const passwordHash = await bcrypt.hash(password, salt);
@@ -50,6 +64,7 @@ const register = async (req, res) => {
     email,
     password: passwordHash,
     company: company._id,
+    role: role || "USER",
   });
 
   // If user was created successfully, return the token
@@ -114,9 +129,9 @@ const update = async (req, res) => {
   const reqUser = req.user;
 
   //I had to digit new before mongoose.Types to fix the bug about internal error 500.
-  const user = await User.findById(new mongoose.Types.ObjectId(reqUser._id)).select(
-    "-password",
-  );
+  const user = await User.findById(
+    new mongoose.Types.ObjectId(reqUser._id),
+  ).select("-password");
 
   if (name) {
     user.name = name;
