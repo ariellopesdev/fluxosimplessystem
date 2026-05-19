@@ -3,48 +3,72 @@ const { body } = require("express-validator");
 const userCreateValidation = () => {
   return [
     body("name")
+      .trim()
+      .notEmpty()
       .isString()
-      .withMessage("O nome do usuário é obrigatório.")
+      .withMessage("Nome é obrigatório.")
       .isLength({ min: 3 })
-      .withMessage("O nome do usuário precisa ter no mínimo 3 caracteres."),
+      .withMessage("Nome deve ter pelo menos 3 caracteres."),
     body("email")
+      .trim()
+      .normalizeEmail()
+      .notEmpty()
       .isString()
-      .withMessage("O campo e-mail é obrigatório.")
+      .withMessage("E-mail é obrigatório.")
       .isEmail()
-      .withMessage("Insira um e-mail válido."),
+      .withMessage("E-mail inválido."),
     body("password")
+      .trim()
+      .notEmpty()
       .isString()
-      .withMessage("A senha é obrigatória.")
+      .withMessage("Senha é obrigatória.")
       .isLength({ min: 6 })
-      .withMessage("A senha precisa ter no mínimo 6 caracteres."),
+      .withMessage("Senha precisa ter no mínimo 6 caracteres."),
     body("confirmPassword")
+      .trim()
+      .notEmpty()
       .isString()
-      .withMessage("A confirmação de senha é obrigatória.")
+      .withMessage("Confirmação de senha é obrigatório.")
       .custom((value, { req }) => {
         if (value != req.body.password) {
-          throw new Error("As senhas não são iguais.");
+          throw new Error("As senhas não coincidem.");
         }
         return true;
       }),
     body("companyName")
+      .trim()
+      .notEmpty()
       .isString()
-      .withMessage("O nome da empresa é obrigatório."),
+      .withMessage("Nome da empresa é obrigatório.")
+      .isLength({ min: 2 })
+      .withMessage("Nome da empresa muito curto."),
     body("cnpj")
+      .trim()
+      .notEmpty()
       .isString()
-      .withMessage("O CNPJ da empresa é obrigatório.")
+      .withMessage("CNPJ da empresa é obrigatório.")
       .isLength({ min: 14, max: 14 })
-      .withMessage("O CNPJ deve conter exatamente 14 caracteres."),
+      .withMessage("CNPJ deve ter 14 dígitos.")
+      .isNumeric()
+      .withMessage("CNPJ deve conter apenas números."),
   ];
 };
 
 const loginValidation = () => {
   return [
     body("email")
+      .trim()
+      .normalizeEmail()
+      .notEmpty()
       .isString()
-      .withMessage("O campo e-mail é obrigatório.")
+      .withMessage("E-mail é obrigatório.")
       .isEmail()
-      .withMessage("Insira um e-mail válido."),
-    body("password").isString().withMessage("A senha é obrigatória."),
+      .withMessage("E-mail inválido."),
+    body("password")
+      .trim()
+      .notEmpty()
+      .isString()
+      .withMessage("A senha é obrigatória."),
   ];
 };
 
@@ -52,12 +76,14 @@ const userUpdateValidation = () => {
   return [
     body("name")
       .optional()
+      .trim()
       .isLength({ min: 3 })
-      .withMessage("O nome precisa de pelo menos 3 caracteres."),
+      .withMessage("Nome precisa de pelo menos 3 caracteres."),
     body("password")
       .optional()
+      .trim()
       .isLength({ min: 6 })
-      .withMessage("A senha precisa ter no mínimo 6 caracteres"),
+      .withMessage("Senha precisa ter no mínimo 6 caracteres."),
   ];
 };
 
