@@ -14,11 +14,11 @@
 
 .dashboard__menu {
   list-style-type: none;
-  font-size: clamp(0.75rem, 2vw, 1.2rem);
+  font-size: clamp(0.75rem, 2vw, 1.1rem);
 }
 
 .dashboard__menu--item {
-  padding: 12px 10px;
+  padding: 10px 8px;
   margin-bottom: 6px;
   border-radius: 6px;
   position: relative;

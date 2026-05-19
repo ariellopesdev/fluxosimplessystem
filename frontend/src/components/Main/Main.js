@@ -7,6 +7,7 @@ import Stock from "../../pages/Stock/Stock";
 import Product from "../../pages/Product/Product";
 import Appointment from "../../pages/Appointment/Appointment";
 import Reports from "../../pages/Reports/Reports";
+import Register from "../../pages/Register/Register";
 import Settings from "../../pages/Settings/Settings";
 import Help from "../../pages/Help/Help";
 
@@ -23,6 +24,8 @@ const Main = ({ page }) => {
         return <Appointment />;
       case "reports":
         return <Reports />;
+      case "register":
+        return <Register />;
       case "settings":
         return <Settings />;
       case "help":

@@ -9,6 +9,7 @@ import {
   FiPackage,
   FiCalendar,
   FiBarChart2,
+  FiUsers,
   FiSettings,
   FiHelpCircle,
 } from "react-icons/fi";
@@ -60,6 +61,14 @@ const Aside = ({ setPage, page }) => {
             onClick={() => setPage("reports")}
           >
             <FiBarChart2 className="dashboard__icons" /> Relatórios
+          </li>
+          <li
+            className={`dashboard__menu--item ${
+              page === "register" ? "dashboard__menu--item--active" : ""
+            }`}
+            onClick={() => setPage("register")}
+          >
+            <FiUsers className="dashboard__icons" /> Acessos
           </li>
           <li
             className={`dashboard__menu--item ${
