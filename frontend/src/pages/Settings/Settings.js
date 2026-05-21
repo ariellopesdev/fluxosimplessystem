@@ -90,38 +90,42 @@ const Settings = () => {
           <h2>Configurações</h2>
           <p>Gerencie seus dados e preferências</p>
         </div>
-        {(user.profileImage || previewImage) && (
-          <img
-            className="editProfile__image"
-            src={
-              previewImage
-                ? URL.createObjectURL(previewImage)
-                : `${uploads}/users/${user.profileImage}`
-            }
-            alt={user.name}
-          />
-        )}
+        <div className="settingsPage__profileSection">
+          {(user.profileImage || previewImage) && (
+            <img
+              className="editProfile__image"
+              src={
+                previewImage
+                  ? URL.createObjectURL(previewImage)
+                  : `${uploads}/users/${user.profileImage}`
+              }
+              alt={user.name}
+            />
+          )}
+          <div className="settingsPage__profileUpload">
+            <label>
+              <span>Imagem do Perfil</span>
+              <input type="file" onChange={handleFile} />
+            </label>
+          </div>
+        </div>
         <form onSubmit={handleSubmit}>
           {/* GRID */}
           <div className="settingsPage__grid">
             {/* CONTA */}
             <div className="settingsPage__card">
               <h3>Conta</h3>
-
               <input
                 type="text"
                 value={name || ""}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Nome completo"
               />
-
               <input type="email" value={email || ""} disabled />
             </div>
-
             {/* SEGURANÇA */}
             <div className="settingsPage__card">
               <h3>Segurança</h3>
-
               <input
                 type="password"
                 placeholder="Nova senha"
@@ -129,34 +133,25 @@ const Settings = () => {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
-
             {/* EMPRESA */}
             <div className="settingsPage__card">
               <h3>Empresa</h3>
-
               <input type="text" value={companyName || ""} disabled />
               <input type="text" value={cnpj || ""} disabled />
             </div>
-
             {/* PREFERÊNCIAS */}
             <div className="settingsPage__card">
               <h3>Preferências</h3>
               <label>
-                <span>Imagem do Perfil:</span>
-                <input type="file" onChange={handleFile} />
-              </label>
-              <label>
                 <input type="checkbox" />
                 Tema escuro
               </label>
-
               <label>
                 <input type="checkbox" />
                 Receber notificações
               </label>
             </div>
           </div>
-
           {!loading && (
             <input
               type="submit"
