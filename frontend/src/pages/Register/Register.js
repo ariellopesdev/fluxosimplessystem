@@ -23,6 +23,7 @@ const Register = () => {
   const [cnpj, setCnpj] = useState("");
   const [role, setRole] = useState("USER");
   const [cnpjError, setCnpjError] = useState("");
+  const [errors, setErrors] = useState({});
 
   const formatCNPJ = (value) => {
     value = value.replace(/\D/g, "");
@@ -42,6 +43,45 @@ const Register = () => {
       return;
     }
     setCnpjError("");
+  };
+
+  const validateField = (name, value) => {
+    let error = "";
+
+    switch (name) {
+      case "name":
+        if (value.length < 3) {
+          error = "O nome deve ter no mínimo 3 caracteres.";
+        }
+        break;
+      case "email":
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(value)) {
+          error = "Insira um e-mail válido.";
+        }
+        break;
+      case "password":
+        if (value.length < 6) {
+          error = "A senha deve ter no mínimo 6 caracteres.";
+        }
+        break;
+      case "confirmPassword":
+        if (value !== password) {
+          error = "As senhas não coincidem.";
+        }
+        break;
+      case "companyName":
+        if (value.length < 2) {
+          error = "O nome da empresa deve ter no mínimo 2 caracteres.";
+        }
+        break;
+      default:
+        break;
+    }
+    setErrors((prev) => ({
+      ...prev,
+      [name]: error,
+    }));
   };
 
   const dispatch = useDispatch();
@@ -107,56 +147,123 @@ const Register = () => {
   return (
     <div id="register">
       <main id="register__main">
-        <form onSubmit={handleSubmit} className="form__register">
+        <div className="register__header">
           <h2>Cadastre um usuário</h2>
-          <select onChange={(e) => setRole(e.target.value)} value={role}>
-            <option value="USER">Usuário</option>
-            <option value="ADMIN">Administrador</option>
-          </select>
-          <input
-            type="text"
-            placeholder="Nome completo"
-            onChange={(e) => setName(e.target.value)}
-            value={name || ""}
-          />
-          <input
-            type="email"
-            placeholder="E-mail"
-            onChange={(e) => setEmail(e.target.value)}
-            value={email || ""}
-          />
-          <input
-            type="password"
-            placeholder="Senha"
-            onChange={(e) => setPassword(e.target.value)}
-            value={password || ""}
-          />
-          <input
-            type="password"
-            placeholder="Confirme sua senha"
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            value={confirmPassword || ""}
-          />
-          <input
-            type="text"
-            placeholder="Nome da empresa"
-            onChange={(e) => setCompanyName(e.target.value)}
-            value={companyName || ""}
-          />
-          <input
-            type="text"
-            placeholder="CNPJ da empresa"
-            value={cnpj}
-            maxLength={18}
-            onChange={(e) => {
-              const formatted = formatCNPJ(e.target.value);
-
-              setCnpj(formatted);
-
-              validateCNPJ(formatted);
-            }}
-          />
-          {cnpjError && <Message msg={cnpjError} type="error" />}
+          <p>Preencha os dados para criar um novo acesso.</p>
+        </div>
+        <form onSubmit={handleSubmit} className="form__register">
+          <div className="form__group--register">
+            <label>Tipo de usuário</label>
+            <select onChange={(e) => setRole(e.target.value)} value={role}>
+              <option value="USER">Usuário</option>
+              <option value="ADMIN">Administrador</option>
+            </select>
+          </div>
+          <div className="form__group--register">
+            <label>Nome completo</label>
+            <input
+              type="text"
+              placeholder="Digite o nome completo"
+              value={name || ""}
+              onChange={(e) => {
+                setName(e.target.value);
+                validateField("name", e.target.value);
+              }}
+            />
+            {errors.name && <Message msg={errors.name} type="error" />}
+          </div>
+          <div className="form__group--register">
+            <label>E-mail</label>
+            <input
+              type="email"
+              placeholder="Digite o e-mail"
+              value={email || ""}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                validateField("email", e.target.value);
+              }}
+            />
+            {errors.email && <Message msg={errors.email} type="error" />}
+          </div>
+          <div className="form__group--register">
+            <label>Senha</label>
+            <input
+              type="password"
+              placeholder="Digite a senha"
+              value={password || ""}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                validateField("password", e.target.value);
+              }}
+            />
+            <div className="password__strength">
+              <div
+                className="password__strength--bar"
+                style={{
+                  width:
+                    password.length >= 10
+                      ? "100%"
+                      : password.length >= 6
+                        ? "70%"
+                        : password.length > 0
+                          ? "40%"
+                          : "0%",
+                  backgroundColor:
+                    password.length >= 10
+                      ? "#10b981"
+                      : password.length >= 6
+                        ? "#f59e0b"
+                        : "#ef4444",
+                }}
+              />
+            </div>
+            {errors.password && <Message msg={errors.password} type="error" />}
+          </div>
+          <div className="form__group--register">
+            <label>Confirmar senha</label>
+            <input
+              type="password"
+              placeholder="Confirme sua senha"
+              value={confirmPassword || ""}
+              onChange={(e) => {
+                setConfirmPassword(e.target.value);
+                validateField("confirmPassword", e.target.value);
+              }}
+            />
+            {errors.confirmPassword && (
+              <Message msg={errors.confirmPassword} type="error" />
+            )}
+          </div>
+          <div className="form__group--register">
+            <label>Noma da empresa</label>
+            <input
+              type="text"
+              placeholder="Digite o nome da empresa"
+              value={companyName || ""}
+              onChange={(e) => {
+                setCompanyName(e.target.value);
+                validateField("companyName", e.target.value);
+              }}
+            />
+            {errors.companyName && (
+              <Message msg={errors.companyName} type="error" />
+            )}
+          </div>
+          <div className="form__group--register">
+            <label>CNPJ da empresa</label>
+            <input
+              type="text"
+              placeholder="Digite o CNPJ da empresa"
+              value={cnpj}
+              maxLength={18}
+              onChange={(e) => {
+                const formatted = formatCNPJ(e.target.value);
+                setCnpj(formatted);
+                validateCNPJ(formatted);
+              }}
+            />
+            {cnpjError && <Message msg={cnpjError} type="error" />}
+          </div>
           {!loading && (
             <input
               type="submit"

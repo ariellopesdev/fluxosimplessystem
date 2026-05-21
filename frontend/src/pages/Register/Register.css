@@ -2,97 +2,163 @@
 
 .form__register {
   width: 100%;
-  max-width: 420px;
+  max-width: 460px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
+
+  background-color: var(--surface);
+  padding: 32px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-.form__register h2 {
-  font-size: clamp(1.5rem, 2vw, 1.8rem);
+.register__header {
+  width: 100%;
+  max-width: 460px;
+  margin-bottom: 24px;
+}
+
+.register__header h2 {
+  font-size: clamp(1.7rem, 2vw, 2rem);
   color: var(--text);
-  margin-bottom: 20px;
+  margin-bottom: 8px;
 }
 
+.register__header p {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/************ LABELS ************/
+
+.form__group--register {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form__group--register label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/************ INPUTS & SELECT ************/
+
+.form__register input,
 .form__register select {
   height: 50px;
-  padding: 0 12px;
+  padding: 0 14px;
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: clamp(0.9rem, 1.5vw, 1rem);
   background-color: var(--surface);
   color: var(--text);
-  cursor: pointer;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.1s ease;
 }
 
-/* foco igual input */
+/* focus */
+.form__register input:focus,
 .form__register select:focus {
   border-color: var(--primary);
   outline: none;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
 }
 
-/* opcional: melhora aparência da seta no Chrome */
-/* .form__register select {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-} */
-
-.form__register input {
-  height: 50px;
-  padding: 0 12px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  font-size: clamp(0.9rem, 1.5vw, 1rem);
-}
-
-.form__register input:focus {
+/* hover */
+.form__register input:hover,
+.form__register select:hover {
   border-color: var(--primary);
-  outline: none;
 }
+
+/************ INPUT ERROR ************/
+
+.input__error {
+  border-color: #ef4444 !important;
+}
+
+.input__error:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
+}
+
+/************ MESSAGES ************/
+
+.form__error {
+  font-size: 0.82rem;
+  color: #ef4444;
+  margin-top: -4px;
+}
+
+.form__success {
+  font-size: 0.82rem;
+  color: #10b981;
+  margin-top: -4px;
+}
+
+/************ PASSWORD STRENGTH ************/
+
+.password__strength {
+  height: 6px;
+  width: 100%;
+  background-color: #e5e7eb;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.password__strength--bar {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+/************ BUTTON ************/
 
 .register__btn--primary {
-  height: 50px;
-  background-color: var(--primary);
-  color: var(--surface);
+  height: 52px;
+  background-color: var(--primary) !important;
+  color: var(--surface) !important;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   font-weight: var(--weight-700);
   cursor: pointer;
   font-size: clamp(1rem, 1.8vw, 1.125rem);
+
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease,
+    /* opacity 0.2s ease; */
 }
 
 .register__btn--primary:hover {
-  background-color: var(--primary-hover);
+  background-color: var(--primary-hover) !important;
+}
+
+.register__btn--primary:active {
+  transform: scale(0.98);
+}
+
+.register__btn--primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 /************ RESPONSIVO ************/
 
 @media (max-width: 768px) {
-  #register__header {
-    flex-direction: column;
-    height: auto;
-    gap: 10px;
-    padding: 20px;
-    margin-bottom: 40px;
+  .form__register {
+    max-width: 100%;
+    padding: 24px;
+    border-radius: 0;
+    box-shadow: none;
   }
 
-  .register__header--company {
-    margin-bottom: 20px;
-  }
-
-  .form__register--login {
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .form__register--login input {
-    width: 48%;
-  }
-  .form__register--login button {
-    width: 40%;
-    margin-top: 8px;
+  .form__register h2 {
+    text-align: center;
   }
 }
