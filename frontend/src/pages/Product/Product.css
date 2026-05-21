@@ -6,109 +6,29 @@
 
 .product__btn {
   background: var(--primary);
-  color: white;
+  color: var(--surface);
   border: none;
-  padding: 10px 15px;.product__modalOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.45);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  z-index: 999;
-  padding: 20px;
-}
-
-.product__modal {
-  width: 100%;
-  max-width: 500px;
-
-  background: white;
-  border-radius: 12px;
-
-  padding: 25px;
-
-  animation: modalFade 0.2s ease;
-}
-
-.product__modalHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  margin-bottom: 20px;
-}
-
-.product__modalHeader h3 {
-  margin: 0;
-}
-
-.product__closeBtn {
-  border: none;
-  background: transparent;
-  font-size: 20px;
-  cursor: pointer;
-}
-
-.product__modal form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.product__modal input,
-.product__modal textarea {
-  padding: 12px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
-
-.product__modal textarea {
-  resize: none;
-  min-height: 100px;
-}
-
-@keyframes modalFade {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@media (max-width: 768px) {
-  .product__cards {
-    flex-direction: column;
-  }
-
-  .product__filters {
-    flex-direction: column;
-  }
-
-  .product__header {
-    flex-direction: column;
-    gap: 15px;
-  }
-
-  .product__btn {
-    width: 100%;
-  }
-
-  .product__table {
-    overflow-x: auto;
-  }
-}
+  padding: 10px 15px;
   border-radius: 6px;
   cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease,
+    opacity 0.2s ease;
+}
+
+.product__btn:hover {
+  background: var(--primary-hover);
+}
+
+.product__btn:active {
+  transform: scale(0.98);
+}
+
+.product__btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 .product__cards {
@@ -137,8 +57,19 @@
   overflow: hidden;
 }
 
-.product__table th, td {
+.product__table th,
+.product__table td {
   padding: 12px;
+}
+
+.product__table td {
+  vertical-align: middle;
+}
+
+.product__table th:last-child,
+.product__table td:last-child {
+  width: 110px;
+  text-align: center;
 }
 
 .status.active {
@@ -152,6 +83,8 @@
 .card.red {
   background: #ef4444;
 }
+
+/************ MODAL ************/
 
 .product__modalOverlay {
   position: fixed;
@@ -200,25 +133,139 @@
   cursor: pointer;
 }
 
-.product__modal form {
+/************ FORM PRODUCT ************/
+
+.form__product {
   display: flex;
   flex-direction: column;
   gap: 15px;
 }
 
-.product__modal input,
-.product__modal textarea {
+.form__group--product {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form__group--product label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.form__product input,
+.form__product textarea {
   padding: 12px;
   border-radius: 6px;
   border: 1px solid #ccc;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-.product__modal textarea {
+.form__product input:focus,
+.form__product textarea:focus {
+  border-color: var(--primary);
+  outline: none;
+
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+.form__product input:hover,
+.form__product textarea:hover {
+  border-color: var(--primary);
+}
+
+.form__product textarea {
   resize: none;
   min-height: 100px;
 }
 
+.status.active {
+  color: green;
+}
 
+.status.inactive {
+  color: red;
+}
+
+/************ IMAGEM DA TABELA ************/
+
+.product__tableImage {
+  width: 55px;
+  height: 55px;
+
+  object-fit: cover;
+
+  border-radius: 8px;
+
+  border: 1px solid #e5e7eb;
+}
+
+.product__tableImagePlaceholder {
+  width: 55px;
+  height: 55px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 0.7rem;
+  text-align: center;
+
+  border-radius: 8px;
+
+  background: #f3f4f6;
+  color: #6b7280;
+
+  padding: 4px;
+}
+
+.product__table th:first-child,
+.product__table td:first-child {
+  width: 80px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+/************ ACTION ICONS ************/
+
+.table__edit--close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+
+  height: 100%;
+}
+
+.product__actionIcon {
+  cursor: pointer;
+
+  font-size: 18px;
+
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+
+  margin-right: 12px;
+}
+
+.product__actionIcon:hover {
+  transform: scale(1.1);
+  opacity: 0.8;
+}
+
+.product__actionIcon.edit {
+  color: #3b82f6;
+}
+
+.product__actionIcon.delete {
+  color: #ef4444;
+}
+
+/************ ANIMATION ************/
 
 @keyframes modalFade {
   from {
@@ -229,5 +276,34 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/************ RESPONSIVO ************/
+
+@media (max-width: 768px) {
+  .product__cards {
+    flex-direction: column;
+  }
+
+  .product__filters {
+    flex-direction: column;
+  }
+
+  .product__header {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .product__btn {
+    width: 100%;
+  }
+
+  .product__table {
+    overflow-x: auto;
+  }
+
+  .product__modal {
+    padding: 20px;
   }
 }

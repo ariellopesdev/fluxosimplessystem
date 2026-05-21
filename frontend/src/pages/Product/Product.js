@@ -20,27 +20,59 @@ import {
   getProductById,
 } from "../../slices/productSlice";
 
+//Storage
+import { uploads } from "../../utils/config";
+
+import { FaEdit, FaTrash } from "react-icons/fa";
+
 const Product = () => {
   const dispatch = useDispatch();
 
   const { products, loading, error, message } = useSelector(
-    (state) => state.product
+    (state) => state.product,
   );
 
-  // Modal
   const [showModal, setShowModal] = useState(false);
-
-  // Edit
   const [editId, setEditId] = useState(null);
-
-  // Form states (AJUSTADO PARA BACKEND)
   const [name, setName] = useState("");
   const [stock, setStock] = useState("");
   const [unityPrice, setUnityPrice] = useState("");
   const [productImage, setProductImage] = useState("");
-
-  // Search
   const [search, setSearch] = useState("");
+  const [errors, setErrors] = useState({});
+
+  const validateField = (name, value) => {
+    let error = "";
+
+    switch (name) {
+      case "name":
+        if (value.trim().length < 3) {
+          error = "O nome do produto precisa ter no mínimo 3 caracteres.";
+        }
+        break;
+      case "stock":
+        if (value === "") {
+          error = "Estoque é obrigatório.";
+        } else if (Number(value) < 0) {
+          error = "O estoque não pode ser negativo.";
+        }
+        break;
+      case "unityPrice":
+        if (value === "") {
+          error = "O preço do produto unitário é obrigatório.";
+        } else if (Number(value) <= 0) {
+          error = "O preço precisa ser um valor maior que zero.";
+        }
+        break;
+      default:
+        break;
+    }
+
+    setErrors((prev) => ({
+      ...prev,
+      [name]: error,
+    }));
+  };
 
   // Load products
   useEffect(() => {
@@ -57,7 +89,7 @@ const Product = () => {
     if (message || error) {
       const timer = setTimeout(() => {
         dispatch(resetMessage());
-      }, 3000);
+      }, 2000);
 
       return () => clearTimeout(timer);
     }
@@ -66,6 +98,21 @@ const Product = () => {
   // Submit create/update
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    validateField("name", name);
+    validateField("stock", stock);
+    validateField("unityPrice", unityPrice);
+
+    if (
+      !name ||
+      name.length < 3 ||
+      stock === "" ||
+      Number(stock) < 0 ||
+      unityPrice === "" ||
+      Number(unityPrice) <= 0
+    ) {
+      return;
+    }
 
     const productData = new FormData();
 
@@ -85,7 +132,7 @@ const Product = () => {
         updateProduct({
           id: editId,
           productData,
-        })
+        }),
       );
     }
 
@@ -133,28 +180,23 @@ const Product = () => {
 
   // FILTER
   const filteredProducts = products.filter((product) =>
-    product.name?.toLowerCase().includes(search.toLowerCase())
+    product.name?.toLowerCase().includes(search.toLowerCase()),
   );
 
   return (
     <div className="product">
       <main className="product__main">
-
-        {/* HEADER */}
         <div className="product__header">
           <h2>Produtos</h2>
-
           <button
             className="product__btn"
             onClick={() => {
               setShowModal(true);
               setEditId(null);
-
               setName("");
               setStock("");
               setUnityPrice("");
               setProductImage("");
-
               dispatch(resetMessage());
             }}
           >
@@ -166,7 +208,6 @@ const Product = () => {
         {showModal && (
           <div className="product__modalOverlay">
             <div className="product__modal">
-
               <div className="product__modalHeader">
                 <h3>{editId ? "Editar Produto" : "Novo Produto"}</h3>
 
@@ -188,34 +229,56 @@ const Product = () => {
                 </button>
               </div>
 
-              <form onSubmit={handleSubmit}>
-
-                <input
-                  type="text"
-                  placeholder="Nome do produto"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-
-                <input
-                  type="number"
-                  placeholder="Estoque"
-                  value={stock}
-                  onChange={(e) => setStock(e.target.value)}
-                />
-
-                <input
-                  type="number"
-                  placeholder="Preço unitário"
-                  value={unityPrice}
-                  onChange={(e) => setUnityPrice(e.target.value)}
-                />
-
-                <input
-                  type="file"
-                  onChange={(e) => setProductImage(e.target.files[0])}
-                />
-
+              <form onSubmit={handleSubmit} className="form__product">
+                <div className="form__group--product">
+                  <label>Nome do produto</label>
+                  <input
+                    type="text"
+                    placeholder="Digite o nome do produto"
+                    value={name}
+                    onChange={(e) => {
+                      setName(e.target.value);
+                      validateField("name", e.target.value);
+                    }}
+                  />
+                  {errors.name && <Message msg={errors.name} type="error" />}
+                </div>
+                <div className="form__group--product">
+                  <label>Estoque</label>
+                  <input
+                    type="number"
+                    placeholder="Digite a quantidade do produto"
+                    value={stock}
+                    onChange={(e) => {
+                      setStock(e.target.value);
+                      validateField("stock", e.target.value);
+                    }}
+                  />
+                  {errors.stock && <Message msg={errors.stock} type="error" />}
+                </div>
+                <div className="form__group--product">
+                  <label>Preço unitário</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    placeholder="Digite o preço unitário"
+                    value={unityPrice}
+                    onChange={(e) => {
+                      setUnityPrice(e.target.value);
+                      validateField("unityPrice", e.target.value);
+                    }}
+                  />
+                  {errors.unityPrice && (
+                    <Message msg={errors.unityPrice} type="error" />
+                  )}
+                </div>
+                <div className="form__group--product">
+                  <label>Imagem do produto</label>
+                  <input
+                    type="file"
+                    onChange={(e) => setProductImage(e.target.files[0])}
+                  />
+                </div>
                 {!loading && (
                   <input
                     type="submit"
@@ -241,9 +304,7 @@ const Product = () => {
 
         {/* CARDS */}
         <div className="product__cards">
-          <div className="card green">
-            {products.length} Produtos
-          </div>
+          <div className="card green">{products.length} Produtos</div>
 
           <div className="card blue">
             Estoque total:{" "}
@@ -251,11 +312,39 @@ const Product = () => {
           </div>
 
           <div className="card orange">
-            Controle de estoque
+            Última entrada:{" "}
+            {products.length > 0
+              ? (() => {
+                  const latestProduct = [...products].sort(
+                    (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+                  )[0];
+
+                  const latestDate = new Date(latestProduct.createdAt);
+                  const today = new Date();
+
+                  const isToday =
+                    latestDate.getDate() === today.getDate() &&
+                    latestDate.getMonth() === today.getMonth() &&
+                    latestDate.getFullYear() === today.getFullYear();
+
+                  return isToday
+                    ? "Hoje"
+                    : latestDate.toLocaleDateString("pt-BR");
+                })()
+              : "Nenhum produto"}
           </div>
 
           <div className="card red">
-            Sistema ativo
+            R${" "}
+            {products
+              .reduce((acc, product) => {
+                return acc + Number(product.totalPrice || 0);
+              }, 0)
+              .toLocaleString("pt-BR", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}{" "}
+            em estoque
           </div>
         </div>
 
@@ -274,6 +363,7 @@ const Product = () => {
           <table>
             <thead>
               <tr>
+                <th>Imagem</th>
                 <th>Produto</th>
                 <th>Estoque</th>
                 <th>Preço Unitário</th>
@@ -287,34 +377,50 @@ const Product = () => {
             <tbody>
               {filteredProducts.map((product) => (
                 <tr key={product._id}>
-                  <td>{product.name}</td>
-
-                  <td>{product.stock}</td>
-
-                  <td>R$ {Number(product.unityPrice).toFixed(2)}</td>
-
-                  <td>R$ {Number(product.totalPrice).toFixed(2)}</td>
-
-                  <td>{product.company?.name}</td>
-
                   <td>
-                    <span className="status active">Ativo</span>
+                    {product.productImage ? (
+                      <img
+                        src={`${uploads}/products/${product.productImage}`}
+                        alt={product.name}
+                        className="product__tableImage"
+                      />
+                    ) : (
+                      <div className="product__tableImagePlaceholder">
+                        Sem imagem
+                      </div>
+                    )}
                   </td>
-
+                  <td>{product.name}</td>
+                  <td>{product.stock}</td>
+                  <td>R$ {Number(product.unityPrice).toFixed(2)}</td>
+                  <td>R$ {Number(product.totalPrice).toFixed(2)}</td>
+                  <td>{product.company?.name}</td>
                   <td>
                     <span
-                      style={{ cursor: "pointer", marginRight: "10px" }}
-                      onClick={() => handleEdit(product._id)}
+                      className={
+                        Number(product.stock) > 0
+                          ? "status active"
+                          : "status inactive"
+                      }
                     >
-                      ✏️
+                      {Number(product.stock) > 0 ? "Ativo" : "Sem estoque"}
                     </span>
-
-                    <span
-                      style={{ cursor: "pointer" }}
-                      onClick={() => handleDelete(product._id)}
-                    >
-                      🗑
-                    </span>
+                  </td>
+                  <td>
+                    <div className="table__edit--close">
+                      <span
+                        className="product__actionIcon edit"
+                        onClick={() => handleEdit(product._id)}
+                      >
+                        <FaEdit />
+                      </span>
+                      <span
+                        className="product__actionIcon delete"
+                        onClick={() => handleDelete(product._id)}
+                      >
+                        <FaTrash />
+                      </span>
+                    </div>
                   </td>
                 </tr>
               ))}
