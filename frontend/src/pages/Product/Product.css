@@ -84,6 +84,18 @@
   background: #ef4444;
 }
 
+.card {
+  flex: 1;
+  padding: 20px;
+  border-radius: 10px;
+  color: white;
+}
+
+.green { background: #2ecc71; }
+.orange { background: #f39c12; }
+.blue { background: #3498db; }
+.teal { background: #1abc9c; }
+
 /************ MODAL ************/
 
 .product__modalOverlay {

@@ -39,14 +39,6 @@ const Aside = ({ setPage, page }) => {
           </li>
           <li
             className={`dashboard__menu--item ${
-              page === "stock" ? "dashboard__menu--item--active" : ""
-            }`}
-            onClick={() => setPage("stock")}
-          >
-            <FiBox className="dashboard__icons" /> Estoque
-          </li>
-          <li
-            className={`dashboard__menu--item ${
               page === "products" ? "dashboard__menu--item--active" : ""
             }`}
             onClick={() => setPage("products")}
