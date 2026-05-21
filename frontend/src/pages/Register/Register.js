@@ -22,6 +22,27 @@ const Register = () => {
   const [companyName, setCompanyName] = useState("");
   const [cnpj, setCnpj] = useState("");
   const [role, setRole] = useState("USER");
+  const [cnpjError, setCnpjError] = useState("");
+
+  const formatCNPJ = (value) => {
+    value = value.replace(/\D/g, "");
+
+    value = value.replace(/^(\d{2})(\d)/, "$1.$2");
+    value = value.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
+    value = value.replace(/\.(\d{3})(\d)/, ".$1/$2");
+    value = value.replace(/(\d{4})(\d)/, "$1-$2");
+
+    return value;
+  };
+
+  const validateCNPJ = (cnpj) => {
+    const cleaned = cnpj.replace(/\D/g, "");
+    if (cleaned.length < 14) {
+      setCnpjError("CNPJ incompleto.");
+      return;
+    }
+    setCnpjError("");
+  };
 
   const dispatch = useDispatch();
 
@@ -49,14 +70,14 @@ const Register = () => {
   }, [success]);
 
   useEffect(() => {
-  if (error || message) {
-    const timer = setTimeout(() => {
-      dispatch(resetMessage());
-    }, 2000);
+    if (error || message) {
+      const timer = setTimeout(() => {
+        dispatch(resetMessage());
+      }, 2000);
 
-    return () => clearTimeout(timer);
-  }
-}, [error, message, dispatch]);
+      return () => clearTimeout(timer);
+    }
+  }, [error, message, dispatch]);
 
   const canAccess =
     loggedUser?.role === "SUPER_ADMIN" || loggedUser?.role === "ADMIN";
@@ -125,9 +146,17 @@ const Register = () => {
           <input
             type="text"
             placeholder="CNPJ da empresa"
-            onChange={(e) => setCnpj(e.target.value)}
-            value={cnpj || ""}
+            value={cnpj}
+            maxLength={18}
+            onChange={(e) => {
+              const formatted = formatCNPJ(e.target.value);
+
+              setCnpj(formatted);
+
+              validateCNPJ(formatted);
+            }}
           />
+          {cnpjError && <Message msg={cnpjError} type="error" />}
           {!loading && (
             <input
               type="submit"
