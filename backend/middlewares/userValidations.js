@@ -49,29 +49,27 @@ const userCreateValidation = () => {
     body("name")
       .trim()
       .notEmpty()
-      .isString()
       .withMessage("Nome é obrigatório.")
+      .isString()
+      .withMessage("Nome inválido.")
       .isLength({ min: 3 })
       .withMessage("Nome deve ter pelo menos 3 caracteres."),
     body("email")
       .trim()
-      .normalizeEmail()
       .notEmpty()
-      .isString()
       .withMessage("E-mail é obrigatório.")
       .isEmail()
-      .withMessage("E-mail inválido."),
+      .withMessage("E-mail inválido.")
+      .normalizeEmail(),
     body("password")
       .trim()
       .notEmpty()
-      .isString()
       .withMessage("Senha é obrigatória.")
       .isLength({ min: 6 })
       .withMessage("Senha precisa ter no mínimo 6 caracteres."),
     body("confirmPassword")
       .trim()
       .notEmpty()
-      .isString()
       .withMessage("Confirmação de senha é obrigatório.")
       .custom((value, { req }) => {
         if (value != req.body.password) {
@@ -82,7 +80,6 @@ const userCreateValidation = () => {
     body("companyName")
       .trim()
       .notEmpty()
-      .isString()
       .withMessage("Nome da empresa é obrigatório.")
       .isLength({ min: 2 })
       .withMessage("Nome da empresa muito curto."),
