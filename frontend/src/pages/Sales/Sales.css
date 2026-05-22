@@ -1,0 +1,179 @@
+.sales__header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.sales__btn {
+  background: var(--primary);
+  color: var(--surface);
+  border: none;
+  padding: 10px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease,
+    opacity 0.2s ease;
+}
+
+.sales__btn:hover {
+  background: var(--primary-hover);
+}
+
+.sales__cards {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.card {
+  flex: 1;
+  padding: 20px;
+  border-radius: 10px;
+  color: white;
+}
+
+.green {
+  background: #2ecc71;
+}
+
+.blue {
+  background: #3498db;
+}
+
+.orange {
+  background: #f39c12;
+}
+
+.red {
+  background: #ef4444;
+}
+
+.sales__filters {
+  margin-bottom: 20px;
+}
+
+.sales__filters input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.sales__table table {
+  width: 100%;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.sales__table th,
+.sales__table td {
+  padding: 12px;
+}
+
+.status.active {
+  color: green;
+  font-weight: 600;
+}
+
+.status.pending {
+  color: #f39c12;
+  font-weight: 600;
+}
+
+/************ MODAL ************/
+
+.sales__modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.45);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 999;
+  padding: 20px;
+}
+
+.sales__modal {
+  width: 100%;
+  max-width: 500px;
+
+  background: white;
+  border-radius: 12px;
+
+  padding: 25px;
+}
+
+.sales__modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 20px;
+}
+
+.sales__closeBtn {
+  border: none;
+  background: transparent;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.form__sales {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form__group--sales {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form__sales input,
+.form__sales select {
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.form__sales input:focus,
+.form__sales select:focus {
+  border-color: var(--primary);
+  outline: none;
+
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+.form__sales select {
+  background: white;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .sales__header {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .sales__cards {
+    flex-direction: column;
+  }
+
+  .sales__table {
+    overflow-x: auto;
+  }
+}

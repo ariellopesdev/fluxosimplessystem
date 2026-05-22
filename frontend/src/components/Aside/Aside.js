@@ -13,6 +13,7 @@ import {
   FiSettings,
   FiHelpCircle,
 } from "react-icons/fi";
+import { FaShoppingCart } from "react-icons/fa";
 
 //Components
 import { NavLink } from "react-router-dom";
@@ -36,6 +37,14 @@ const Aside = ({ setPage, page }) => {
             onClick={() => setPage("dashboard")}
           >
             <FiHome className="dashboard__icons" /> Dashboard
+          </li>
+          <li
+            className={`dashboard__menu--item ${
+              page === "sales" ? "dashboard__menu--item--active" : ""
+            }`}
+            onClick={() => setPage("sales")}
+          >
+            <FaShoppingCart className="dashboard__icons" /> Vendas
           </li>
           <li
             className={`dashboard__menu--item ${

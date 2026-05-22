@@ -12,6 +12,7 @@ import Home from "./pages/Home/Home";
 import Painel from "./pages/Painel/Painel";
 import Register from "./pages/Register/Register";
 import Dashboard from "./pages/Dashboard/Dashboard";
+import Sales from "./pages/Sales/Sales";
 import Product from "./pages/Product/Product";
 import Appointment from "./pages/Appointment/Appointment";
 import Reports from "./pages/Reports/Reports";
@@ -35,11 +36,15 @@ function App() {
           />
           <Route
             path="/register"
-            element={!auth ? <Register /> : <Navigate to="/painel" />}
+            element={auth ? <Register /> : <Navigate to="/" />}
           />
           <Route
             path="/dashboard"
             element={auth ? <Dashboard /> : <Navigate to="/" />}
+          />
+          <Route
+            path="/sales"
+            element={auth ? <Sales /> : <Navigate to="/" />}
           />
           <Route
             path="/product"

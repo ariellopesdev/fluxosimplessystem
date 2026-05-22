@@ -9,12 +9,15 @@ import Reports from "../../pages/Reports/Reports";
 import Register from "../../pages/Register/Register";
 import Settings from "../../pages/Settings/Settings";
 import Help from "../../pages/Help/Help";
+import Sales from "../../pages/Sales/Sales";
 
 const Main = ({ page }) => {
   const renderPage = () => {
     switch (page) {
       case "dashboard":
         return <Dashboard />;
+      case "sales":
+        return <Sales />;
       case "products":
         return <Product />;
       case "appointment":
