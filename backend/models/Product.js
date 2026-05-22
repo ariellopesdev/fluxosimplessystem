@@ -13,6 +13,10 @@ const productSchema = new Schema(
       ref: "Company",
     },
     cnpj: String,
+    category: {
+      type: String,
+      enum: ["ASSET", "SELLABLE", "OPERATIONAL"],
+    },
   },
   {
     timestamps: true,

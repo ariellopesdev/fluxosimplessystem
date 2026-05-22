@@ -4,7 +4,17 @@ const mongoose = require("mongoose");
 
 // Create a product
 const createProduct = async (req, res) => {
-  const { name, stock, unityPrice } = req.body;
+  const { name, stock, unityPrice, category } = req.body;
+
+  const validCategories = ["ASSET", "SELLABLE", "OPERATIONAL"];
+
+  if (!validCategories.includes(category)) {
+    res.status(422).json({
+      errors: ["Categoria inválida."],
+    });
+
+    return;
+  }
 
   const totalPrice = Number(stock) * Number(unityPrice);
 
@@ -39,6 +49,7 @@ const createProduct = async (req, res) => {
     productImage,
     company: req.user.company,
     cnpj: req.user.cnpj,
+    category,
   });
 
   // Error handling
@@ -107,7 +118,21 @@ const getProductById = async (req, res) => {
 const updateProduct = async (req, res) => {
   const { id } = req.params;
 
-  const { name, stock, unityPrice } = req.body;
+  const { name, stock, unityPrice, category } = req.body;
+
+  const validCategories = [
+  "ASSET",
+  "SELLABLE",
+  "OPERATIONAL",
+];
+
+if (category && !validCategories.includes(category)) {
+  res.status(422).json({
+    errors: ["Categoria inválida."],
+  });
+
+  return;
+}
 
   const totalPrice = Number(stock) * Number(unityPrice);
 
@@ -158,6 +183,10 @@ const updateProduct = async (req, res) => {
   // update image
   if (image) {
     product.productImage = image;
+  }
+
+  if (category) {
+    product.category = category;
   }
 
   await product.save();
