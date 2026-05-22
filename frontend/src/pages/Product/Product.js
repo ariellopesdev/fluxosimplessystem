@@ -40,6 +40,7 @@ const Product = () => {
   const [productImage, setProductImage] = useState("");
   const [search, setSearch] = useState("");
   const [errors, setErrors] = useState({});
+  const [category, setCategory] = useState("");
 
   const validateField = (name, value) => {
     let error = "";
@@ -62,6 +63,11 @@ const Product = () => {
           error = "O preço do produto unitário é obrigatório.";
         } else if (Number(value) <= 0) {
           error = "O preço precisa ser um valor maior que zero.";
+        }
+        break;
+      case "category":
+        if (!value) {
+          error = "A categoria é obrigatória.";
         }
         break;
       default:
@@ -102,6 +108,7 @@ const Product = () => {
     validateField("name", name);
     validateField("stock", stock);
     validateField("unityPrice", unityPrice);
+    validateField("category", category);
 
     if (
       !name ||
@@ -109,7 +116,8 @@ const Product = () => {
       stock === "" ||
       Number(stock) < 0 ||
       unityPrice === "" ||
-      Number(unityPrice) <= 0
+      Number(unityPrice) <= 0 ||
+      !category
     ) {
       return;
     }
@@ -119,6 +127,7 @@ const Product = () => {
     productData.append("name", name);
     productData.append("stock", stock);
     productData.append("unityPrice", unityPrice);
+    productData.append("category", category);
 
     if (productImage) {
       productData.append("productImage", productImage);
@@ -150,6 +159,7 @@ const Product = () => {
       setStock("");
       setUnityPrice("");
       setProductImage("");
+      setCategory("");
 
       setEditId(null);
       setShowModal(false);
@@ -168,6 +178,7 @@ const Product = () => {
       setName(product.name || "");
       setStock(product.stock || "");
       setUnityPrice(product.unityPrice || "");
+      setCategory(product.category || "");
 
       setShowModal(true);
     }
@@ -230,6 +241,24 @@ const Product = () => {
               </div>
 
               <form onSubmit={handleSubmit} className="form__product">
+                <div className="form__group--product">
+                  <label>Categoria</label>
+                  <select
+                    value={category}
+                    onChange={(e) => {
+                      setCategory(e.target.value);
+                      validateField("category", e.target.value);
+                    }}
+                  >
+                    <option value="">Selecione uma categoria</option>
+                    <option value="ASSET">Bem da Empresa</option>
+                    <option value="SELLABLE">Produto vendável</option>
+                    <option value="OPERATIONAL">Produto operacional</option>
+                  </select>
+                  {errors.category && (
+                    <Message msg={errors.category} type="error" />
+                  )}
+                </div>
                 <div className="form__group--product">
                   <label>Nome do produto</label>
                   <input
@@ -364,12 +393,14 @@ const Product = () => {
             <thead>
               <tr>
                 <th>Imagem</th>
+                <th>Categoria</th>
                 <th>Produto</th>
                 <th>Estoque</th>
                 <th>Preço Unitário</th>
                 <th>Total</th>
                 <th>Empresa</th>
                 <th>Status</th>
+                <th>Criado em</th>
                 <th>Ações</th>
               </tr>
             </thead>
@@ -390,6 +421,13 @@ const Product = () => {
                       </div>
                     )}
                   </td>
+                  <td>
+                    {product.category === "ASSET"
+                      ? "Bem da empresa"
+                      : product.category === "SELLABLE"
+                        ? "Vendável"
+                        : "Operacional"}
+                  </td>
                   <td>{product.name}</td>
                   <td>{product.stock}</td>
                   <td>R$ {Number(product.unityPrice).toFixed(2)}</td>
@@ -405,6 +443,9 @@ const Product = () => {
                     >
                       {Number(product.stock) > 0 ? "Ativo" : "Sem estoque"}
                     </span>
+                  </td>
+                  <td>
+                    {new Date(product.createdAt).toLocaleDateString("pt-BR")}
                   </td>
                   <td>
                     <div className="table__edit--close">

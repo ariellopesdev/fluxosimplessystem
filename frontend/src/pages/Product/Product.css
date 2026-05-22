@@ -91,10 +91,18 @@
   color: white;
 }
 
-.green { background: #2ecc71; }
-.orange { background: #f39c12; }
-.blue { background: #3498db; }
-.teal { background: #1abc9c; }
+.green {
+  background: #2ecc71;
+}
+.orange {
+  background: #f39c12;
+}
+.blue {
+  background: #3498db;
+}
+.teal {
+  background: #1abc9c;
+}
 
 /************ MODAL ************/
 
@@ -166,7 +174,8 @@
 }
 
 .form__product input,
-.form__product textarea {
+.form__product textarea,
+.form__product select {
   padding: 12px;
   border-radius: 6px;
   border: 1px solid #ccc;
@@ -177,7 +186,8 @@
 }
 
 .form__product input:focus,
-.form__product textarea:focus {
+.form__product textarea:focus,
+.form__product select:focus {
   border-color: var(--primary);
   outline: none;
 
@@ -185,13 +195,19 @@
 }
 
 .form__product input:hover,
-.form__product textarea:hover {
+.form__product textarea:hover,
+.form__product select:hover {
   border-color: var(--primary);
 }
 
 .form__product textarea {
   resize: none;
   min-height: 100px;
+}
+
+.form__product select {
+  background: #fff;
+  cursor: pointer;
 }
 
 .status.active {
