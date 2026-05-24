@@ -18,6 +18,7 @@ const createClient = async (req, res) => {
 
     street,
     number,
+    complement,
     neighborhood,
     city,
     state,
@@ -55,6 +56,7 @@ const createClient = async (req, res) => {
     address: {
       street,
       number,
+      complement,
       neighborhood,
       city,
       state,
@@ -76,9 +78,7 @@ const createClient = async (req, res) => {
 
 // Get all clients
 const getAllClients = async (req, res) => {
-  const clients = await Client.find().sort([
-    ["createdAt", -1],
-  ]);
+  const clients = await Client.find().sort([["createdAt", -1]]);
 
   res.status(200).json(clients);
 };
@@ -88,9 +88,7 @@ const getClientById = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const client = await Client.findById(
-      new mongoose.Types.ObjectId(id),
-    );
+    const client = await Client.findById(new mongoose.Types.ObjectId(id));
 
     // Check if client exists
     if (!client) {
@@ -127,15 +125,14 @@ const updateClient = async (req, res) => {
 
     street,
     number,
+    complement,
     neighborhood,
     city,
     state,
     zipCode,
   } = req.body;
 
-  const client = await Client.findById(
-    new mongoose.Types.ObjectId(id),
-  );
+  const client = await Client.findById(new mongoose.Types.ObjectId(id));
 
   // Check if client exists
   if (!client) {
@@ -182,8 +179,8 @@ const updateClient = async (req, res) => {
   client.address = {
     street: street || client.address.street,
     number: number || client.address.number,
-    neighborhood:
-      neighborhood || client.address.neighborhood,
+    complement: complement || client.address.complement,
+    neighborhood: neighborhood || client.address.neighborhood,
     city: city || client.address.city,
     state: state || client.address.state,
     zipCode: zipCode || client.address.zipCode,

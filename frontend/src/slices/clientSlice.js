@@ -23,7 +23,7 @@ export const createClient = createAsyncThunk(
     }
 
     return data;
-  }
+  },
 );
 
 // Get all clients
@@ -35,7 +35,7 @@ export const getAllClients = createAsyncThunk(
     const data = await clientService.getAllClients(token);
 
     return data;
-  }
+  },
 );
 
 // Get client by id
@@ -47,27 +47,19 @@ export const getClientById = createAsyncThunk(
     const data = await clientService.getClientById(id, token);
 
     return data;
-  }
+  },
 );
 
 // Update client
 export const updateClient = createAsyncThunk(
   "client/update",
-  async ({ id, clientData }, thunkAPI) => {
+  async ({ id, ...clientData }, thunkAPI) => {
     const token = thunkAPI.getState().auth.user.token;
 
-    const data = await clientService.updateClient(
-      clientData,
-      id,
-      token
-    );
-
-    if (data.errors) {
-      return thunkAPI.rejectWithValue(data.errors[0]);
-    }
+    const data = await clientService.updateClient(clientData, id, token);
 
     return data;
-  }
+  },
 );
 
 // Delete client
@@ -83,7 +75,7 @@ export const deleteClient = createAsyncThunk(
     }
 
     return data;
-  }
+  },
 );
 
 export const clientSlice = createSlice({
@@ -116,7 +108,7 @@ export const clientSlice = createSlice({
         state.loading = false;
         state.success = true;
 
-        state.clients.unshift(action.payload);
+        state.clients = [...state.clients, action.payload];
 
         state.message = "Cliente cadastrado com sucesso.";
       })
@@ -157,9 +149,7 @@ export const clientSlice = createSlice({
         state.success = true;
 
         state.clients = state.clients.map((client) =>
-          client._id === action.payload._id
-            ? action.payload
-            : client
+          client._id === action.payload._id ? action.payload : client,
         );
 
         state.message = "Cliente atualizado com sucesso.";
@@ -170,11 +160,14 @@ export const clientSlice = createSlice({
         state.loading = false;
         state.success = true;
 
+        const deletedId =
+          action.payload?.id || action.payload?._id || action.payload;
+
         state.clients = state.clients.filter(
-          (client) => client._id !== action.payload.id
+          (client) => client._id !== deletedId,
         );
 
-        state.message = action.payload.message;
+        state.message = action.payload?.message;
       });
   },
 });
