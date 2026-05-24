@@ -69,6 +69,76 @@ const Clients = () => {
 
   const onlyNumbers = (value) => value.replace(/\D/g, "");
 
+  const validateField = (name, value) => {
+    let error = "";
+
+    switch (name) {
+      case "name":
+        if (value.trim().length < 3) {
+          error = "O nome deve ter no mínimo 3 caracteres.";
+        }
+        break;
+
+      case "email":
+        if (value) {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+          if (!emailRegex.test(value)) {
+            error = "Insira um e-mail válido.";
+          }
+        }
+        break;
+
+      case "primaryPhone":
+        if (onlyNumbers(value).length < 10) {
+          error = "Telefone principal inválido.";
+        }
+        break;
+
+      case "secondaryPhone":
+        if (
+          value &&
+          onlyNumbers(value).length > 0 &&
+          onlyNumbers(value).length < 10
+        ) {
+          error = "Telefone secundário inválido.";
+        }
+        break;
+
+      case "emergencyPhone":
+        if (
+          value &&
+          onlyNumbers(value).length > 0 &&
+          onlyNumbers(value).length < 10
+        ) {
+          error = "Telefone de emergência inválido.";
+        }
+        break;
+
+      case "cpfCnpj":
+        error = validateCpfCnpj(value);
+        break;
+
+      case "zipCode":
+        if (
+          value &&
+          onlyNumbers(value).length > 0 &&
+          onlyNumbers(value).length < 8
+        ) {
+          error = "CEP incompleto.";
+        }
+        break;
+
+      default:
+        break;
+    }
+
+    setErrors((prev) => ({
+      ...prev,
+      [name]: error,
+    }));
+  };
+
   const formatCPF = (value) => {
     value = onlyNumbers(value).slice(0, 11);
 
@@ -283,11 +353,9 @@ const Clients = () => {
     const { name, value } = e.target;
 
     let formattedValue = value;
-    let error = "";
 
     if (name === "cpfCnpj") {
       formattedValue = formatCpfCnpj(value);
-      error = validateCpfCnpj(formattedValue);
     }
 
     if (
@@ -296,24 +364,10 @@ const Clients = () => {
       name === "emergencyPhone"
     ) {
       formattedValue = formatPhone(value);
-
-      if (
-        onlyNumbers(formattedValue).length > 0 &&
-        onlyNumbers(formattedValue).length < 10
-      ) {
-        error = "Telefone incompleto.";
-      }
     }
 
     if (name === "zipCode") {
       formattedValue = formatCEP(value);
-
-      if (
-        onlyNumbers(formattedValue).length > 0 &&
-        onlyNumbers(formattedValue).length < 8
-      ) {
-        error = "CEP incompleto.";
-      }
 
       if (onlyNumbers(formattedValue).length === 8) {
         fetchAddressByCEP(formattedValue);
@@ -325,10 +379,7 @@ const Clients = () => {
       [name]: formattedValue,
     }));
 
-    setErrors((prev) => ({
-      ...prev,
-      [name]: error,
-    }));
+    validateField(name, formattedValue);
   };
 
   const resetForm = () => {
@@ -559,8 +610,12 @@ const Clients = () => {
                     placeholder="Digite o nome completo"
                     value={formData.name}
                     onChange={handleChange}
+                    className={errors.name ? "input__error" : ""}
                     required
                   />
+                  {errors.name && (
+                    <span className="field__error">{errors.name}</span>
+                  )}
                 </div>
 
                 <div className="form__group--client">
@@ -570,7 +625,11 @@ const Clients = () => {
                     placeholder="Digite o e-mail do cliente"
                     value={formData.email}
                     onChange={handleChange}
+                    className={errors.email ? "input__error" : ""}
                   />
+                  {errors.email && (
+                    <span className="field__error">{errors.email}</span>
+                  )}
                 </div>
 
                 <div className="form__group--client">
@@ -579,21 +638,8 @@ const Clients = () => {
                     name="cpfCnpj"
                     placeholder="Digite CPF ou CNPJ"
                     value={formData.cpfCnpj}
-                    onChange={(e) => {
-                      const value = e.target.value;
-
-                      const cleaned = value.replace(/\D/g, "");
-
-                      const formatted =
-                        cleaned.length > 11
-                          ? formatCNPJ(cleaned)
-                          : formatCPF(cleaned);
-
-                      setFormData((prev) => ({
-                        ...prev,
-                        cpfCnpj: formatted,
-                      }));
-                    }}
+                    onChange={handleChange}
+                    className={errors.cpfCnpj ? "input__error" : ""}
                   />
                   {errors.cpfCnpj && (
                     <span className="field__error">{errors.cpfCnpj}</span>
@@ -611,12 +657,8 @@ const Clients = () => {
                     name="primaryPhone"
                     placeholder="(00) 00000-0000"
                     value={formData.primaryPhone}
-                    onChange={(e) => {
-                      setFormData((prev) => ({
-                        ...prev,
-                        primaryPhone: formatPhone(e.target.value),
-                      }));
-                    }}
+                    onChange={handleChange}
+                    className={errors.primaryPhone ? "input__error" : ""}
                   />
                   {errors.primaryPhone && (
                     <span className="field__error">{errors.primaryPhone}</span>
@@ -629,12 +671,8 @@ const Clients = () => {
                     name="secondaryPhone"
                     placeholder="(00) 00000-0000"
                     value={formData.secondaryPhone}
-                    onChange={(e) => {
-                      setFormData((prev) => ({
-                        ...prev,
-                        secondaryPhone: formatPhone(e.target.value),
-                      }));
-                    }}
+                    onChange={handleChange}
+                    className={errors.secondaryPhone ? "input__error" : ""}
                   />
                   {errors.secondaryPhone && (
                     <span className="field__error">
@@ -649,12 +687,8 @@ const Clients = () => {
                     name="emergencyPhone"
                     placeholder="(00) 00000-0000"
                     value={formData.emergencyPhone}
-                    onChange={(e) => {
-                      setFormData((prev) => ({
-                        ...prev,
-                        emergencyPhone: formatPhone(e.target.value),
-                      }));
-                    }}
+                    onChange={handleChange}
+                    className={errors.emergencyPhone ? "input__error" : ""}
                   />
                   {errors.emergencyPhone && (
                     <span className="field__error">
@@ -763,6 +797,7 @@ const Clients = () => {
                       placeholder="00000-000"
                       value={formData.zipCode}
                       onChange={handleChange}
+                      className={errors.zipCode ? "input__error" : ""}
                     />
                     {errors.zipCode && (
                       <span className="field__error">{errors.zipCode}</span>
