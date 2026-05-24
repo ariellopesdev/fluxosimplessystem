@@ -60,11 +60,11 @@ const updateSale = async (data, id, token) => {
   }
 };
 
-const saleService = {
+const salesService = {
   createSale,
   getAllSales,
   getSaleById,
   updateSale,
 };
 
-export default saleService;
+export default salesService;

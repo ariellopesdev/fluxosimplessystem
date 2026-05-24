@@ -300,10 +300,10 @@ const Sales = () => {
     setShowPaymentModal(true);
   };
 
-  const handlePaymentSubmit = (e) => {
+  const handlePaymentSubmit = async (e) => {
     e.preventDefault();
 
-    dispatch(
+    await dispatch(
       updateSale({
         id: selectedSale._id,
         payment: {
@@ -313,7 +313,9 @@ const Sales = () => {
         },
         status: paymentData.statusSale,
       }),
-    );
+    ).unwrap();
+
+    dispatch(getAllSales());
 
     setShowPaymentModal(false);
     setSelectedSale(null);

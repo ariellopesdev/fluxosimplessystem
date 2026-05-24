@@ -54,12 +54,11 @@ export const getSaleById = createAsyncThunk(
 // Update sale
 export const updateSale = createAsyncThunk(
   "sale/update",
-  async ({ id, saleData }, thunkAPI) => {
+  async ({ id, ...saleData }, thunkAPI) => {
     const token = thunkAPI.getState().auth.user.token;
 
     const data = await salesService.updateSale(saleData, id, token);
 
-    // Check for errors
     if (data.errors) {
       return thunkAPI.rejectWithValue(data.errors[0]);
     }

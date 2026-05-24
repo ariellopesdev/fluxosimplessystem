@@ -242,10 +242,21 @@ const updateSale = async (req, res) => {
       return;
     }
 
-    sale.payment = {
-      ...sale.payment,
-      ...payment,
-    };
+    if (payment) {
+      if (payment.method) {
+        sale.payment.method = payment.method;
+      }
+
+      if (payment.status) {
+        sale.payment.status = payment.status;
+      }
+
+      if (payment.installments !== undefined) {
+        sale.payment.installments = Number(payment.installments);
+      }
+
+      sale.markModified("payment");
+    }
   }
 
   // OBSERVAÇÕES
