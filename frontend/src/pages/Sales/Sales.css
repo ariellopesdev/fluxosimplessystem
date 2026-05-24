@@ -1,26 +1,46 @@
+/************ HEADER ************/
+
 .sales__header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 20px;
+}
+
+.sales__header h2 {
+  margin: 0;
 }
 
 .sales__btn {
   background: var(--primary);
   color: var(--surface);
   border: none;
-  padding: 10px 15px;
   border-radius: 6px;
+  padding: 10px 15px;
   cursor: pointer;
-
   transition:
     background-color 0.2s ease,
     transform 0.1s ease,
     opacity 0.2s ease;
+  font-weight: var(--weight-600);
+  letter-spacing: 0.3px;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.18);
 }
 
 .sales__btn:hover {
   background: var(--primary-hover);
 }
+
+.sales__btn:active {
+  transform: scale(0.98);
+}
+
+.sales__btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/************ CARDS ************/
 
 .sales__cards {
   display: flex;
@@ -32,148 +52,524 @@
   flex: 1;
   padding: 20px;
   border-radius: 10px;
-  color: white;
+  color: #fff;
+  font-weight: 600;
 }
 
 .green {
-  background: #2ecc71;
+  background: #22c55e;
 }
 
 .blue {
-  background: #3498db;
+  background: #3b82f6;
 }
 
 .orange {
-  background: #f39c12;
+  background: #f97316;
 }
 
 .red {
   background: #ef4444;
 }
 
+/************ FILTER ************/
+
 .sales__filters {
+  display: flex;
+  gap: 10px;
   margin-bottom: 20px;
 }
 
 .sales__filters input {
-  width: 100%;
-  padding: 12px;
+  width: 260px;
+  padding: 10px;
   border-radius: 6px;
   border: 1px solid #ccc;
 }
 
+.sales__filters input:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+/************ TABLE ************/
+
+.sales__table {
+  width: 100%;
+  overflow-x: auto;
+}
+
 .sales__table table {
   width: 100%;
-  background: white;
+  min-width: 1100px;
+  background: #fff;
   border-radius: 10px;
   overflow: hidden;
+  border-collapse: collapse;
 }
 
 .sales__table th,
 .sales__table td {
   padding: 12px;
+  vertical-align: middle;
+}
+
+.sales__table th {
+  background: #f9fafb;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #6b7280;
+}
+
+.sales__table th:nth-child(1),
+.sales__table td:nth-child(1),
+.sales__table th:nth-child(2),
+.sales__table td:nth-child(2),
+.sales__table th:nth-child(3),
+.sales__table td:nth-child(3) {
+  text-align: left;
+}
+
+.sales__table th:nth-child(n + 4),
+.sales__table td:nth-child(n + 4) {
+  text-align: center;
+}
+
+.sales__table tbody tr:nth-child(even) {
+  background: #fafafa;
+}
+
+.sales__table tbody tr:hover {
+  background: #f3f4f6;
+}
+
+.sales__itemsList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 360px;
+}
+
+.sales__itemsList span {
+  display: block;
+  font-size: 0.86rem;
+  color: #374151;
+  line-height: 1.35;
+}
+
+/************ STATUS ************/
+
+.status {
+  font-weight: 600;
 }
 
 .status.active {
-  color: green;
-  font-weight: 600;
+  color: #22c55e;
 }
 
 .status.pending {
-  color: #f39c12;
+  color: #f97316;
+}
+
+.status.inactive {
+  color: #ef4444;
+}
+
+/************ BUTTONS ************/
+
+.sales__smallBtn,
+.sales__outlineBtn,
+.sales__removeBtn {
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
   font-weight: 600;
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease,
+    opacity 0.2s ease;
+}
+
+.sales__smallBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  background: #2563eb;
+  color: #fff;
+  padding: 7px 10px;
+  font-size: 12px;
+}
+
+.sales__smallBtn:hover {
+  background: #1d4ed8;
+}
+
+.sales__outlineBtn {
+  background: #fff;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+  padding: 10px 14px;
+}
+
+.sales__outlineBtn:hover {
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.sales__removeBtn {
+  align-self: end;
+  background: #ef4444;
+  color: #fff;
+  padding: 9px 12px;
+  height: 38px;
+}
+
+.sales__removeBtn:hover {
+  background: #dc2626;
 }
 
 /************ MODAL ************/
 
 .sales__modalOverlay {
   position: fixed;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100%;
   height: 100vh;
   background: rgba(0, 0, 0, 0.45);
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   z-index: 999;
   padding: 20px;
 }
 
 .sales__modal {
   width: 100%;
-  max-width: 500px;
-
-  background: white;
+  max-width: 620px;
+  max-height: 95vh;
+  overflow-y: auto;
+  background: #fff;
   border-radius: 12px;
+  padding: 32px;
+  animation: modalFade 0.2s ease;
+}
 
-  padding: 25px;
+.sales__receiptModal {
+  max-width: 960px;
+}
+
+.sales__detailsModal {
+  max-width: 760px;
 }
 
 .sales__modalHeader {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-
+  justify-content: space-between;
   margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #ececec;
+}
+
+.sales__modalHeader h3 {
+  margin: 0;
 }
 
 .sales__closeBtn {
-  border: none;
   background: transparent;
-  font-size: 20px;
+  border: none;
+  font-size: 22px;
   cursor: pointer;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  transition: background 0.2s ease;
 }
+
+.sales__closeBtn:hover {
+  background: #f3f4f6;
+}
+
+/************ FORM ************/
 
 .form__sales {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 10px;
 }
 
 .form__group--sales {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.form__group--sales label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #4b5563;
+  font-size: 0.82rem;
 }
 
 .form__sales input,
-.form__sales select {
-  padding: 12px;
+.form__sales select,
+.form__sales textarea {
+  width: 100%;
+  min-width: 0;
+  background: #fff;
+  padding: 0 12px;
   border-radius: 6px;
   border: 1px solid #ccc;
-
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease;
 }
 
-.form__sales input:focus,
-.form__sales select:focus {
-  border-color: var(--primary);
-  outline: none;
-
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+.form__sales input,
+.form__sales select {
+  height: 38px;
+  line-height: 38px;
 }
 
-.form__sales select {
-  background: white;
+.form__sales textarea {
+  min-height: 100px;
+  padding: 12px;
+  resize: none;
+}
+
+.form__sales input:hover,
+.form__sales select:hover,
+.form__sales textarea:hover {
+  border-color: var(--primary);
+}
+
+.form__sales input:focus,
+.form__sales select:focus,
+.form__sales textarea:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.12);
+}
+
+.form__sales input:disabled {
+  background: #f9fafb;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+/************ RECEIPT MODAL ************/
+
+.sales__receipt {
+  background: #fafafa;
+  border: 1px solid #ececec;
+  border-radius: 12px;
+  padding: 22px;
+}
+
+.sales__receiptTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed #d1d5db;
+  color: #374151;
+}
+
+.sales__productsBox {
+  margin-top: 14px;
+  padding: 18px;
+  background: #fff;
+  border: 1px solid #ececec;
+  border-radius: 10px;
+}
+
+.sales__productsBox h4 {
+  margin: 0 0 14px;
+}
+
+.sales__productRow {
+  display: grid;
+  grid-template-columns: minmax(220px, 2fr) 90px 130px 130px auto;
+  gap: 12px;
+  align-items: end;
+  padding-bottom: 14px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.sales__paymentGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.sales__totals {
+  display: grid;
+  grid-template-columns: 160px 160px 1fr;
+  gap: 14px;
+  align-items: start;
+  margin-top: 18px;
+}
+
+.sales__summary {
+  background: #fff;
+  border: 1px solid #ececec;
+  border-radius: 10px;
+  padding: 14px;
+}
+
+.sales__summary p {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 0 8px;
+  color: #4b5563;
+}
+
+.sales__summaryTotal {
+  padding-top: 10px;
+  margin-top: 10px !important;
+  border-top: 1px dashed #d1d5db;
+  font-size: 1.05rem;
+  color: #111827 !important;
+}
+
+/************ DETAILS MODAL ************/
+
+.sales__details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  text-align: left;
+}
+
+.sales__details p {
+  margin: 0;
+  padding: 12px;
+  background: #fafafa;
+  border-radius: 8px;
+  color: #374151;
+}
+
+.sales__details strong {
+  color: #111827;
+}
+
+.sales__detailsProducts {
+  grid-column: 1 / -1;
+  margin-top: 8px;
+  padding: 14px;
+  background: #fafafa;
+  border-radius: 10px;
+}
+
+.sales__detailsProduct {
+  display: grid;
+  grid-template-columns: 2fr 90px 150px 150px;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid #e5e7eb;
+  color: #374151;
+}
+
+.sales__detailsProduct:last-child {
+  border-bottom: none;
+}
+
+/************ ACTION ICONS ************/
+
+.table__edit--close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.sales__actionIcon {
   cursor: pointer;
+  font-size: 20px;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.sales__actionIcon:hover {
+  transform: scale(1.1);
+  opacity: 0.8;
+}
+
+.sales__actionIcon.edit {
+  color: #3b82f6;
+}
+
+/************ ANIMATION ************/
+
+@keyframes modalFade {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/************ RESPONSIVE ************/
+
+@media (max-width: 900px) {
+  .sales__productRow,
+  .sales__paymentGrid,
+  .sales__totals,
+  .sales__details,
+  .sales__detailsProduct {
+    grid-template-columns: 1fr;
+  }
+
+  .sales__removeBtn {
+    width: 100%;
+  }
 }
 
 @media (max-width: 768px) {
   .sales__header {
     flex-direction: column;
     gap: 15px;
+    align-items: stretch;
+  }
+
+  .sales__btn {
+    width: 100%;
   }
 
   .sales__cards {
     flex-direction: column;
   }
 
-  .sales__table {
-    overflow-x: auto;
+  .sales__filters {
+    flex-direction: column;
+  }
+
+  .sales__filters input {
+    width: 100%;
+  }
+
+  .sales__modal {
+    padding: 20px;
+  }
+
+  .sales__receipt {
+    padding: 16px;
+  }
+
+  .sales__receiptTop {
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-start;
   }
 }

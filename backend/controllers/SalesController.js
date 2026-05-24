@@ -164,17 +164,21 @@ const getSaleById = async (req, res) => {
 const updateSale = async (req, res) => {
   const { id } = req.params;
 
+  // 🔒 SOMENTE ESTES CAMPOS PODEM SER ALTERADOS
   const { payment, notes, status } = req.body;
 
-  const validStatus = ["OPEN", "FINISHED", "CANCELLED"];
+  const validSaleStatus = ["OPEN", "FINISHED", "CANCELLED"];
 
-  if (status && !validStatus.includes(status)) {
-    res.status(422).json({
-      errors: ["Status da venda inválido."],
-    });
+  const validPaymentStatus = ["PENDING", "PAID", "CANCELLED", "REFUNDED"];
 
-    return;
-  }
+  const validPaymentMethods = [
+    "CASH",
+    "PIX",
+    "CREDIT_CARD",
+    "DEBIT_CARD",
+    "BANK_SLIP",
+    "TRANSFER",
+  ];
 
   const reqUser = req.user;
 
@@ -196,19 +200,57 @@ const updateSale = async (req, res) => {
     return;
   }
 
+  // 🔒 NÃO DEIXA ALTERAR PRODUTOS DA VENDA
+  if (req.body.products || req.body.client || req.body.total) {
+    res.status(403).json({
+      errors: [
+        "Não é permitido alterar produtos, cliente ou valores da venda.",
+      ],
+    });
+
+    return;
+  }
+
+  // STATUS DA VENDA
+  if (status) {
+    if (!validSaleStatus.includes(status)) {
+      res.status(422).json({
+        errors: ["Status da venda inválido."],
+      });
+
+      return;
+    }
+
+    sale.status = status;
+  }
+
+  // PAGAMENTO
   if (payment) {
+    if (payment.method && !validPaymentMethods.includes(payment.method)) {
+      res.status(422).json({
+        errors: ["Método de pagamento inválido."],
+      });
+
+      return;
+    }
+
+    if (payment.status && !validPaymentStatus.includes(payment.status)) {
+      res.status(422).json({
+        errors: ["Status de pagamento inválido."],
+      });
+
+      return;
+    }
+
     sale.payment = {
       ...sale.payment,
       ...payment,
     };
   }
 
+  // OBSERVAÇÕES
   if (notes !== undefined) {
     sale.notes = notes;
-  }
-
-  if (status) {
-    sale.status = status;
   }
 
   await sale.save();
@@ -221,42 +263,9 @@ const updateSale = async (req, res) => {
   res.status(200).json(updatedSale);
 };
 
-// Delete a sale
-const deleteSale = async (req, res) => {
-  const { id } = req.params;
-
-  const reqUser = req.user;
-
-  const sale = await Sale.findById(id);
-
-  if (!sale) {
-    res.status(404).json({
-      errors: ["Venda não encontrada."],
-    });
-
-    return;
-  }
-
-  if (sale.seller.toString() !== reqUser._id.toString()) {
-    res.status(403).json({
-      errors: ["Acesso negado."],
-    });
-
-    return;
-  }
-
-  await Sale.findByIdAndDelete(sale._id);
-
-  res.status(200).json({
-    id: sale._id,
-    message: "Venda excluída com sucesso.",
-  });
-};
-
 module.exports = {
   createSale,
   getAllSales,
   getSaleById,
   updateSale,
-  deleteSale,
 };

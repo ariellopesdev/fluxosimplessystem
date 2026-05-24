@@ -16,7 +16,7 @@ const createSale = async (data, token) => {
 };
 
 // Get all sales
-const getSales = async (token) => {
+const getAllSales = async (token) => {
   const config = requestConfig("GET", null, token);
 
   try {
@@ -60,27 +60,11 @@ const updateSale = async (data, id, token) => {
   }
 };
 
-// Delete a sale
-const deleteSale = async (id, token) => {
-  const config = requestConfig("DELETE", null, token);
-
-  try {
-    const res = await fetch(api + "/sales/" + id, config)
-      .then((res) => res.json())
-      .catch((err) => err);
-
-    return res;
-  } catch (error) {
-    console.log(error);
-  }
-};
-
 const saleService = {
   createSale,
-  getSales,
+  getAllSales,
   getSaleById,
   updateSale,
-  deleteSale,
 };
 
 export default saleService;

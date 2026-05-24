@@ -7,7 +7,6 @@ const {
   getAllSales,
   getSaleById,
   updateSale,
-  deleteSale,
 } = require("../controllers/salesController");
 
 // Middlewares
@@ -27,7 +26,5 @@ router.get("/", authGuard, getAllSales);
 router.get("/:id", authGuard, getSaleById);
 
 router.put("/:id", authGuard, salesUpdateValidation(), validate, updateSale);
-
-router.delete("/:id", authGuard, deleteSale);
 
 module.exports = router;

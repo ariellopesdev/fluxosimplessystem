@@ -28,13 +28,16 @@ export const createSale = createAsyncThunk(
 );
 
 // Get all sales
-export const getSales = createAsyncThunk("sale/getall", async (_, thunkAPI) => {
-  const token = thunkAPI.getState().auth.user.token;
+export const getAllSales = createAsyncThunk(
+  "sale/getall",
+  async (_, thunkAPI) => {
+    const token = thunkAPI.getState().auth.user.token;
 
-  const data = await salesService.getSales(token);
+    const data = await salesService.getAllSales(token);
 
-  return data;
-});
+    return data;
+  },
+);
 
 // Get sale by id
 export const getSaleById = createAsyncThunk(
@@ -55,23 +58,6 @@ export const updateSale = createAsyncThunk(
     const token = thunkAPI.getState().auth.user.token;
 
     const data = await salesService.updateSale(saleData, id, token);
-
-    // Check for errors
-    if (data.errors) {
-      return thunkAPI.rejectWithValue(data.errors[0]);
-    }
-
-    return data;
-  },
-);
-
-// Delete sale
-export const deleteSale = createAsyncThunk(
-  "sale/delete",
-  async (id, thunkAPI) => {
-    const token = thunkAPI.getState().auth.user.token;
-
-    const data = await salesService.deleteSale(id, token);
 
     // Check for errors
     if (data.errors) {
@@ -124,18 +110,18 @@ export const salesSlice = createSlice({
       })
 
       // Get sales
-      .addCase(getSales.pending, (state) => {
+      .addCase(getAllSales.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(getSales.fulfilled, (state, action) => {
+      .addCase(getAllSales.fulfilled, (state, action) => {
         state.loading = false;
         state.success = true;
         state.error = null;
 
         state.sales = action.payload;
       })
-      .addCase(getSales.rejected, (state, action) => {
+      .addCase(getAllSales.rejected, (state, action) => {
         state.loading = false;
         state.success = false;
         state.error = action.payload;
@@ -180,28 +166,6 @@ export const salesSlice = createSlice({
         state.message = "Venda atualizada com sucesso!";
       })
       .addCase(updateSale.rejected, (state, action) => {
-        state.loading = false;
-        state.success = false;
-        state.error = action.payload;
-      })
-
-      // Delete sale
-      .addCase(deleteSale.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(deleteSale.fulfilled, (state, action) => {
-        state.loading = false;
-        state.success = true;
-        state.error = null;
-
-        state.sales = state.sales.filter(
-          (sale) => sale._id !== action.payload.id,
-        );
-
-        state.message = "Venda excluída com sucesso!";
-      })
-      .addCase(deleteSale.rejected, (state, action) => {
         state.loading = false;
         state.success = false;
         state.error = action.payload;
