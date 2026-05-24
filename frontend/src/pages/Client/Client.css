@@ -1,0 +1,282 @@
+/************ HEADER ************/
+
+.clients__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.clients__header h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+
+.clients__btn {
+  background: var(--primary);
+  color: var(--surface);
+  border: none;
+  border-radius: 6px;
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease, opacity 0.2s ease;
+}
+
+.clients__btn:hover {
+  background: var(--primary-hover);
+}
+
+.clients__btn:active {
+  transform: scale(0.98);
+}
+
+.clients__btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/************ TABLE ************/
+
+.clients__table table {
+  width: 100%;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.clients__table th,
+.clients__table td {
+  padding: 12px;
+}
+
+.clients__table td {
+  vertical-align: middle;
+}
+
+.clients__table th:last-child,
+.clients__table td:last-child {
+  width: 120px;
+  text-align: center;
+}
+
+/************ STATUS ************/
+
+.status.active {
+  color: #22c55e;
+  font-weight: 600;
+}
+
+.status.inactive {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+/************ MODAL (GENÉRICO) ************/
+
+.clients__modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  padding: 20px;
+}
+
+.clients__modal {
+  width: 100%;
+  max-width: 550px;
+  background: white;
+  border-radius: 12px;
+  padding: 25px;
+  animation: modalFade 0.2s ease;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.clients__modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.clients__modalHeader h3 {
+  margin: 0;
+}
+
+.clients__closeBtn {
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+/************ FORM (NÃO MEXIDO) ************/
+
+.form__client {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form__group--client {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form__group--client label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.form__client input,
+.form__client select,
+.form__client textarea {
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form__client input:hover,
+.form__client select:hover,
+.form__client textarea:hover {
+  border-color: var(--primary);
+}
+
+.form__client input:focus,
+.form__client select:focus,
+.form__client textarea:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+.form__client textarea {
+  resize: none;
+  min-height: 100px;
+}
+
+/************ ADDRESS BUTTON ************/
+
+.addressBtn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.addressBtn:hover {
+  background: #1d4ed8;
+}
+
+/************ 🔥 AQUI ESTÁ A CORREÇÃO REAL ************/
+
+.address__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;   /* CENTRALIZA HORIZONTAL */
+  justify-content: center;
+  gap: 12px;
+  padding: 20px 0;
+  text-align: center;    /* CENTRALIZA TEXTO */
+}
+
+.address__content p {
+  margin: 0;
+  width: 100%;
+}
+
+/************ ACTION ICONS ************/
+
+.table__edit--close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.client__actionIcon {
+  cursor: pointer;
+  font-size: 20px;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.client__actionIcon:hover {
+  transform: scale(1.1);
+  opacity: 0.8;
+}
+
+.client__actionIcon.edit {
+  color: #3b82f6;
+}
+
+.client__actionIcon.delete {
+  color: #ef4444;
+}
+
+/************ CENTRALIZAÇÃO INTELIGENTE DA TABELA ************/
+
+.clients__table td {
+  padding: 12px;
+  vertical-align: middle;
+}
+
+.clients__table td:nth-child(1) {
+  text-align: left;
+}
+
+.clients__table td:nth-child(2) {
+  text-align: left;
+}
+
+.clients__table td:nth-child(n+3) {
+  text-align: center;
+}
+
+/************ ANIMATION ************/
+
+@keyframes modalFade {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/************ RESPONSIVE ************/
+
+@media (max-width: 768px) {
+  .clients__header {
+    flex-direction: column;
+    gap: 15px;
+    align-items: stretch;
+  }
+
+  .clients__btn {
+    width: 100%;
+  }
+
+  .clients__table {
+    overflow-x: auto;
+  }
+
+  .clients__modal {
+    padding: 20px;
+  }
+}

@@ -2,9 +2,7 @@
 import "./Product.css";
 
 // Components
-import Navbar from "../../components/Navbar/Navbar";
 import Message from "../../components/Message/Message";
-import Footer from "../../components/Footer/Footer";
 
 // Hooks
 import { useEffect, useState } from "react";
@@ -473,8 +471,6 @@ const Product = () => {
           {loading && <p>Carregando produtos...</p>}
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 };

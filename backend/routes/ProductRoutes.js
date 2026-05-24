@@ -21,7 +21,6 @@ const {
   productUpdateValidation,
 } = require("../middlewares/productValidations");
 
-// 🔹 ROTAS
 router.post(
   "/",
   authGuard,

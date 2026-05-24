@@ -20,8 +20,6 @@ const {
   clientUpdateValidation,
 } = require("../middlewares/clientValidations");
 
-// 🔹 ROUTES
-
 router.post(
   "/",
   authGuard,

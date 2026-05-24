@@ -4,7 +4,7 @@ import clientService from "../services/clientService";
 const initialState = {
   clients: [],
   client: {},
-  error: false,
+  error: null,
   success: false,
   loading: false,
   message: null,
@@ -16,18 +16,14 @@ export const createClient = createAsyncThunk(
   async (client, thunkAPI) => {
     const token = thunkAPI.getState().auth.user.token;
 
-    const data = await clientService.createClient(
-      client,
-      token,
-    );
+    const data = await clientService.createClient(client, token);
 
-    // Check for errors
     if (data.errors) {
       return thunkAPI.rejectWithValue(data.errors[0]);
     }
 
     return data;
-  },
+  }
 );
 
 // Get all clients
@@ -39,42 +35,39 @@ export const getAllClients = createAsyncThunk(
     const data = await clientService.getAllClients(token);
 
     return data;
-  },
+  }
 );
 
 // Get client by id
 export const getClientById = createAsyncThunk(
-  "client/getbyid",
+  "client/get",
   async (id, thunkAPI) => {
     const token = thunkAPI.getState().auth.user.token;
 
-    const data = await clientService.getClientById(
-      id,
-      token,
-    );
+    const data = await clientService.getClientById(id, token);
 
     return data;
-  },
+  }
 );
 
 // Update client
 export const updateClient = createAsyncThunk(
   "client/update",
-  async (clientData, thunkAPI) => {
+  async ({ id, clientData }, thunkAPI) => {
     const token = thunkAPI.getState().auth.user.token;
 
     const data = await clientService.updateClient(
       clientData,
-      token,
+      id,
+      token
     );
 
-    // Check for errors
     if (data.errors) {
       return thunkAPI.rejectWithValue(data.errors[0]);
     }
 
     return data;
-  },
+  }
 );
 
 // Delete client
@@ -83,18 +76,14 @@ export const deleteClient = createAsyncThunk(
   async (id, thunkAPI) => {
     const token = thunkAPI.getState().auth.user.token;
 
-    const data = await clientService.deleteClient(
-      id,
-      token,
-    );
+    const data = await clientService.deleteClient(id, token);
 
-    // Check for errors
     if (data.errors) {
       return thunkAPI.rejectWithValue(data.errors[0]);
     }
 
     return data;
-  },
+  }
 );
 
 export const clientSlice = createSlice({
@@ -104,12 +93,13 @@ export const clientSlice = createSlice({
   reducers: {
     resetMessage: (state) => {
       state.message = null;
+      state.error = null;
     },
 
     reset: (state) => {
+      state.loading = false;
       state.error = false;
       state.success = false;
-      state.loading = false;
       state.message = null;
     },
   },
@@ -117,12 +107,11 @@ export const clientSlice = createSlice({
   extraReducers: (builder) => {
     builder
 
-      // Create client
+      // CREATE
       .addCase(createClient.pending, (state) => {
         state.loading = true;
-        state.error = false;
+        state.error = null;
       })
-
       .addCase(createClient.fulfilled, (state, action) => {
         state.loading = false;
         state.success = true;
@@ -131,40 +120,30 @@ export const clientSlice = createSlice({
 
         state.message = "Cliente cadastrado com sucesso.";
       })
-
       .addCase(createClient.rejected, (state, action) => {
         state.loading = false;
-        state.error = true;
-
-        state.message = action.payload;
+        state.error = action.payload;
       })
 
-      // Get all clients
+      // GET ALL
       .addCase(getAllClients.pending, (state) => {
         state.loading = true;
-        state.error = false;
+        state.error = null;
       })
-
       .addCase(getAllClients.fulfilled, (state, action) => {
         state.loading = false;
         state.success = true;
 
-        state.clients = action.payload;
+        state.clients = Array.isArray(action.payload)
+          ? action.payload
+          : action.payload?.clients || [];
       })
-
       .addCase(getAllClients.rejected, (state, action) => {
         state.loading = false;
-        state.error = true;
-
-        state.message = action.payload;
+        state.error = action.payload;
       })
 
-      // Get client by id
-      .addCase(getClientById.pending, (state) => {
-        state.loading = true;
-        state.error = false;
-      })
-
+      // GET BY ID
       .addCase(getClientById.fulfilled, (state, action) => {
         state.loading = false;
         state.success = true;
@@ -172,68 +151,34 @@ export const clientSlice = createSlice({
         state.client = action.payload;
       })
 
-      .addCase(getClientById.rejected, (state, action) => {
-        state.loading = false;
-        state.error = true;
-
-        state.message = action.payload;
-      })
-
-      // Update client
-      .addCase(updateClient.pending, (state) => {
-        state.loading = true;
-        state.error = false;
-      })
-
+      // UPDATE
       .addCase(updateClient.fulfilled, (state, action) => {
         state.loading = false;
         state.success = true;
 
-        state.clients = state.clients.map((client) => {
-          if (client._id === action.payload._id) {
-            return action.payload;
-          }
-
-          return client;
-        });
+        state.clients = state.clients.map((client) =>
+          client._id === action.payload._id
+            ? action.payload
+            : client
+        );
 
         state.message = "Cliente atualizado com sucesso.";
       })
 
-      .addCase(updateClient.rejected, (state, action) => {
-        state.loading = false;
-        state.error = true;
-
-        state.message = action.payload;
-      })
-
-      // Delete client
-      .addCase(deleteClient.pending, (state) => {
-        state.loading = true;
-        state.error = false;
-      })
-
+      // DELETE
       .addCase(deleteClient.fulfilled, (state, action) => {
         state.loading = false;
         state.success = true;
 
         state.clients = state.clients.filter(
-          (client) => client._id !== action.payload.id,
+          (client) => client._id !== action.payload.id
         );
 
         state.message = action.payload.message;
-      })
-
-      .addCase(deleteClient.rejected, (state, action) => {
-        state.loading = false;
-        state.error = true;
-
-        state.message = action.payload;
       });
   },
 });
 
-export const { resetMessage, reset } =
-  clientSlice.actions;
+export const { resetMessage, reset } = clientSlice.actions;
 
 export default clientSlice.reducer;
