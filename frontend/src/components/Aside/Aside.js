@@ -40,6 +40,14 @@ const Aside = ({ setPage, page }) => {
           </li>
           <li
             className={`dashboard__menu--item ${
+              page === "client" ? "dashboard__menu--item--active" : ""
+            }`}
+            onClick={() => setPage("client")}
+          >
+            <FiUser className="dashboard__icons" /> Clientes
+          </li>
+          <li
+            className={`dashboard__menu--item ${
               page === "sales" ? "dashboard__menu--item--active" : ""
             }`}
             onClick={() => setPage("sales")}
