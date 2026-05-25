@@ -41,6 +41,7 @@ const Sales = () => {
 
   const [formData, setFormData] = useState({
     client: "",
+    customerDocument: "",
     products: [
       {
         product: "",
@@ -89,6 +90,40 @@ const Sales = () => {
       style: "currency",
       currency: "BRL",
     });
+  };
+
+  const translatePaymentMethod = (method) => {
+    const methods = {
+      CASH: "Dinheiro",
+      PIX: "Pix",
+      CREDIT_CARD: "Cartão de crédito",
+      DEBIT_CARD: "Cartão de débito",
+      BANK_SLIP: "Boleto",
+      TRANSFER: "Transferência",
+    };
+
+    return methods[method] || "-";
+  };
+
+  const translatePaymentStatus = (status) => {
+    const statuses = {
+      PENDING: "Pendente",
+      PAID: "Pago",
+      CANCELLED: "Cancelado",
+      REFUNDED: "Reembolsado",
+    };
+
+    return statuses[status] || "-";
+  };
+
+  const translateSaleStatus = (status) => {
+    const statuses = {
+      OPEN: "Aberta",
+      FINISHED: "Finalizada",
+      CANCELLED: "Cancelada",
+    };
+
+    return statuses[status] || "-";
   };
 
   const getClientName = (sale) => {
@@ -163,6 +198,7 @@ const Sales = () => {
   const resetForm = () => {
     setFormData({
       client: "",
+      customerDocument: "",
       products: [
         {
           product: "",
@@ -270,7 +306,8 @@ const Sales = () => {
     if (invalidProduct) return;
 
     const payload = {
-      client: formData.client,
+      client: formData.client || null,
+      customerDocument: formData.customerDocument,
       products: formData.products,
       payment: formData.payment,
       subtotal,
@@ -361,6 +398,7 @@ const Sales = () => {
           <thead>
             <tr>
               <th>ID Compra</th>
+              <th>CPF/CNPJ</th>
               <th>Cliente</th>
               <th>Itens comprados</th>
               <th>Total</th>
@@ -377,6 +415,7 @@ const Sales = () => {
               filteredSales.map((sale) => (
                 <tr key={sale._id}>
                   <td>{sale.saleNumber || sale._id}</td>
+                  <td>{sale.customerDocument || "-"}</td>
                   <td>{getClientName(sale)}</td>
 
                   <td>
@@ -393,7 +432,8 @@ const Sales = () => {
                   <td>{formatCurrency(sale.total)}</td>
 
                   <td>
-                    {sale.payment?.method} / {sale.payment?.status}
+                    {translatePaymentMethod(sale.payment?.method)} /{" "}
+                    {translatePaymentStatus(sale.payment?.status)}
                   </td>
 
                   <td>
@@ -406,7 +446,7 @@ const Sales = () => {
                             : "pending"
                       }`}
                     >
-                      {sale.status}
+                      {translateSaleStatus(sale.status)}
                     </span>
                   </td>
 
@@ -469,27 +509,44 @@ const Sales = () => {
                   <span>{new Date().toLocaleDateString("pt-BR")}</span>
                 </div>
 
-                <div className="form__group--sales">
-                  <label>Cliente</label>
+                <div className="sales__customerGrid">
+                  <div className="form__group--sales">
+                    <label>Cliente cadastrado</label>
 
-                  <select
-                    value={formData.client}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        client: e.target.value,
-                      }))
-                    }
-                    required
-                  >
-                    <option value="">Selecione um cliente</option>
+                    <select
+                      value={formData.client}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          client: e.target.value,
+                        }))
+                      }
+                    >
+                      <option value="">Venda sem cliente vinculado</option>
 
-                    {clients?.map((client) => (
-                      <option key={client._id} value={client._id}>
-                        {client.name}
-                      </option>
-                    ))}
-                  </select>
+                      {clients?.map((client) => (
+                        <option key={client._id} value={client._id}>
+                          {client.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="form__group--sales">
+                    <label>CPF/CNPJ na nota</label>
+
+                    <input
+                      type="text"
+                      placeholder="Opcional"
+                      value={formData.customerDocument}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          customerDocument: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
                 </div>
 
                 <div className="sales__productsBox">
@@ -607,17 +664,20 @@ const Sales = () => {
                     </select>
                   </div>
 
-                  <div className="form__group--sales">
-                    <label>Parcelas</label>
+                  {formData.payment.method === "CREDIT_CARD" && (
+                    <div className="form__group--sales">
+                      <label>Parcelas</label>
 
-                    <input
-                      type="number"
-                      name="installments"
-                      min="1"
-                      value={formData.payment.installments}
-                      onChange={handlePaymentChange}
-                    />
-                  </div>
+                      <input
+                        type="number"
+                        name="installments"
+                        min="1"
+                        max="12"
+                        value={formData.payment.installments}
+                        onChange={handlePaymentChange}
+                      />
+                    </div>
+                  )}
 
                   <div className="form__group--sales">
                     <label>Status da venda</label>
@@ -776,21 +836,24 @@ const Sales = () => {
                 </select>
               </div>
 
-              <div className="form__group--sales">
-                <label>Parcelas</label>
+              {paymentData.method === "CREDIT_CARD" && (
+                <div className="form__group--sales">
+                  <label>Parcelas</label>
 
-                <input
-                  type="number"
-                  min="1"
-                  value={paymentData.installments}
-                  onChange={(e) =>
-                    setPaymentData((prev) => ({
-                      ...prev,
-                      installments: Number(e.target.value),
-                    }))
-                  }
-                />
-              </div>
+                  <input
+                    type="number"
+                    min="1"
+                    max="12"
+                    value={paymentData.installments}
+                    onChange={(e) =>
+                      setPaymentData((prev) => ({
+                        ...prev,
+                        installments: Number(e.target.value),
+                      }))
+                    }
+                  />
+                </div>
+              )}
 
               <div className="form__group--sales">
                 <label>Status da venda</label>
@@ -847,16 +910,23 @@ const Sales = () => {
               </p>
 
               <p>
+                <strong>CPF/CNPJ na nota:</strong>{" "}
+                {detailsSale.customerDocument || "-"}
+              </p>
+
+              <p>
                 <strong>Vendedor:</strong> {getSellerName(detailsSale)}
               </p>
 
               <p>
-                <strong>Status da venda:</strong> {detailsSale.status}
+                <strong>Status da venda:</strong>{" "}
+                {translateSaleStatus(detailsSale.status)}
               </p>
 
               <p>
-                <strong>Pagamento:</strong> {detailsSale.payment?.method} /{" "}
-                {detailsSale.payment?.status} /{" "}
+                <strong>Pagamento:</strong>{" "}
+                {translatePaymentMethod(detailsSale.payment?.method)} /{" "}
+                {translatePaymentStatus(detailsSale.payment?.status)} /{" "}
                 {detailsSale.payment?.installments}x
               </p>
 

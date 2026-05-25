@@ -520,6 +520,18 @@
   }
 }
 
+.sales__customerGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+@media (max-width: 900px) {
+  .sales__customerGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /************ RESPONSIVE ************/
 
 @media (max-width: 900px) {

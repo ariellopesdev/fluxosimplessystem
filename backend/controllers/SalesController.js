@@ -5,7 +5,15 @@ const mongoose = require("mongoose");
 
 // Create a sale
 const createSale = async (req, res) => {
-  const { client, products, payment, discount, shipping, notes } = req.body;
+  const {
+    client,
+    customerDocument,
+    products,
+    payment,
+    discount,
+    shipping,
+    notes,
+  } = req.body;
 
   const reqUser = req.user;
 
@@ -72,7 +80,8 @@ const createSale = async (req, res) => {
 
   const newSale = await Sale.create({
     saleNumber,
-    client,
+    client: client || null,
+    customerDocument: customerDocument || "",
     seller: reqUser._id,
     products: saleProducts,
     payment,
