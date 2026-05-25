@@ -12,12 +12,14 @@ import Register from "../../pages/Register/Register";
 import Settings from "../../pages/Settings/Settings";
 import Help from "../../pages/Help/Help";
 import Sales from "../../pages/Sales/Sales";
+import UnderConstruction from "../../components/UnderConstruction/UnderConstruction";
 
 const Main = ({ page }) => {
   const renderPage = () => {
     switch (page) {
       case "dashboard":
-        return <Dashboard />;
+        return <UnderConstruction />;
+        // return <Dashboard />;
       case "client":
         return <Client />;
       case "sales":
@@ -27,15 +29,18 @@ const Main = ({ page }) => {
       case "financial":
         return <Financial />;
       case "appointment":
-        return <Appointment />;
+        return <UnderConstruction />;
+        // return <Appointment />;
       case "reports":
-        return <Reports />;
+        return <UnderConstruction />;
+        // return <Reports />;
       case "register":
         return <Register />;
       case "settings":
         return <Settings />;
       case "help":
-        return <Help />;
+        return <UnderConstruction />;
+        // return <Help />;
     }
   };
   return (
