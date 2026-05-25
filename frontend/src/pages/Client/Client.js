@@ -510,7 +510,6 @@ const Clients = () => {
         <div className="clientCard orange">{companyClients} Empresas</div>
         <div className="clientCard red">{cancelledClients} Cancelados</div>
       </div>
-
       <div className="clients__filters">
         <input
           type="text"
@@ -519,8 +518,6 @@ const Clients = () => {
           onChange={(e) => setSearch(e.target.value)}
         />
       </div>
-
-      {/* TABLE */}
       <div className="clients__table">
         <table>
           <thead>
@@ -873,9 +870,9 @@ const Clients = () => {
       {/* MODAL ENDEREÇO */}
       {selectedAddress && (
         <div className="clients__modalOverlay">
-          <div className="clients__modal addressModal">
+          <div className="clients__modal clientViewModal">
             <div className="clients__modalHeader">
-              <h3>Endereço</h3>
+              <h3>Endereço do Cliente</h3>
 
               <button
                 className="clients__closeBtn"
@@ -885,58 +882,48 @@ const Clients = () => {
               </button>
             </div>
 
-            <div className="address__content">
-              <div className="address__item">
-                <FaRoad className="address__icon" />
-                <div>
-                  <strong>Endereço</strong>
-                  <p>{selectedAddress.street}</p>
+            <div className="form__section clientViewSection">
+              <div className="form__section-grid clientViewGrid">
+                <div className="form__group--client form__full">
+                  <label>Rua</label>
+                  <input value={selectedAddress.street || "-"} disabled />
                 </div>
-              </div>
-              <div className="address__item">
-                <FaHome className="address__icon" />
-                <div>
-                  <strong>Número</strong>
-                  <p>{selectedAddress.number}</p>
+
+                <div className="form__group--client">
+                  <label>Número</label>
+                  <input value={selectedAddress.number || "-"} disabled />
                 </div>
-              </div>
-              <div className="address__item">
-                <FaDoorOpen className="address__icon" />
-                <div>
-                  <strong>Complemento</strong>
-                  <p>{selectedAddress.complement}</p>
+
+                <div className="form__group--client">
+                  <label>Complemento</label>
+                  <input value={selectedAddress.complement || "-"} disabled />
                 </div>
-              </div>
-              <div className="address__item">
-                <FaMapMarkedAlt className="address__icon" />
-                <div>
-                  <strong>Bairro</strong>
-                  <p>{selectedAddress.neighborhood}</p>
+
+                <div className="form__group--client">
+                  <label>Bairro</label>
+                  <input value={selectedAddress.neighborhood || "-"} disabled />
                 </div>
-              </div>
-              <div className="address__item">
-                <FaCity className="address__icon" />
-                <div>
-                  <strong>Cidade</strong>
-                  <p>{selectedAddress.city}</p>
+
+                <div className="form__group--client">
+                  <label>Cidade</label>
+                  <input value={selectedAddress.city || "-"} disabled />
                 </div>
-              </div>
-              <div className="address__item">
-                <FaMap className="address__icon" />
-                <div>
-                  <strong>Estado</strong>
-                  <p>{selectedAddress.state}</p>
+
+                <div className="form__group--client">
+                  <label>Estado</label>
+                  <input value={selectedAddress.state || "-"} disabled />
                 </div>
-              </div>
-              <div className="address__item">
-                <FaMailBulk className="address__icon" />
-                <div>
-                  <strong>CEP</strong>
-                  <p>
-                    {selectedAddress.zipCode
-                      ? formatCEP(selectedAddress.zipCode)
-                      : "-"}
-                  </p>
+
+                <div className="form__group--client">
+                  <label>CEP</label>
+                  <input
+                    value={
+                      selectedAddress.zipCode
+                        ? formatCEP(selectedAddress.zipCode)
+                        : "-"
+                    }
+                    disabled
+                  />
                 </div>
               </div>
             </div>
@@ -947,9 +934,9 @@ const Clients = () => {
       {/* MODAL TELEFONES */}
       {selectedPhones && (
         <div className="clients__modalOverlay">
-          <div className="clients__modal addressModal">
+          <div className="clients__modal clientViewModal">
             <div className="clients__modalHeader">
-              <h3>Telefones</h3>
+              <h3>Telefones do Cliente</h3>
 
               <button
                 className="clients__closeBtn"
@@ -959,40 +946,42 @@ const Clients = () => {
               </button>
             </div>
 
-            <div className="address__content">
-              <div className="address__item">
-                <FaPhoneAlt className="address__icon" />
-                <div>
-                  <strong>Telefone Principal</strong>
-                  <p>
-                    {selectedPhones.primary
-                      ? formatPhone(selectedPhones.primary)
-                      : "-"}
-                  </p>
+            <div className="form__section clientViewSection">
+              <div className="clientViewColumn">
+                <div className="form__group--client">
+                  <label>Telefone Principal</label>
+                  <input
+                    value={
+                      selectedPhones.primary
+                        ? formatPhone(selectedPhones.primary)
+                        : "-"
+                    }
+                    disabled
+                  />
                 </div>
-              </div>
 
-              <div className="address__item">
-                <FaMobileAlt className="address__icon" />
-                <div>
-                  <strong>Telefone Secundário</strong>
-                  <p>
-                    {selectedPhones.secondary
-                      ? formatPhone(selectedPhones.secondary)
-                      : "-"}
-                  </p>
+                <div className="form__group--client">
+                  <label>Telefone Secundário</label>
+                  <input
+                    value={
+                      selectedPhones.secondary
+                        ? formatPhone(selectedPhones.secondary)
+                        : "-"
+                    }
+                    disabled
+                  />
                 </div>
-              </div>
 
-              <div className="address__item">
-                <FaExclamationTriangle className="address__icon" />
-                <div>
-                  <strong>Telefone de Emergência</strong>
-                  <p>
-                    {selectedPhones.emergency
-                      ? formatPhone(selectedPhones.emergency)
-                      : "-"}
-                  </p>
+                <div className="form__group--client">
+                  <label>Telefone de Emergência</label>
+                  <input
+                    value={
+                      selectedPhones.emergency
+                        ? formatPhone(selectedPhones.emergency)
+                        : "-"
+                    }
+                    disabled
+                  />
                 </div>
               </div>
             </div>

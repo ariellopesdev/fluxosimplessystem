@@ -168,7 +168,7 @@
   animation: modalFade 0.2s ease;
 }
 
-.clients__modal.addressModal {
+.clientViewModal {
   max-width: 520px;
 }
 
@@ -306,7 +306,60 @@
   box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
 }
 
-/************ ADDRESS ************/
+/************ CLIENT VIEW MODALS ************/
+
+.clientViewSection {
+  padding: 20px;
+  margin-bottom: 0;
+}
+
+.clientViewGrid {
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+.clientViewColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.clientViewModal .form__group--client {
+  margin-bottom: 0;
+}
+
+.clientViewModal .form__group--client label {
+  font-size: 0.76rem;
+  color: #6b7280;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.35px;
+}
+
+.clientViewModal .form__group--client input {
+  height: 46px;
+  padding: 0 18px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  color: #111827;
+  font-size: 0.94rem;
+  font-weight: 600;
+  opacity: 1;
+  cursor: default;
+}
+
+.clientViewModal .form__group--client input:disabled {
+  background: #fff;
+  color: #111827;
+  opacity: 1;
+}
+
+.clientViewModal .form__group--client input:hover {
+  border-color: #d1d5db;
+}
+
+/************ BUTTONS ************/
 
 .addressBtn {
   background: #2563eb;
@@ -320,46 +373,6 @@
 
 .addressBtn:hover {
   background: #1d4ed8;
-}
-
-.address__content {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-  padding: 20px 10px;
-  text-align: left;
-}
-
-.address__item {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  width: 100%;
-  min-height: 72px;
-  padding: 12px;
-  background: transparent;
-  border-bottom: 1px solid #f1f5f9;
-  border-radius: 10px;
-}
-
-.address__item strong {
-  display: block;
-  font-size: 0.75rem;
-  color: #9ca3af;
-  margin-bottom: 2px;
-  font-weight: 600;
-}
-
-.address__item p {
-  margin: 0;
-  color: #111827;
-}
-
-.address__icon {
-  font-size: 18px;
-  color: #9ca3af;
-  margin-top: 2px;
-  flex-shrink: 0;
 }
 
 /************ ACTION ICONS ************/
@@ -392,24 +405,10 @@
   color: #ef4444;
 }
 
-/************ ANIMATION ************/
-
-@keyframes modalFade {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 /************ PURCHASE HISTORY ************/
 
 .purchaseHistoryModal {
-   max-width: 900px;
+  max-width: 900px;
   max-height: 88vh;
   overflow-y: auto;
 }
@@ -451,6 +450,11 @@
   padding-right: 8px;
 }
 
+.purchase__couponWrapper {
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
 .purchase__coupon {
   background: #fff;
   border: 1px solid #e5e7eb;
@@ -468,11 +472,6 @@
   background: #f9fafb;
   padding: 14px 16px;
   border-bottom: 1px dashed #d1d5db;
-}
-
-.purchase__couponWrapper {
-  overflow-x: auto;
-  padding-bottom: 6px;
 }
 
 .purchase__couponHeader strong {
@@ -536,27 +535,21 @@
   text-align: right;
 }
 
-.purchase__couponFooter p {
-  word-break: normal;
-  white-space: normal;
-  line-height: 1.4;
-}
-
-.purchase__couponFooter strong {
-  white-space: nowrap;
-}
-
 .purchase__couponFooter strong {
   display: block;
   font-size: 0.75rem;
   color: #9ca3af;
   margin-bottom: 4px;
+  white-space: nowrap;
 }
 
 .purchase__couponFooter p {
   margin: 0;
   font-weight: 700;
   color: #111827;
+  word-break: normal;
+  white-space: normal;
+  line-height: 1.4;
 }
 
 .purchase__empty {
@@ -567,28 +560,17 @@
   border-radius: 10px;
 }
 
-@media (max-width: 768px) {
-  .purchase__summary {
-    grid-template-columns: 1fr 1fr;
+/************ ANIMATION ************/
+
+@keyframes modalFade {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
   }
 
-  .purchase__productsHeader,
-  .purchase__productsRow {
-    grid-template-columns: 1fr;
-    gap: 4px;
-  }
-
-  .purchase__couponFooter {
-    grid-template-columns: 1fr;
-  }
-
-  .purchase__couponFooter div:last-child {
-    text-align: left;
-  }
-
-  .purchase__couponHeader {
-    flex-direction: column;
-    align-items: flex-start;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -625,12 +607,38 @@
     padding: 20px;
   }
 
-  .form__section-grid,
-  .address__content {
+  .form__section-grid {
     grid-template-columns: 1fr;
   }
 
   .form__full {
     grid-column: auto;
+  }
+
+  .clientViewModal {
+    max-width: 100%;
+  }
+
+  .purchase__summary {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .purchase__productsHeader,
+  .purchase__productsRow {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .purchase__couponFooter {
+    grid-template-columns: 1fr;
+  }
+
+  .purchase__couponFooter div:last-child {
+    text-align: left;
+  }
+
+  .purchase__couponHeader {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
