@@ -14,6 +14,7 @@ import {
   FiHelpCircle,
 } from "react-icons/fi";
 import { FaShoppingCart } from "react-icons/fa";
+import { MdAttachMoney } from "react-icons/md";
 
 //Components
 import { NavLink } from "react-router-dom";
@@ -61,6 +62,14 @@ const Aside = ({ setPage, page }) => {
             onClick={() => setPage("products")}
           >
             <FiPackage className="dashboard__icons" /> Produtos
+          </li>
+          <li
+            className={`dashboard__menu--item ${
+              page === "financial" ? "dashboard__menu--item--active" : ""
+            }`}
+            onClick={() => setPage("financial")}
+          >
+            <MdAttachMoney className="dashboard__icons" /> Financeiro
           </li>
           <li
             className={`dashboard__menu--item ${

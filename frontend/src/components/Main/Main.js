@@ -5,6 +5,7 @@ import "./Main.css";
 import Dashboard from "../../pages/Dashboard/Dashboard";
 import Client from "../../pages/Client/Client";
 import Product from "../../pages/Product/Product";
+import Financial from "../../pages/Financial/Financial";
 import Appointment from "../../pages/Appointment/Appointment";
 import Reports from "../../pages/Reports/Reports";
 import Register from "../../pages/Register/Register";
@@ -23,6 +24,8 @@ const Main = ({ page }) => {
         return <Sales />;
       case "products":
         return <Product />;
+      case "financial":
+        return <Financial />;
       case "appointment":
         return <Appointment />;
       case "reports":

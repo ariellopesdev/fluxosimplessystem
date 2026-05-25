@@ -15,6 +15,7 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import Client from "./pages/Client/Client";
 import Sales from "./pages/Sales/Sales";
 import Product from "./pages/Product/Product";
+import Financial from "./pages/Financial/Financial";
 import Appointment from "./pages/Appointment/Appointment";
 import Reports from "./pages/Reports/Reports";
 import Settings from "./pages/Settings/Settings";
@@ -54,6 +55,10 @@ function App() {
           <Route
             path="/product"
             element={auth ? <Product /> : <Navigate to="/" />}
+          />
+          <Route
+            path="/financial"
+            element={auth ? <Financial /> : <Navigate to="/" />}
           />
           <Route
             path="/appointment"
