@@ -4,7 +4,8 @@ const router = express();
 router.use("/api/users", require("./UserRoutes"));
 router.use("/api/products", require("./ProductRoutes"));
 router.use("/api/clients", require("./ClientRoutes"));
-router.use("/api/sales/", require("./SalesRoutes"));
+router.use("/api/sales", require("./SalesRoutes"));
+router.use("/api/financial", require("./FinancialRoutes"));
 
 // test route
 router.get("/", (req, res) => {
