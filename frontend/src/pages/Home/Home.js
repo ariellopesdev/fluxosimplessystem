@@ -13,9 +13,13 @@ import { useSelector, useDispatch } from "react-redux";
 //Redux
 import { login, reset } from "../../slices/authSlice.js";
 
+//Icons
+import { FiEye, FiEyeOff } from "react-icons/fi";
+
 const Home = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -61,13 +65,30 @@ const Home = () => {
             placeholder="E-mail"
             onChange={(e) => setEmail(e.target.value)}
             value={email || ""}
+            autoComplete="off"
+            name="login_email_custom"
+            id="login_email_custom"
           />
-          <input
-            type="password"
-            placeholder="Senha"
-            onChange={(e) => setPassword(e.target.value)}
-            value={password || ""}
-          />
+          <div className="password__container">
+            <input
+              type="text"
+              placeholder="Senha"
+              onChange={(e) => setPassword(e.target.value)}
+              value={password || ""}
+              autoComplete="off"
+              name="fake_field_not_password"
+              id="fake_field_not_password"
+              className={!showPassword ? "password__hidden" : ""}
+            />
+
+            <button
+              type="button"
+              className="password__toggle"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <FiEyeOff /> : <FiEye />}
+            </button>
+          </div>
           {!loading && (
             <input
               type="submit"

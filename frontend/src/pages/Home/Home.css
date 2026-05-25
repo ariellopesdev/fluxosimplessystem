@@ -87,6 +87,45 @@
   text-decoration: underline;
 }
 
+.password__container {
+  position: relative;
+  width: 100%;
+}
+
+.password__container input {
+  width: 100%;
+  padding-right: 50px;
+}
+
+.password__toggle {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: transparent;
+  border: none;
+
+  cursor: pointer;
+
+  color: var(--text-light);
+
+  font-size: 1.2rem;
+}
+
+.password__toggle:hover {
+  color: var(--primary);
+}
+
+.password__hidden {
+  -webkit-text-security: disc;
+  text-security: disc;
+}
+
 @media (max-width: 768px) {
   #home {
     flex-direction: column;
