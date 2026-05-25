@@ -99,7 +99,6 @@ const loginValidation = () => {
   return [
     body("email")
       .trim()
-      .normalizeEmail()
       .notEmpty()
       .isString()
       .withMessage("E-mail é obrigatório.")
