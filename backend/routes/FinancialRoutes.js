@@ -14,6 +14,7 @@ const {
 // Middlewares
 const authGuard = require("../middlewares/authGuard");
 const validate = require("../middlewares/handleValidation");
+const roleGuard = require("../middlewares/roleGuard");
 
 // Validations
 const {
@@ -25,25 +26,42 @@ const {
 router.post(
   "/",
   authGuard,
+  roleGuard("ADMIN", "SUPER_ADMIN"),
   financialCreateValidation(),
   validate,
   createFinancial,
 );
 
-router.get("/", authGuard, getAllFinancials);
+router.get("/", authGuard, roleGuard("ADMIN", "SUPER_ADMIN"), getAllFinancials);
 
-router.get("/summary", authGuard, getFinancialSummary);
+router.get(
+  "/summary",
+  authGuard,
+  roleGuard("ADMIN", "SUPER_ADMIN"),
+  getFinancialSummary,
+);
 
-router.get("/:id", authGuard, getFinancialById);
+router.get(
+  "/:id",
+  authGuard,
+  roleGuard("ADMIN", "SUPER_ADMIN"),
+  getFinancialById,
+);
 
 router.put(
   "/:id",
   authGuard,
+  roleGuard("ADMIN", "SUPER_ADMIN"),
   financialUpdateValidation(),
   validate,
   updateFinancial,
 );
 
-router.delete("/:id", authGuard, deleteFinancial);
+router.delete(
+  "/:id",
+  authGuard,
+  roleGuard("ADMIN", "SUPER_ADMIN"),
+  deleteFinancial,
+);
 
 module.exports = router;

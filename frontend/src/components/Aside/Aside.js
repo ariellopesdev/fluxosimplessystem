@@ -26,6 +26,8 @@ const Aside = ({ setPage, page }) => {
 
   const canRegisterUsers =
     user?.role === "SUPER_ADMIN" || user?.role === "ADMIN";
+  const canAccessFinancial =
+    user?.role === "SUPER_ADMIN" || user?.role === "ADMIN";
   return (
     <aside id="aside">
       <div className="dashboard__container--menu">
@@ -62,14 +64,16 @@ const Aside = ({ setPage, page }) => {
           >
             <FiPackage className="dashboard__icons" /> Produtos
           </li>
-          <li
-            className={`dashboard__menu--item ${
-              page === "financial" ? "dashboard__menu--item--active" : ""
-            }`}
-            onClick={() => setPage("financial")}
-          >
-            <FaChartLine className="dashboard__icons" /> Financeiro
-          </li>
+          {canAccessFinancial && (
+            <li
+              className={`dashboard__menu--item ${
+                page === "financial" ? "dashboard__menu--item--active" : ""
+              }`}
+              onClick={() => setPage("financial")}
+            >
+              <FaChartLine className="dashboard__icons" /> Financeiro
+            </li>
+          )}
           <li
             className={`dashboard__menu--item ${
               page === "appointment" ? "dashboard__menu--item--active" : ""
