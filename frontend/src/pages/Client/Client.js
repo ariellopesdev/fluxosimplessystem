@@ -12,6 +12,7 @@ import {
   updateClient,
   resetMessage,
 } from "../../slices/clientSlice";
+import { getAllSales } from "../../slices/salesSlice";
 
 //Icons
 import { MdDelete, MdEdit } from "react-icons/md";
@@ -37,13 +38,14 @@ const Clients = () => {
   const dispatch = useDispatch();
 
   const { clients, error, message } = useSelector((state) => state.client);
-
+  const { sales } = useSelector((state) => state.sales);
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [errors, setErrors] = useState({});
   const [selectedPhones, setSelectedPhones] = useState(null);
   const [search, setSearch] = useState("");
+  const [selectedPurchaseHistory, setSelectedPurchaseHistory] = useState(null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -337,6 +339,7 @@ const Clients = () => {
 
   useEffect(() => {
     dispatch(getAllClients());
+    dispatch(getAllSales());
   }, [dispatch]);
 
   useEffect(() => {
@@ -476,6 +479,15 @@ const Clients = () => {
     dispatch(deleteClient(id));
   };
 
+  const getClientSales = (client) => {
+    return sales?.filter((sale) => {
+      const saleClientId =
+        typeof sale.client === "object" ? sale.client?._id : sale.client;
+
+      return saleClientId === client._id;
+    });
+  };
+
   return (
     <div className="clients">
       {/* HEADER */}
@@ -520,6 +532,7 @@ const Clients = () => {
               <th>Tipo</th>
               <th>Status</th>
               <th>Endereço</th>
+              <th>Histórico</th>
               <th>Ações</th>
             </tr>
           </thead>
@@ -563,7 +576,14 @@ const Clients = () => {
                       Ver endereço
                     </button>
                   </td>
-
+                  <td>
+                    <button
+                      className="addressBtn"
+                      onClick={() => setSelectedPurchaseHistory(client)}
+                    >
+                      Ver histórico
+                    </button>
+                  </td>
                   <td>
                     <div className="table__edit--close">
                       <MdEdit
@@ -975,6 +995,175 @@ const Clients = () => {
                   </p>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {selectedPurchaseHistory && (
+        <div className="clients__modalOverlay">
+          <div className="clients__modal purchaseHistoryModal">
+            <div className="clients__modalHeader">
+              <h3>Histórico de Compras</h3>
+
+              <button
+                className="clients__closeBtn"
+                onClick={() => setSelectedPurchaseHistory(null)}
+              >
+                <IoClose />
+              </button>
+            </div>
+
+            <div className="purchase__summary">
+              <div>
+                <strong>Cliente</strong>
+                <p>{selectedPurchaseHistory.name}</p>
+              </div>
+
+              <div>
+                <strong>Total de compras</strong>
+                <p>{getClientSales(selectedPurchaseHistory)?.length || 0}</p>
+              </div>
+
+              <div>
+                <strong>Itens comprados</strong>
+                <p>
+                  {getClientSales(selectedPurchaseHistory)?.reduce(
+                    (acc, sale) => {
+                      const totalItems = sale.products?.reduce(
+                        (sum, item) => sum + Number(item.quantity || 0),
+                        0,
+                      );
+
+                      return acc + Number(totalItems || 0);
+                    },
+                    0,
+                  )}
+                </p>
+              </div>
+
+              <div>
+                <strong>Valor gasto</strong>
+                <p>
+                  R${" "}
+                  {getClientSales(selectedPurchaseHistory)
+                    ?.reduce((acc, sale) => acc + Number(sale.total || 0), 0)
+                    .toLocaleString("pt-BR", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                </p>
+              </div>
+            </div>
+
+            <div className="purchase__history">
+              {getClientSales(selectedPurchaseHistory)?.length > 0 ? (
+                getClientSales(selectedPurchaseHistory).map((sale) => (
+                  <div className="purchase__couponWrapper" key={sale._id}>
+                    <div className="purchase__coupon">
+                      <div className="purchase__couponHeader">
+                        <div>
+                          <strong>{sale.saleNumber}</strong>
+                          <span>
+                            {sale.createdAt
+                              ? new Date(sale.createdAt).toLocaleString("pt-BR")
+                              : "-"}
+                          </span>
+                        </div>
+
+                        <span
+                          className={`status ${
+                            sale.payment?.status === "PAID"
+                              ? "active"
+                              : "pending"
+                          }`}
+                        >
+                          {sale.payment?.status === "PAID"
+                            ? "Pago"
+                            : sale.payment?.status === "PENDING"
+                              ? "Pendente"
+                              : sale.payment?.status === "CANCELLED"
+                                ? "Cancelado"
+                                : "Reembolsado"}
+                        </span>
+                      </div>
+
+                      <div className="purchase__productsTable">
+                        <div className="purchase__productsHeader">
+                          <span>Produto</span>
+                          <span>Qtd</span>
+                          <span>Unitário</span>
+                          <span>Total</span>
+                        </div>
+
+                        {sale.products?.map((item, index) => (
+                          <div key={index} className="purchase__productsRow">
+                            <span>{item.name}</span>
+                            <span>{item.quantity}</span>
+                            <span>
+                              R${" "}
+                              {Number(item.unityPrice || 0).toLocaleString(
+                                "pt-BR",
+                                {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                },
+                              )}
+                            </span>
+                            <span>
+                              R${" "}
+                              {Number(item.totalPrice || 0).toLocaleString(
+                                "pt-BR",
+                                {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                },
+                              )}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="purchase__couponFooter">
+                        <div>
+                          <strong>Pagamento</strong>
+                          <p>
+                            {sale.payment?.method === "CASH"
+                              ? "Dinheiro"
+                              : sale.payment?.method === "PIX"
+                                ? "Pix"
+                                : sale.payment?.method === "CREDIT_CARD"
+                                  ? "Cartão de crédito"
+                                  : sale.payment?.method === "DEBIT_CARD"
+                                    ? "Cartão de débito"
+                                    : sale.payment?.method === "BANK_SLIP"
+                                      ? "Boleto"
+                                      : "Transferência"}{" "}
+                            /{" "}
+                            {sale.payment?.installments
+                              ? `${sale.payment.installments}x`
+                              : "1x"}
+                          </p>
+                        </div>
+
+                        <div>
+                          <strong>Total</strong>
+                          <p>
+                            R${" "}
+                            {Number(sale.total || 0).toLocaleString("pt-BR", {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="purchase__empty">
+                  Nenhuma compra encontrada para este cliente.
+                </p>
+              )}
             </div>
           </div>
         </div>
