@@ -76,14 +76,14 @@ const Sales = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (message) {
+    if (error || message) {
       const timer = setTimeout(() => {
         dispatch(resetMessage());
       }, 2000);
 
       return () => clearTimeout(timer);
     }
-  }, [message, dispatch]);
+  }, [error, message, dispatch]);
 
   const formatCurrency = (value) => {
     return Number(value || 0).toLocaleString("pt-BR", {
@@ -126,6 +126,35 @@ const Sales = () => {
     return statuses[status] || "-";
   };
 
+  const onlyNumbers = (value) => value.replace(/\D/g, "");
+
+  const formatCPF = (value) => {
+    value = onlyNumbers(value).slice(0, 11);
+
+    value = value.replace(/^(\d{3})(\d)/, "$1.$2");
+    value = value.replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3");
+    value = value.replace(/\.(\d{3})(\d)/, ".$1-$2");
+
+    return value;
+  };
+
+  const formatCNPJ = (value) => {
+    value = onlyNumbers(value).slice(0, 14);
+
+    value = value.replace(/^(\d{2})(\d)/, "$1.$2");
+    value = value.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
+    value = value.replace(/\.(\d{3})(\d)/, ".$1/$2");
+    value = value.replace(/(\d{4})(\d)/, "$1-$2");
+
+    return value;
+  };
+
+  const formatCpfCnpj = (value) => {
+    const numbers = onlyNumbers(value || "");
+
+    return numbers.length > 11 ? formatCNPJ(numbers) : formatCPF(numbers);
+  };
+
   const getClientName = (sale) => {
     if (typeof sale.client === "object") {
       return sale.client?.name || "-";
@@ -149,7 +178,10 @@ const Sales = () => {
 
   const getSellableProducts = () => {
     return products?.filter(
-      (product) => Number(product.stock) > 0 && Number(product.unityPrice) > 0,
+      (product) =>
+        product.category === "SELLABLE" &&
+        Number(product.stock) > 0 &&
+        Number(product.unityPrice) > 0,
     );
   };
 
@@ -188,6 +220,7 @@ const Sales = () => {
     return (
       sale.saleNumber?.toLowerCase().includes(searchText) ||
       getClientName(sale).toLowerCase().includes(searchText) ||
+      sale.customerDocument?.toLowerCase().includes(searchText) ||
       productsText?.includes(searchText) ||
       sale.payment?.method?.toLowerCase().includes(searchText) ||
       sale.payment?.status?.toLowerCase().includes(searchText) ||
@@ -309,7 +342,13 @@ const Sales = () => {
       client: formData.client || null,
       customerDocument: formData.customerDocument,
       products: formData.products,
-      payment: formData.payment,
+      payment: {
+        ...formData.payment,
+        installments:
+          formData.payment.method === "CREDIT_CARD"
+            ? Number(formData.payment.installments)
+            : 1,
+      },
       subtotal,
       discount: Number(formData.discount || 0),
       shipping: Number(formData.shipping || 0),
@@ -343,12 +382,17 @@ const Sales = () => {
     await dispatch(
       updateSale({
         id: selectedSale._id,
-        payment: {
-          method: paymentData.method,
-          status: paymentData.status,
-          installments: Number(paymentData.installments),
+        saleData: {
+          payment: {
+            method: paymentData.method,
+            status: paymentData.status,
+            installments:
+              paymentData.method === "CREDIT_CARD"
+                ? Number(paymentData.installments)
+                : 1,
+          },
+          status: paymentData.statusSale,
         },
-        status: paymentData.statusSale,
       }),
     ).unwrap();
 
@@ -356,6 +400,18 @@ const Sales = () => {
 
     setShowPaymentModal(false);
     setSelectedSale(null);
+  };
+
+  const handleClientChange = (clientId) => {
+    const selectedClient = clients?.find((client) => client._id === clientId);
+
+    setFormData((prev) => ({
+      ...prev,
+      client: clientId,
+      customerDocument: selectedClient?.cpfCnpj
+        ? formatCpfCnpj(selectedClient.cpfCnpj)
+        : "",
+    }));
   };
 
   return (
@@ -398,8 +454,8 @@ const Sales = () => {
           <thead>
             <tr>
               <th>ID Compra</th>
-              <th>CPF/CNPJ</th>
               <th>Cliente</th>
+              <th>CPF/CNPJ</th>
               <th>Itens comprados</th>
               <th>Total</th>
               <th>Pagamento</th>
@@ -415,8 +471,8 @@ const Sales = () => {
               filteredSales.map((sale) => (
                 <tr key={sale._id}>
                   <td>{sale.saleNumber || sale._id}</td>
-                  <td>{sale.customerDocument || "-"}</td>
                   <td>{getClientName(sale)}</td>
+                  <td>{sale.customerDocument || "-"}</td>
 
                   <td>
                     <div className="sales__itemsList">
@@ -478,7 +534,7 @@ const Sales = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="9">Nenhuma venda encontrada.</td>
+                <td colSpan="10">Nenhuma venda encontrada.</td>
               </tr>
             )}
           </tbody>
@@ -515,12 +571,7 @@ const Sales = () => {
 
                     <select
                       value={formData.client}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          client: e.target.value,
-                        }))
-                      }
+                      onChange={(e) => handleClientChange(e.target.value)}
                     >
                       <option value="">Venda sem cliente vinculado</option>
 
@@ -539,10 +590,11 @@ const Sales = () => {
                       type="text"
                       placeholder="Opcional"
                       value={formData.customerDocument}
+                      maxLength={18}
                       onChange={(e) =>
                         setFormData((prev) => ({
                           ...prev,
-                          customerDocument: e.target.value,
+                          customerDocument: formatCpfCnpj(e.target.value),
                         }))
                       }
                     />
@@ -769,9 +821,17 @@ const Sales = () => {
                   />
                 </div>
 
-                <button type="submit" className="sales__btn" disabled={loading}>
-                  Finalizar Venda
-                </button>
+                {!loading && (
+                  <button type="submit" className="sales__btn">
+                    Finalizar Venda
+                  </button>
+                )}
+
+                {loading && (
+                  <button type="submit" className="sales__btn" disabled>
+                    Aguarde...
+                  </button>
+                )}
               </div>
             </form>
           </div>
@@ -873,9 +933,17 @@ const Sales = () => {
                 </select>
               </div>
 
-              <button type="submit" className="sales__btn" disabled={loading}>
-                Atualizar Pagamento
-              </button>
+              {!loading && (
+                <button type="submit" className="sales__btn">
+                  Atualizar Pagamento
+                </button>
+              )}
+
+              {loading && (
+                <button type="submit" className="sales__btn" disabled>
+                  Aguarde...
+                </button>
+              )}
             </form>
           </div>
         </div>
