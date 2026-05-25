@@ -1,0 +1,494 @@
+/************ HEADER ************/
+
+.financial__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.financial__header h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+
+/************ BUTTONS ************/
+
+.financial__btn {
+  background: var(--primary);
+  color: var(--surface);
+  border: none;
+  border-radius: 6px;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-weight: var(--weight-600);
+  letter-spacing: 0.3px;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.18);
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease,
+    opacity 0.2s ease;
+}
+
+.financial__btn:hover {
+  background: var(--primary-hover);
+}
+
+.financial__btn:active {
+  transform: scale(0.98);
+}
+
+.financial__btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.financial__smallBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  padding: 7px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.financial__smallBtn:hover {
+  background: #1d4ed8;
+}
+
+/************ CARDS ************/
+
+.financial__cards {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.financial__card {
+  flex: 1;
+  padding: 20px;
+  border-radius: 10px;
+  color: #fff;
+  font-weight: 600;
+}
+
+.financial__card span {
+  display: block;
+  font-size: 0.85rem;
+  margin-bottom: 8px;
+}
+
+.financial__card strong {
+  display: block;
+  font-size: 1.15rem;
+}
+
+.financial__card.income {
+  background: #22c55e;
+}
+
+.financial__card.expense {
+  background: #ef4444;
+}
+
+.financial__card.asset {
+  background: #3b82f6;
+}
+
+.financial__card.balance {
+  background: #f97316;
+}
+
+/************ FILTERS ************/
+
+.financial__filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.financial__filters input,
+.financial__filters select {
+  width: 220px;
+  height: 38px;
+  padding: 0 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #fff;
+}
+
+.financial__filters input:focus,
+.financial__filters select:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+/************ TABLE ************/
+
+.financial__table {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.financial__table table {
+  width: 100%;
+  min-width: 1100px;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  border-collapse: collapse;
+}
+
+.financial__table th,
+.financial__table td {
+  padding: 12px;
+  vertical-align: middle;
+}
+
+.financial__table th {
+  background: #f9fafb;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #6b7280;
+}
+
+.financial__table th:nth-child(1),
+.financial__table td:nth-child(1),
+.financial__table th:nth-child(3),
+.financial__table td:nth-child(3) {
+  text-align: left;
+}
+
+.financial__table th:nth-child(n + 2),
+.financial__table td:nth-child(n + 2) {
+  text-align: center;
+}
+
+.financial__table tbody tr:nth-child(even) {
+  background: #fafafa;
+}
+
+.financial__table tbody tr:hover {
+  background: #f3f4f6;
+}
+
+/************ STATUS ************/
+
+.status {
+  font-weight: 600;
+}
+
+.status.active {
+  color: #22c55e;
+}
+
+.status.pending {
+  color: #f97316;
+}
+
+.status.inactive {
+  color: #ef4444;
+}
+
+.financial__automatic {
+  color: #6b7280;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+/************ MODAL ************/
+
+.financial__modalOverlay {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  padding: 20px;
+}
+
+.financial__modal {
+  width: 100%;
+  max-width: 860px;
+  max-height: 95vh;
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 12px;
+  padding: 32px;
+  animation: modalFade 0.2s ease;
+}
+
+.financial__modal.details {
+  max-width: 760px;
+}
+
+.financial__modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #ececec;
+}
+
+.financial__modalHeader h3 {
+  margin: 0;
+}
+
+.financial__closeBtn {
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  transition: background 0.2s ease;
+}
+
+.financial__closeBtn:hover {
+  background: #f3f4f6;
+}
+
+/************ FORM ************/
+
+.financial__form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.financial__section {
+  margin-bottom: 18px;
+  padding: 18px;
+  border: 1px solid #ececec;
+  border-radius: 10px;
+  background: #fafafa;
+}
+
+.financial__section h4 {
+  margin: 0 0 14px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.financial__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  align-items: start;
+}
+
+.financial__grid > * {
+  min-width: 0;
+}
+
+.form__group--financial {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+}
+
+.form__group--financial label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #4b5563;
+  font-size: 0.82rem;
+}
+
+.form__group--financial input,
+.form__group--financial select,
+.form__group--financial textarea {
+  width: 100%;
+  min-width: 0;
+  background: #fff;
+  padding: 0 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.form__group--financial input,
+.form__group--financial select {
+  height: 38px;
+  line-height: 38px;
+}
+
+.form__group--financial textarea {
+  min-height: 90px;
+  padding: 12px;
+  resize: none;
+}
+
+.form__group--financial input:hover,
+.form__group--financial select:hover,
+.form__group--financial textarea:hover {
+  border-color: var(--primary);
+}
+
+.form__group--financial input:focus,
+.form__group--financial select:focus,
+.form__group--financial textarea:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.12);
+}
+
+.form__group--financial.checkbox {
+  justify-content: center;
+}
+
+.form__group--financial.checkbox label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  margin-top: 24px;
+  cursor: pointer;
+}
+
+.form__group--financial.checkbox input {
+  width: auto;
+  height: auto;
+}
+
+/************ DETAILS ************/
+
+.financial__details {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.financial__detailsSection {
+  padding: 18px;
+  border: 1px solid #ececec;
+  border-radius: 10px;
+  background: #fafafa;
+}
+
+.financial__detailsSection h4 {
+  margin: 0 0 14px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.financial__detailsSection p {
+  margin: 0 0 10px;
+  padding: 12px;
+  background: #fff;
+  border-radius: 8px;
+  color: #374151;
+}
+
+.financial__detailsSection p:last-child {
+  margin-bottom: 0;
+}
+
+.financial__details strong {
+  color: #111827;
+}
+
+/************ ACTION ICONS ************/
+
+.table__edit--close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.financial__actionIcon {
+  cursor: pointer;
+  font-size: 20px;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.financial__actionIcon:hover {
+  transform: scale(1.1);
+  opacity: 0.8;
+}
+
+.financial__actionIcon.edit {
+  color: #3b82f6;
+}
+
+.financial__actionIcon.delete {
+  color: #ef4444;
+}
+
+/************ ANIMATION ************/
+
+@keyframes modalFade {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/************ RESPONSIVE ************/
+
+@media (max-width: 900px) {
+  .financial__grid,
+  .financial__details {
+    grid-template-columns: 1fr;
+  }
+
+  .financial__cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .financial__header {
+    flex-direction: column;
+    gap: 15px;
+    align-items: stretch;
+  }
+
+  .financial__btn {
+    width: 100%;
+  }
+
+  .financial__cards {
+    grid-template-columns: 1fr;
+  }
+
+  .financial__filters {
+    flex-direction: column;
+  }
+
+  .financial__filters input,
+  .financial__filters select {
+    width: 100%;
+  }
+
+  .financial__modal {
+    padding: 20px;
+  }
+}

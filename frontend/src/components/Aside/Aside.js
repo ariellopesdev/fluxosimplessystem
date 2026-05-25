@@ -13,8 +13,7 @@ import {
   FiSettings,
   FiHelpCircle,
 } from "react-icons/fi";
-import { FaShoppingCart } from "react-icons/fa";
-import { MdAttachMoney } from "react-icons/md";
+import { FaShoppingCart, FaChartLine } from "react-icons/fa";
 
 //Components
 import { NavLink } from "react-router-dom";
@@ -69,7 +68,7 @@ const Aside = ({ setPage, page }) => {
             }`}
             onClick={() => setPage("financial")}
           >
-            <MdAttachMoney className="dashboard__icons" /> Financeiro
+            <FaChartLine className="dashboard__icons" /> Financeiro
           </li>
           <li
             className={`dashboard__menu--item ${

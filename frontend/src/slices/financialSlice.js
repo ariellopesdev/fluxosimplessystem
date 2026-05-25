@@ -162,7 +162,7 @@ export const financialSlice = createSlice({
         state.success = true;
         state.error = null;
 
-        state.financials = action.payload;
+        state.financials = Array.isArray(action.payload) ? action.payload : [];
       })
       .addCase(getAllFinancials.rejected, (state, action) => {
         state.loading = false;
