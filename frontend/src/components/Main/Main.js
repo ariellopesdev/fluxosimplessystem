@@ -29,8 +29,7 @@ const Main = ({ page }) => {
       case "financial":
         return <Financial />;
       case "appointment":
-        return <UnderConstruction />;
-        // return <Appointment />;
+        return <Appointment />;
       case "reports":
         return <UnderConstruction />;
         // return <Reports />;
