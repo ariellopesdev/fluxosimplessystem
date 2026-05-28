@@ -1,0 +1,382 @@
+/************ HEADER ************/
+
+.services__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.services__header h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+
+/************ BUTTONS ************/
+
+.services__btn {
+  background: var(--primary);
+  color: var(--surface);
+  border: none;
+  border-radius: 6px;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-weight: 600;
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease,
+    opacity 0.2s ease;
+}
+
+.services__btn:hover {
+  background: var(--primary-hover);
+}
+
+.services__btn:active {
+  transform: scale(0.98);
+}
+
+.services__btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/************ CARDS ************/
+
+.services__cards {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.serviceCard {
+  flex: 1;
+  padding: 20px;
+  border-radius: 10px;
+  color: #fff;
+  font-weight: 600;
+}
+
+/************ FILTERS ************/
+
+.services__filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.services__filters input {
+  width: 240px;
+  height: 38px;
+  padding: 0 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #fff;
+}
+
+.services__filters input:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+/************ TABLE ************/
+
+.services__table {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.services__table table {
+  width: 100%;
+  min-width: 1050px;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  border-collapse: collapse;
+}
+
+.services__table th,
+.services__table td {
+  padding: 12px;
+  vertical-align: middle;
+}
+
+.services__table th {
+  background: #f9fafb;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #6b7280;
+}
+
+.services__table th:nth-child(1),
+.services__table td:nth-child(1) {
+  text-align: left;
+}
+
+.services__table th:nth-child(n + 2),
+.services__table td:nth-child(n + 2) {
+  text-align: center;
+}
+
+.services__table td strong {
+  display: block;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.services__table td span {
+  display: block;
+  color: #6b7280;
+  font-size: 0.82rem;
+}
+
+.services__table tbody tr:nth-child(even) {
+  background: #fafafa;
+}
+
+.services__table tbody tr:hover {
+  background: #f3f4f6;
+}
+
+/************ STATUS ************/
+
+.status {
+  font-weight: 600;
+}
+
+.status.active {
+  color: #22c55e;
+}
+
+.status.inactive {
+  color: #ef4444;
+}
+
+/************ MODAL ************/
+
+.services__modalOverlay {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  padding: 20px;
+}
+
+.services__modal {
+  width: 100%;
+  max-width: 860px;
+  max-height: 95vh;
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 12px;
+  padding: 32px;
+  animation: modalFade 0.2s ease;
+}
+
+.services__modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #ececec;
+}
+
+.services__modalHeader h3 {
+  margin: 0;
+}
+
+.services__closeBtn {
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+}
+
+.services__closeBtn:hover {
+  background: #f3f4f6;
+}
+
+/************ FORM ************/
+
+.services__form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.services__section {
+  margin-bottom: 18px;
+  padding: 18px;
+  border: 1px solid #ececec;
+  border-radius: 10px;
+  background: #fafafa;
+}
+
+.services__section h4 {
+  margin: 0 0 14px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.services__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.services__grid.two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.form__group--service {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+}
+
+.form__group--service label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #4b5563;
+  font-size: 0.82rem;
+}
+
+.form__group--service input,
+.form__group--service select,
+.form__group--service textarea {
+  width: 100%;
+  min-width: 0;
+  background: #fff;
+  padding: 0 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.form__group--service input,
+.form__group--service select {
+  height: 38px;
+  line-height: 38px;
+}
+
+.form__group--service textarea {
+  min-height: 90px;
+  padding: 12px;
+  resize: none;
+}
+
+.form__group--service input:hover,
+.form__group--service select:hover,
+.form__group--service textarea:hover {
+  border-color: var(--primary);
+}
+
+.form__group--service input:focus,
+.form__group--service select:focus,
+.form__group--service textarea:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.12);
+}
+
+/************ ACTION ICONS ************/
+
+.table__edit--close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.service__actionIcon {
+  cursor: pointer;
+  font-size: 20px;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.service__actionIcon:hover {
+  transform: scale(1.1);
+  opacity: 0.8;
+}
+
+.service__actionIcon.edit {
+  color: #3b82f6;
+}
+
+.service__actionIcon.delete {
+  color: #ef4444;
+}
+
+/************ ANIMATION ************/
+
+@keyframes modalFade {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/************ RESPONSIVE ************/
+
+@media (max-width: 900px) {
+  .services__grid,
+  .services__grid.two {
+    grid-template-columns: 1fr;
+  }
+
+  .services__cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .services__header {
+    flex-direction: column;
+    gap: 15px;
+    align-items: stretch;
+  }
+
+  .services__btn {
+    width: 100%;
+  }
+
+  .services__cards {
+    grid-template-columns: 1fr;
+  }
+
+  .services__filters {
+    flex-direction: column;
+  }
+
+  .services__filters input {
+    width: 100%;
+  }
+
+  .services__modal {
+    padding: 20px;
+  }
+}
