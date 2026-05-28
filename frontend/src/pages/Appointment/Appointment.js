@@ -26,11 +26,37 @@ const Appointment = ({ setPage }) => {
 
   const { clients } = useSelector((state) => state.client);
   const { services } = useSelector((state) => state.service);
+  const { user } = useSelector((state) => state.auth);
 
   const [showModal, setShowModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [viewMode, setViewMode] = useState("DAY");
   const [clientSearch, setClientSearch] = useState("");
+  const [showAvailabilityModal, setShowAvailabilityModal] = useState(false);
+  const [localError, setLocalError] = useState(null);
+
+  const [availabilityRules, setAvailabilityRules] = useState({
+    workingDays: {
+      0: false,
+      1: true,
+      2: true,
+      3: true,
+      4: true,
+      5: true,
+      6: false,
+    },
+    startTime: "08:00",
+    endTime: "18:00",
+    exceptions: [],
+  });
+
+  const [exceptionForm, setExceptionForm] = useState({
+    date: "",
+    reason: "",
+  });
+
+  const canManageAvailability =
+    user?.role === "SUPER_ADMIN" || user?.role === "ADMIN";
 
   const [formData, setFormData] = useState({
     title: "",
@@ -54,14 +80,15 @@ const Appointment = ({ setPage }) => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (error || message) {
+    if (error || message || localError) {
       const timer = setTimeout(() => {
         dispatch(resetMessage());
+        setLocalError(null);
       }, 2500);
 
       return () => clearTimeout(timer);
     }
-  }, [error, message, dispatch]);
+  }, [error, message, localError, dispatch]);
 
   const appointmentsList = Array.isArray(appointments) ? appointments : [];
   const clientsList = Array.isArray(clients) ? clients : [];
@@ -165,10 +192,6 @@ const Appointment = ({ setPage }) => {
       today.setDate(1);
       endDate.setMonth(today.getMonth() + 1);
       endDate.setDate(1);
-    }
-
-    if (viewMode === "TWO_MONTHS") {
-      endDate.setMonth(today.getMonth() + 2);
     }
 
     return appointmentsList
@@ -421,11 +444,7 @@ Valor do serviço: R$ ${Number(selectedService?.unityPrice || 0).toLocaleString(
       return `Agendamentos do dia ${selectedDate.toLocaleDateString("pt-BR")}`;
     }
 
-    if (viewMode === "MONTH") {
-      return `Agendamentos de ${monthName}`;
-    }
-
-    return "Agendamentos dos próximos 2 meses";
+    return `Agendamentos de ${monthName}`;
   };
 
   const todayFormatted = formatDateToCompare(new Date());
@@ -435,17 +454,136 @@ Valor do serviço: R$ ${Number(selectedService?.unityPrice || 0).toLocaleString(
     return formatDateToCompare(date) < todayFormatted;
   };
 
+  const isTimeBetween = (time, start, end) => {
+    if (!time || !start || !end) return true;
+
+    return time >= start && time <= end;
+  };
+
+  const isExceptionDate = (date) => {
+    return availabilityRules.exceptions.some(
+      (exception) => exception.date === date,
+    );
+  };
+
+  const getExceptionReason = (date) => {
+    const exception = availabilityRules.exceptions.find(
+      (item) => item.date === date,
+    );
+
+    return exception?.reason || "Indisponível";
+  };
+
+  const isAvailableDate = (date) => {
+    if (!date) return false;
+
+    const parsedDate = new Date(`${date}T12:00:00`);
+    const dayOfWeek = parsedDate.getDay();
+
+    const isWorkingDay = availabilityRules.workingDays[dayOfWeek];
+
+    if (!isWorkingDay) return false;
+
+    if (isExceptionDate(date)) return false;
+
+    return true;
+  };
+
+  const isUnavailableDay = (day) => {
+    const date = new Date(currentYear, currentMonth, day);
+    const formattedDate = formatDateToCompare(date);
+
+    return isPastDate(day) || !isAvailableDate(formattedDate);
+  };
+
+  const getUnavailableReason = (day) => {
+    const date = new Date(currentYear, currentMonth, day);
+    const formattedDate = formatDateToCompare(date);
+
+    if (isPastDate(day)) {
+      return "Não é possível agendar datas anteriores a hoje";
+    }
+
+    if (isExceptionDate(formattedDate)) {
+      return getExceptionReason(formattedDate);
+    }
+
+    if (!isAvailableDate(formattedDate)) {
+      return "Dia indisponível para atendimento";
+    }
+
+    return "";
+  };
+
+  const handleAddException = () => {
+    if (!exceptionForm.date) return;
+
+    const alreadyExists = availabilityRules.exceptions.some(
+      (item) => item.date === exceptionForm.date,
+    );
+
+    if (alreadyExists) {
+      setLocalError("Esta exceção já foi adicionada.");
+      return;
+    }
+
+    setAvailabilityRules((prev) => ({
+      ...prev,
+      exceptions: [
+        ...prev.exceptions,
+        {
+          date: exceptionForm.date,
+          reason: exceptionForm.reason || "Indisponível",
+        },
+      ],
+    }));
+
+    setExceptionForm({
+      date: "",
+      reason: "",
+    });
+  };
+
+  const handleRemoveException = (date) => {
+    setAvailabilityRules((prev) => ({
+      ...prev,
+      exceptions: prev.exceptions.filter((item) => item.date !== date),
+    }));
+  };
+
+  const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
+
+  const calendarDays = [
+    ...Array(firstDayOfMonth).fill(null),
+    ...Array.from({ length: daysInMonth }, (_, index) => index + 1),
+  ];
+
   return (
     <div className="appointment">
       <div className="appointment__header">
         <h2>Agendamentos</h2>
 
-        <button className="appointment__btn" onClick={() => setShowModal(true)}>
-          + Novo Agendamento
-        </button>
+        <div className="appointment__headerActions">
+          {canManageAvailability && (
+            <button
+              className="appointment__secondaryBtn"
+              onClick={() => setShowAvailabilityModal(true)}
+            >
+              Disponibilidade
+            </button>
+          )}
+
+          <button
+            className="appointment__btn"
+            onClick={() => setShowModal(true)}
+          >
+            + Novo Agendamento
+          </button>
+        </div>
       </div>
 
       {error && <Message msg={error} type="error" />}
+      {localError && <Message msg={localError} type="error" />}
       {message && <Message msg={message} type="success" />}
 
       <div className="appointment__cards">
@@ -461,7 +599,6 @@ Valor do serviço: R$ ${Number(selectedService?.unityPrice || 0).toLocaleString(
         <select value={viewMode} onChange={(e) => setViewMode(e.target.value)}>
           <option value="DAY">Agendamentos do dia</option>
           <option value="MONTH">Agendamentos do mês</option>
-          <option value="TWO_MONTHS">Próximos 2 meses</option>
         </select>
       </div>
 
@@ -490,11 +627,22 @@ Valor do serviço: R$ ${Number(selectedService?.unityPrice || 0).toLocaleString(
           </div>
 
           <div className="calendar__grid">
-            {[...Array(daysInMonth)].map((_, i) => {
-              const day = i + 1;
+            {["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].map(
+              (weekDay) => (
+                <div key={weekDay} className="calendar__weekDay">
+                  {weekDay}
+                </div>
+              ),
+            )}
+            {calendarDays.map((day, i) => {
+              if (!day) {
+                return (
+                  <div key={`empty-${i}`} className="calendar__day empty"></div>
+                );
+              }
               const isSelected = selectedDate.getDate() === day;
               const hasAppointment = getDayHasAppointment(day);
-              const pastDate = isPastDate(day);
+              const unavailableDay = isUnavailableDay(day);
 
               return (
                 <div
@@ -502,15 +650,11 @@ Valor do serviço: R$ ${Number(selectedService?.unityPrice || 0).toLocaleString(
                   className={`calendar__day 
       ${isSelected ? "selected" : ""} 
       ${hasAppointment ? "hasAppointment" : ""} 
-      ${pastDate ? "disabled" : ""}
+      ${unavailableDay ? "disabled" : ""}
     `}
-                  title={
-                    pastDate
-                      ? "Não é possível agendar datas anteriores a hoje"
-                      : ""
-                  }
+                  title={unavailableDay ? getUnavailableReason(day) : ""}
                   onClick={() => {
-                    if (pastDate) return;
+                    if (unavailableDay) return;
 
                     setSelectedDate(new Date(currentYear, currentMonth, day));
                   }}
@@ -712,12 +856,27 @@ Valor do serviço: R$ ${Number(selectedService?.unityPrice || 0).toLocaleString(
                       type="date"
                       min={todayFormatted}
                       value={formData.date}
-                      onChange={(e) =>
+                      onChange={(e) => {
+                        const selected = e.target.value;
+
+                        if (!isAvailableDate(selected)) {
+                          setLocalError(
+                            "Esta data não está disponível para atendimento.",
+                          );
+
+                          setFormData((prev) => ({
+                            ...prev,
+                            date: "",
+                          }));
+
+                          return;
+                        }
+
                         setFormData((prev) => ({
                           ...prev,
-                          date: e.target.value,
-                        }))
-                      }
+                          date: selected,
+                        }));
+                      }}
                       required
                     />
                   </div>
@@ -727,8 +886,27 @@ Valor do serviço: R$ ${Number(selectedService?.unityPrice || 0).toLocaleString(
 
                     <input
                       type="time"
+                      min={availabilityRules.startTime}
+                      max={availabilityRules.endTime}
                       value={formData.startTime}
-                      onChange={(e) => handleStartTimeChange(e.target.value)}
+                      onChange={(e) => {
+                        const selectedTime = e.target.value;
+
+                        if (
+                          !isTimeBetween(
+                            selectedTime,
+                            availabilityRules.startTime,
+                            availabilityRules.endTime,
+                          )
+                        ) {
+                          setLocalError(
+                            "Horário fora do período disponível para atendimento.",
+                          );
+                          return;
+                        }
+
+                        handleStartTimeChange(selectedTime);
+                      }}
                       required
                     />
                   </div>
@@ -835,6 +1013,173 @@ Valor do serviço: R$ ${Number(selectedService?.unityPrice || 0).toLocaleString(
                 </button>
               )}
             </form>
+          </div>
+        </div>
+      )}
+      {showAvailabilityModal && (
+        <div className="appointment__modalOverlay">
+          <div className="appointment__modal">
+            <div className="appointment__modalHeader">
+              <h3>Disponibilidade de Atendimento</h3>
+
+              <button
+                className="appointment__closeBtn"
+                onClick={() => setShowAvailabilityModal(false)}
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="appointment__form">
+              <div className="appointment__formSection">
+                <h4>Dias disponíveis</h4>
+
+                <div className="availability__days">
+                  {[
+                    { key: 0, label: "Domingo" },
+                    { key: 1, label: "Segunda" },
+                    { key: 2, label: "Terça" },
+                    { key: 3, label: "Quarta" },
+                    { key: 4, label: "Quinta" },
+                    { key: 5, label: "Sexta" },
+                    { key: 6, label: "Sábado" },
+                  ].map((day) => (
+                    <label key={day.key} className="availability__day">
+                      <input
+                        type="checkbox"
+                        checked={availabilityRules.workingDays[day.key]}
+                        onChange={(e) =>
+                          setAvailabilityRules((prev) => ({
+                            ...prev,
+                            workingDays: {
+                              ...prev.workingDays,
+                              [day.key]: e.target.checked,
+                            },
+                          }))
+                        }
+                      />
+
+                      {day.label}
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="appointment__formSection">
+                <h4>Horário de trabalho</h4>
+
+                <div className="appointment__grid two">
+                  <div className="appointment__formGroup">
+                    <label>Início do expediente</label>
+
+                    <input
+                      type="time"
+                      value={availabilityRules.startTime}
+                      onChange={(e) =>
+                        setAvailabilityRules((prev) => ({
+                          ...prev,
+                          startTime: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+
+                  <div className="appointment__formGroup">
+                    <label>Fim do expediente</label>
+
+                    <input
+                      type="time"
+                      value={availabilityRules.endTime}
+                      onChange={(e) =>
+                        setAvailabilityRules((prev) => ({
+                          ...prev,
+                          endTime: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="appointment__formSection">
+                <h4>Exceções</h4>
+
+                <div className="appointment__grid two">
+                  <div className="appointment__formGroup">
+                    <label>Data indisponível</label>
+
+                    <input
+                      type="date"
+                      min={todayFormatted}
+                      value={exceptionForm.date}
+                      onChange={(e) =>
+                        setExceptionForm((prev) => ({
+                          ...prev,
+                          date: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+
+                  <div className="appointment__formGroup">
+                    <label>Motivo</label>
+
+                    <input
+                      type="text"
+                      placeholder="Viagem, doença, compromisso..."
+                      value={exceptionForm.reason}
+                      onChange={(e) =>
+                        setExceptionForm((prev) => ({
+                          ...prev,
+                          reason: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  className="appointment__btn"
+                  onClick={handleAddException}
+                >
+                  Adicionar exceção
+                </button>
+
+                <div className="availability__exceptions">
+                  {availabilityRules.exceptions.length === 0 && (
+                    <p>Nenhuma exceção cadastrada.</p>
+                  )}
+
+                  {availabilityRules.exceptions.map((exception) => (
+                    <div
+                      key={exception.date}
+                      className="availability__exception"
+                    >
+                      <span>
+                        {exception.date.split("-").reverse().join("/")} -{" "}
+                        {exception.reason}
+                      </span>
+
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveException(exception.date)}
+                      >
+                        Remover
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <button
+                type="button"
+                className="appointment__btn"
+                onClick={() => setShowAvailabilityModal(false)}
+              >
+                Salvar disponibilidade
+              </button>
+            </div>
           </div>
         </div>
       )}
