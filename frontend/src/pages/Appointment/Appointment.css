@@ -741,6 +741,83 @@
   font-size: 0.82rem;
 }
 
+.appointment__actions button.edit {
+  background: #2563eb;
+}
+
+.appointment__actions button.edit:hover {
+  background: #1d4ed8;
+}
+
+.appointment__secondaryBtn.history {
+  background: #4f46e5;
+}
+
+.appointment__secondaryBtn.history:hover {
+  background: #4338ca;
+}
+
+.appointment__historyFilters {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.appointment__historyList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.appointment__historyItem {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+
+  background: #fff;
+}
+
+.appointment__historyItem strong {
+  color: #111827;
+}
+
+.appointment__historyItem span,
+.appointment__historyItem small {
+  color: #4b5563;
+  font-size: 0.84rem;
+}
+
+.appointment__historyItem.pending {
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+
+.appointment__historyItem.confirmed {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.appointment__historyItem.finished {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.appointment__historyItem.cancelled {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+@media (max-width: 768px) {
+  .appointment__historyFilters {
+    grid-template-columns: 1fr;
+  }
+}
+
 /************ ANIMATION ************/
 
 @keyframes modalFade {

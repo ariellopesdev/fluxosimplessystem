@@ -35,6 +35,14 @@ const Appointment = ({ setPage }) => {
   const [showAvailabilityModal, setShowAvailabilityModal] = useState(false);
   const [localError, setLocalError] = useState(null);
   const [showTimeDropdown, setShowTimeDropdown] = useState(false);
+  const [editId, setEditId] = useState(null);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
+
+  const [historyFilters, setHistoryFilters] = useState({
+    date: "",
+    month: "",
+    year: "",
+  });
 
   const [availabilityRules, setAvailabilityRules] = useState({
     workingDays: {
@@ -204,6 +212,12 @@ const Appointment = ({ setPage }) => {
     return appointmentsList
       .filter((appointment) => {
         if (!appointment.date) return false;
+        if (
+          appointment.status === "CANCELLED" ||
+          appointment.status === "FINISHED"
+        ) {
+          return false;
+        }
 
         const appointmentDate = new Date(
           `${formatDateToCompare(appointment.date)}T12:00:00`,
@@ -230,7 +244,11 @@ const Appointment = ({ setPage }) => {
     return appointmentsList.some((appointment) => {
       if (!appointment.date) return false;
 
-      return formatDateToCompare(appointment.date) === formattedDate;
+      return (
+        appointment.status !== "CANCELLED" &&
+        appointment.status !== "FINISHED" &&
+        formatDateToCompare(appointment.date) === formattedDate
+      );
     });
   };
 
@@ -240,35 +258,32 @@ const Appointment = ({ setPage }) => {
   };
 
   const handleStatusUpdate = async (id, status) => {
-  try {
-    const appointment = appointmentsList.find((item) => item._id === id);
+    try {
+      const appointment = appointmentsList.find((item) => item._id === id);
 
-    const appointmentData = {
-      status,
-    };
-
-    if (
-      status === "FINISHED" &&
-      appointment?.payment?.status === "PENDING"
-    ) {
-      appointmentData.payment = {
-        ...appointment.payment,
-        status: "PAID",
+      const appointmentData = {
+        status,
       };
+
+      if (status === "FINISHED" && appointment?.payment?.status === "PENDING") {
+        appointmentData.payment = {
+          ...appointment.payment,
+          status: "PAID",
+        };
+      }
+
+      await dispatch(
+        updateAppointment({
+          id,
+          appointmentData,
+        }),
+      ).unwrap();
+
+      await refreshAppointments();
+    } catch (error) {
+      console.log(error);
     }
-
-    await dispatch(
-      updateAppointment({
-        id,
-        appointmentData,
-      }),
-    ).unwrap();
-
-    await refreshAppointments();
-  } catch (error) {
-    console.log(error);
-  }
-};
+  };
 
   const getSelectedService = () => {
     return availableServices.find(
@@ -432,6 +447,77 @@ const Appointment = ({ setPage }) => {
     });
   };
 
+  const handleEditAppointment = (appointment) => {
+    const clientId =
+      typeof appointment.client === "object"
+        ? appointment.client?._id
+        : appointment.client || "";
+
+    const selectedService = availableServices.find(
+      (service) => service.name === appointment.title,
+    );
+
+    setEditId(appointment._id);
+
+    setFormData({
+      title: appointment.title || "",
+      description: appointment.description || "",
+      date: formatDateToCompare(appointment.date),
+      startTime: appointment.startTime || "",
+      endTime: appointment.endTime || "",
+      type: appointment.type || "OTHER",
+      status: appointment.status || "PENDING",
+      priority: appointment.priority || "MEDIUM",
+      client: clientId,
+      service: selectedService?._id || "",
+      payment: {
+        method: appointment.payment?.method || "PIX",
+        status: appointment.payment?.status || "PENDING",
+        installments: appointment.payment?.installments || 1,
+      },
+      discount: Number(appointment.discount || 0),
+      notes: appointment.notes || "",
+    });
+
+    setClientSearch(getClientName(appointment));
+    setShowModal(true);
+  };
+
+  const closeAppointmentModal = () => {
+    setShowModal(false);
+    setEditId(null);
+    setClientSearch("");
+    resetForm();
+  };
+
+  const historyAppointments = appointmentsList
+    .filter((appointment) => {
+      if (!appointment.date) return false;
+
+      const appointmentDate = formatDateToCompare(appointment.date);
+      const [year, month] = appointmentDate.split("-");
+
+      if (historyFilters.date && appointmentDate !== historyFilters.date) {
+        return false;
+      }
+
+      if (historyFilters.month && month !== historyFilters.month) {
+        return false;
+      }
+
+      if (historyFilters.year && year !== historyFilters.year) {
+        return false;
+      }
+
+      return true;
+    })
+    .sort((a, b) => {
+      const dateA = `${formatDateToCompare(a.date)} ${a.startTime || ""}`;
+      const dateB = `${formatDateToCompare(b.date)} ${b.startTime || ""}`;
+
+      return dateB.localeCompare(dateA);
+    });
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -473,14 +559,22 @@ Parcelas: ${
     };
 
     try {
-      await dispatch(createAppointment(payload)).unwrap();
+      if (editId) {
+        await dispatch(
+          updateAppointment({
+            id: editId,
+            appointmentData: payload,
+          }),
+        ).unwrap();
+      } else {
+        await dispatch(createAppointment(payload)).unwrap();
+      }
 
       await refreshAppointments();
 
       setSelectedDate(new Date(`${formData.date}T12:00:00`));
 
-      setShowModal(false);
-      resetForm();
+      closeAppointmentModal();
     } catch (error) {
       console.log(error);
     }
@@ -727,6 +821,12 @@ Parcelas: ${
               Disponibilidade
             </button>
           )}
+          <button
+            className="appointment__secondaryBtn history"
+            onClick={() => setShowHistoryModal(true)}
+          >
+            Histórico
+          </button>
 
           <button
             className="appointment__btn"
@@ -872,6 +972,16 @@ Parcelas: ${
                 </div>
 
                 <div className="appointment__actions">
+                  {appointment.status !== "FINISHED" &&
+                    appointment.status !== "CANCELLED" && (
+                      <button
+                        type="button"
+                        className="edit"
+                        onClick={() => handleEditAppointment(appointment)}
+                      >
+                        Editar
+                      </button>
+                    )}
                   {appointment.status === "PENDING" && (
                     <button
                       onClick={() =>
@@ -913,14 +1023,11 @@ Parcelas: ${
         <div className="appointment__modalOverlay">
           <div className="appointment__modal">
             <div className="appointment__modalHeader">
-              <h3>Novo Agendamento</h3>
+              <h3>{editId ? "Editar Agendamento" : "Novo Agendamento"}</h3>
 
               <button
                 className="appointment__closeBtn"
-                onClick={() => {
-                  setShowModal(false);
-                  resetForm();
-                }}
+                onClick={closeAppointmentModal}
               >
                 ×
               </button>
@@ -1273,7 +1380,7 @@ Parcelas: ${
 
               {!loading && (
                 <button type="submit" className="appointment__btn">
-                  Cadastrar Agendamento
+                  {editId ? "Salvar Alterações" : "Cadastrar Agendamento"}
                 </button>
               )}
 
@@ -1449,6 +1556,111 @@ Parcelas: ${
               >
                 Salvar disponibilidade
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {showHistoryModal && (
+        <div className="appointment__modalOverlay">
+          <div className="appointment__modal">
+            <div className="appointment__modalHeader">
+              <h3>Histórico de Agendamentos</h3>
+
+              <button
+                className="appointment__closeBtn"
+                onClick={() => setShowHistoryModal(false)}
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="appointment__historyFilters">
+              <div className="appointment__formGroup">
+                <label>Data</label>
+                <input
+                  type="date"
+                  value={historyFilters.date}
+                  onChange={(e) =>
+                    setHistoryFilters((prev) => ({
+                      ...prev,
+                      date: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+
+              <div className="appointment__formGroup">
+                <label>Mês</label>
+                <select
+                  value={historyFilters.month}
+                  onChange={(e) =>
+                    setHistoryFilters((prev) => ({
+                      ...prev,
+                      month: e.target.value,
+                    }))
+                  }
+                >
+                  <option value="">Todos</option>
+                  <option value="01">Janeiro</option>
+                  <option value="02">Fevereiro</option>
+                  <option value="03">Março</option>
+                  <option value="04">Abril</option>
+                  <option value="05">Maio</option>
+                  <option value="06">Junho</option>
+                  <option value="07">Julho</option>
+                  <option value="08">Agosto</option>
+                  <option value="09">Setembro</option>
+                  <option value="10">Outubro</option>
+                  <option value="11">Novembro</option>
+                  <option value="12">Dezembro</option>
+                </select>
+              </div>
+
+              <div className="appointment__formGroup">
+                <label>Ano</label>
+                <input
+                  type="number"
+                  placeholder="2026"
+                  value={historyFilters.year}
+                  onChange={(e) =>
+                    setHistoryFilters((prev) => ({
+                      ...prev,
+                      year: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+            </div>
+
+            <div className="appointment__historyList">
+              {historyAppointments.length === 0 && (
+                <p className="appointment__empty">
+                  Nenhum agendamento encontrado.
+                </p>
+              )}
+
+              {historyAppointments.map((appointment) => (
+                <div
+                  key={appointment._id}
+                  className={`appointment__historyItem ${appointment.status?.toLowerCase()}`}
+                >
+                  <strong>{appointment.title}</strong>
+
+                  <span>
+                    {formatDateToCompare(appointment.date)
+                      .split("-")
+                      .reverse()
+                      .join("/")}{" "}
+                    às {appointment.startTime || "--:--"}
+                  </span>
+
+                  <small>
+                    Cliente: {getClientName(appointment)} • CPF/CNPJ:{" "}
+                    {formatCpfCnpj(getClientDocument(appointment)) || "-"} •
+                    Status: {translateStatus(appointment.status)}
+                  </small>
+                </div>
+              ))}
             </div>
           </div>
         </div>
