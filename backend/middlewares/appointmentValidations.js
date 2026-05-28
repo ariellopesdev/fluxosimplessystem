@@ -46,6 +46,34 @@ const appointmentCreateValidation = () => {
       .optional({ checkFalsy: true })
       .isISO8601()
       .withMessage("Data do lembrete inválida."),
+    body("payment.method")
+      .optional()
+      .isIn([
+        "CASH",
+        "PIX",
+        "CREDIT_CARD",
+        "DEBIT_CARD",
+        "BANK_SLIP",
+        "TRANSFER",
+      ])
+      .withMessage("Forma de pagamento inválida."),
+
+    body("payment.status")
+      .optional()
+      .isIn(["PENDING", "PAID", "CANCELLED", "REFUNDED"])
+      .withMessage("Status do pagamento inválido."),
+
+    body("payment.installments")
+      .optional()
+      .isInt({ min: 1, max: 12 })
+      .withMessage("Parcelas inválidas."),
+
+    body("discount")
+      .optional()
+      .isFloat({ min: 0 })
+      .withMessage("Desconto inválido."),
+
+    body("total").optional().isFloat({ min: 0 }).withMessage("Total inválido."),
   ];
 };
 
@@ -57,10 +85,7 @@ const appointmentUpdateValidation = () => {
       .isLength({ min: 3 })
       .withMessage("O título precisa ter no mínimo 3 caracteres."),
 
-    body("date")
-      .optional()
-      .isISO8601()
-      .withMessage("Data inválida."),
+    body("date").optional().isISO8601().withMessage("Data inválida."),
 
     body("startTime").optional().trim(),
 
@@ -90,6 +115,34 @@ const appointmentUpdateValidation = () => {
       .optional({ checkFalsy: true })
       .isISO8601()
       .withMessage("Data do lembrete inválida."),
+    body("payment.method")
+      .optional()
+      .isIn([
+        "CASH",
+        "PIX",
+        "CREDIT_CARD",
+        "DEBIT_CARD",
+        "BANK_SLIP",
+        "TRANSFER",
+      ])
+      .withMessage("Forma de pagamento inválida."),
+
+    body("payment.status")
+      .optional()
+      .isIn(["PENDING", "PAID", "CANCELLED", "REFUNDED"])
+      .withMessage("Status do pagamento inválido."),
+
+    body("payment.installments")
+      .optional()
+      .isInt({ min: 1, max: 12 })
+      .withMessage("Parcelas inválidas."),
+
+    body("discount")
+      .optional()
+      .isFloat({ min: 0 })
+      .withMessage("Desconto inválido."),
+
+    body("total").optional().isFloat({ min: 0 }).withMessage("Total inválido."),
   ];
 };
 

@@ -15,6 +15,9 @@ const createAppointment = async (req, res) => {
     status,
     priority,
     client,
+    payment,
+    discount,
+    total,
     street,
     number,
     complement,
@@ -44,6 +47,7 @@ const createAppointment = async (req, res) => {
     }
 
     if (
+      selectedClient.company &&
       selectedClient.company.toString() !== reqUser.company._id.toString()
     ) {
       return res.status(403).json({
@@ -63,6 +67,18 @@ const createAppointment = async (req, res) => {
     type: type || "OTHER",
     status: status || "PENDING",
     priority: priority || "MEDIUM",
+
+    payment: {
+      method: payment?.method || "PIX",
+      status: payment?.status || "PENDING",
+      installments:
+        payment?.method === "CREDIT_CARD"
+          ? Number(payment?.installments || 1)
+          : 1,
+    },
+
+    discount: Number(discount || 0),
+    total: Number(total || 0),
 
     client: selectedClient ? selectedClient._id : null,
     responsible: reqUser._id,
@@ -105,16 +121,8 @@ const createAppointment = async (req, res) => {
 const getAllAppointments = async (req, res) => {
   const reqUser = req.user;
 
-  const {
-    date,
-    startDate,
-    endDate,
-    status,
-    type,
-    priority,
-    client,
-    search,
-  } = req.query;
+  const { date, startDate, endDate, status, type, priority, client, search } =
+    req.query;
 
   const query = {
     company: reqUser.company._id,
@@ -233,6 +241,9 @@ const updateAppointment = async (req, res) => {
     contactName,
     contactPhone,
     contactEmail,
+    payment,
+    discount,
+    total,
     notes,
     reminderEnabled,
     remindAt,
@@ -271,6 +282,7 @@ const updateAppointment = async (req, res) => {
     }
 
     if (
+      selectedClient.company &&
       selectedClient.company.toString() !== reqUser.company._id.toString()
     ) {
       return res.status(403).json({
@@ -289,11 +301,29 @@ const updateAppointment = async (req, res) => {
   if (type) appointment.type = type;
   if (priority) appointment.priority = priority;
   if (notes !== undefined) appointment.notes = notes;
+  if (payment !== undefined) {
+    appointment.payment = {
+      method: payment?.method || appointment.payment?.method || "PIX",
+      status: payment?.status || appointment.payment?.status || "PENDING",
+      installments:
+        payment?.method === "CREDIT_CARD"
+          ? Number(payment?.installments || 1)
+          : 1,
+    };
+  }
 
+  if (discount !== undefined) {
+    appointment.discount = Number(discount || 0);
+  }
+
+  if (total !== undefined) {
+    appointment.total = Number(total || 0);
+  }
   if (street !== undefined) appointment.location.street = street;
   if (number !== undefined) appointment.location.number = number;
   if (complement !== undefined) appointment.location.complement = complement;
-  if (neighborhood !== undefined) appointment.location.neighborhood = neighborhood;
+  if (neighborhood !== undefined)
+    appointment.location.neighborhood = neighborhood;
   if (city !== undefined) appointment.location.city = city;
   if (state !== undefined) appointment.location.state = state;
   if (zipCode !== undefined) appointment.location.zipCode = zipCode;

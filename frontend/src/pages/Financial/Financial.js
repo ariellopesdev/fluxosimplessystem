@@ -17,6 +17,7 @@ import {
 } from "../../slices/financialSlice";
 import { getAllSales } from "../../slices/salesSlice";
 import { getProducts } from "../../slices/productSlice";
+import { getAllAppointments } from "../../slices/appointmentSlice";
 
 // Icons
 import { FaChartLine } from "react-icons/fa";
@@ -40,6 +41,7 @@ const Financial = () => {
   const [search, setSearch] = useState("");
   const { sales } = useSelector((state) => state.sales);
   const { products } = useSelector((state) => state.product);
+  const { appointments } = useSelector((state) => state.appointment);
   const [filters, setFilters] = useState({
     type: "",
     category: "",
@@ -77,6 +79,7 @@ const Financial = () => {
     dispatch(getFinancialSummary());
     dispatch(getAllSales());
     dispatch(getProducts());
+    dispatch(getAllAppointments());
   }, [dispatch]);
 
   useEffect(() => {
@@ -152,6 +155,35 @@ const Financial = () => {
 
     return categories[category] || "-";
   };
+
+  const appointmentsAsFinancials = Array.isArray(appointments)
+    ? appointments
+        .filter((appointment) => Number(appointment.total || 0) > 0)
+        .map((appointment) => ({
+          _id: `appointment-${appointment._id}`,
+          title: `Agendamento - ${appointment.title || "Serviço"}`,
+          description: "Receita gerada automaticamente por agendamento.",
+          type: "INCOME",
+          category: "UTILITY",
+          amount: Number(appointment.total || 0),
+          payment: {
+            method: appointment.payment?.method || "PIX",
+            status: appointment.payment?.status || "PENDING",
+            installments: appointment.payment?.installments || 1,
+            paidAt: appointment.payment?.paidAt || null,
+            dueDate: appointment.date || null,
+          },
+          notes: appointment.notes || "",
+          isRecurring: false,
+          recurrence: {
+            frequency: "NONE",
+            nextDate: null,
+          },
+          createdAt: appointment.createdAt,
+          updatedAt: appointment.updatedAt,
+          automatic: true,
+        }))
+    : [];
 
   const translatePaymentMethod = (method) => {
     const methods = {
@@ -232,6 +264,7 @@ const Financial = () => {
     ...financialList,
     ...salesAsFinancials,
     ...productsAsFinancials,
+    ...appointmentsAsFinancials,
   ];
 
   const filteredFinancials = allFinancials.filter((financial) => {

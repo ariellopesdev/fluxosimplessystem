@@ -12,14 +12,7 @@ const appointmentSchema = new Schema(
 
     type: {
       type: String,
-      enum: [
-        "DELIVERY",
-        "MEETING",
-        "SERVICE",
-        "FOLLOW_UP",
-        "PAYMENT",
-        "OTHER",
-      ],
+      enum: ["DELIVERY", "MEETING", "SERVICE", "FOLLOW_UP", "PAYMENT", "OTHER"],
       default: "OTHER",
     },
 
@@ -64,6 +57,42 @@ const appointmentSchema = new Schema(
       name: String,
       phone: String,
       email: String,
+    },
+
+    payment: {
+      method: {
+        type: String,
+        enum: [
+          "CASH",
+          "PIX",
+          "CREDIT_CARD",
+          "DEBIT_CARD",
+          "BANK_SLIP",
+          "TRANSFER",
+        ],
+        default: "PIX",
+      },
+
+      status: {
+        type: String,
+        enum: ["PENDING", "PAID", "CANCELLED", "REFUNDED"],
+        default: "PENDING",
+      },
+
+      installments: {
+        type: Number,
+        default: 1,
+      },
+    },
+
+    discount: {
+      type: Number,
+      default: 0,
+    },
+
+    total: {
+      type: Number,
+      default: 0,
     },
 
     notes: String,
