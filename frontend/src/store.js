@@ -7,6 +7,7 @@ import clientReducer from "./slices/clientSlice";
 import salesReducer from "./slices/salesSlice";
 import financialReducer from "./slices/financialSlice";
 import appointmentReducer from "./slices/appointmentSlice";
+import serviceReducer from "./slices/serviceSlice";
 
 export const store = configureStore({
   reducer: {
@@ -17,5 +18,6 @@ export const store = configureStore({
     sales: salesReducer,
     financial: financialReducer,
     appointment: appointmentReducer,
+    service: serviceReducer,
   },
 });
