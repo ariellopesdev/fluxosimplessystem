@@ -39,6 +39,13 @@ const Financial = () => {
   const [detailsData, setDetailsData] = useState(null);
   const [editId, setEditId] = useState(null);
   const [search, setSearch] = useState("");
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
+
+  const [historyFilters, setHistoryFilters] = useState({
+    date: "",
+    month: "",
+    year: "",
+  });
   const { sales } = useSelector((state) => state.sales);
   const { products } = useSelector((state) => state.product);
   const { appointments } = useSelector((state) => state.appointment);
@@ -270,10 +277,24 @@ const Financial = () => {
   const filteredFinancials = allFinancials.filter((financial) => {
     const searchText = search.toLowerCase();
 
-    return (
+    const matchesSearch =
+      !searchText ||
       financial.title?.toLowerCase().includes(searchText) ||
       financial.description?.toLowerCase().includes(searchText) ||
-      financial.notes?.toLowerCase().includes(searchText)
+      financial.notes?.toLowerCase().includes(searchText);
+
+    const matchesType = filters.type ? financial.type === filters.type : true;
+
+    const matchesCategory = filters.category
+      ? financial.category === filters.category
+      : true;
+
+    const matchesPaymentStatus = filters.paymentStatus
+      ? (financial.payment?.status || "PENDING") === filters.paymentStatus
+      : true;
+
+    return (
+      matchesSearch && matchesType && matchesCategory && matchesPaymentStatus
     );
   });
 
@@ -351,6 +372,59 @@ const Financial = () => {
     dispatch(deleteFinancial(id));
   };
 
+  const formatDateToCompare = (date) => {
+    if (!date) return "";
+
+    if (typeof date === "string") {
+      if (date.includes("T")) return date.split("T")[0];
+      return date;
+    }
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  };
+
+  const getFinancialDate = (financial) => {
+    return (
+      financial.payment?.paidAt ||
+      financial.payment?.dueDate ||
+      financial.createdAt ||
+      financial.updatedAt
+    );
+  };
+
+  const historyFinancials = allFinancials
+    .filter((financial) => {
+      const financialDate = formatDateToCompare(getFinancialDate(financial));
+
+      if (!financialDate) return false;
+
+      const [year, month] = financialDate.split("-");
+
+      if (historyFilters.date && financialDate !== historyFilters.date) {
+        return false;
+      }
+
+      if (historyFilters.month && month !== historyFilters.month) {
+        return false;
+      }
+
+      if (historyFilters.year && year !== historyFilters.year) {
+        return false;
+      }
+
+      return true;
+    })
+    .sort((a, b) => {
+      const dateA = formatDateToCompare(getFinancialDate(a));
+      const dateB = formatDateToCompare(getFinancialDate(b));
+
+      return dateB.localeCompare(dateA);
+    });
+
   return (
     <div className="financial">
       <div className="financial__header">
@@ -359,15 +433,24 @@ const Financial = () => {
           Financeiro
         </h2>
 
-        <button
-          className="financial__btn"
-          onClick={() => {
-            resetForm();
-            setShowModal(true);
-          }}
-        >
-          + Novo registro
-        </button>
+        <div className="financial__headerActions">
+          <button
+            className="financial__secondaryBtn"
+            onClick={() => setShowHistoryModal(true)}
+          >
+            Histórico
+          </button>
+
+          <button
+            className="financial__btn"
+            onClick={() => {
+              resetForm();
+              setShowModal(true);
+            }}
+          >
+            + Novo registro
+          </button>
+        </div>
       </div>
 
       <div className="financial__cards">
@@ -452,6 +535,28 @@ const Financial = () => {
         </select>
 
         <select
+          value={filters.category}
+          onChange={(e) =>
+            setFilters((prev) => ({
+              ...prev,
+              category: e.target.value,
+            }))
+          }
+        >
+          <option value="">Todas as categorias</option>
+          <option value="SALE">Venda</option>
+          <option value="PRODUCT_PURCHASE">Compra de produto</option>
+          <option value="PRODUCT_ASSET">Ativo de produto</option>
+          <option value="COMPANY_ASSET">Patrimônio da empresa</option>
+          <option value="MAINTENANCE">Manutenção</option>
+          <option value="TAX">Imposto</option>
+          <option value="SALARY">Salário</option>
+          <option value="RENT">Aluguel</option>
+          <option value="UTILITY">Serviços</option>
+          <option value="OTHER">Outros</option>
+        </select>
+
+        <select
           value={filters.paymentStatus}
           onChange={(e) =>
             setFilters((prev) => ({
@@ -465,6 +570,20 @@ const Financial = () => {
           <option value="PAID">Pago</option>
           <option value="CANCELLED">Cancelado</option>
         </select>
+        <button
+          type="button"
+          className="financial__clearBtn"
+          onClick={() => {
+            setSearch("");
+            setFilters({
+              type: "",
+              category: "",
+              paymentStatus: "",
+            });
+          }}
+        >
+          Limpar filtros
+        </button>
       </div>
 
       <div className="financial__table">
@@ -1012,7 +1131,119 @@ const Financial = () => {
           </div>
         </div>
       )}
+      {showHistoryModal && (
+        <div className="financial__modalOverlay">
+          <div className="financial__modal">
+            <div className="financial__modalHeader">
+              <h3>Histórico Financeiro</h3>
 
+              <button
+                className="financial__closeBtn"
+                onClick={() => setShowHistoryModal(false)}
+              >
+                <IoClose />
+              </button>
+            </div>
+
+            <div className="financial__historyFilters">
+              <div className="form__group--financial">
+                <label>Data</label>
+
+                <input
+                  type="date"
+                  value={historyFilters.date}
+                  onChange={(e) =>
+                    setHistoryFilters((prev) => ({
+                      ...prev,
+                      date: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+
+              <div className="form__group--financial">
+                <label>Mês</label>
+
+                <select
+                  value={historyFilters.month}
+                  onChange={(e) =>
+                    setHistoryFilters((prev) => ({
+                      ...prev,
+                      month: e.target.value,
+                    }))
+                  }
+                >
+                  <option value="">Todos</option>
+                  <option value="01">Janeiro</option>
+                  <option value="02">Fevereiro</option>
+                  <option value="03">Março</option>
+                  <option value="04">Abril</option>
+                  <option value="05">Maio</option>
+                  <option value="06">Junho</option>
+                  <option value="07">Julho</option>
+                  <option value="08">Agosto</option>
+                  <option value="09">Setembro</option>
+                  <option value="10">Outubro</option>
+                  <option value="11">Novembro</option>
+                  <option value="12">Dezembro</option>
+                </select>
+              </div>
+
+              <div className="form__group--financial">
+                <label>Ano</label>
+
+                <input
+                  type="number"
+                  placeholder="2026"
+                  value={historyFilters.year}
+                  onChange={(e) =>
+                    setHistoryFilters((prev) => ({
+                      ...prev,
+                      year: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+            </div>
+
+            <div className="financial__historyList">
+              {historyFinancials.length === 0 && (
+                <p className="financial__empty">
+                  Nenhuma movimentação encontrada.
+                </p>
+              )}
+
+              {historyFinancials.map((financial) => (
+                <div
+                  key={financial._id}
+                  className={`financial__historyItem ${financial.type?.toLowerCase()}`}
+                >
+                  <div>
+                    <strong>{financial.title}</strong>
+
+                    <span>
+                      {formatDateToCompare(getFinancialDate(financial))
+                        .split("-")
+                        .reverse()
+                        .join("/")}
+                    </span>
+                  </div>
+
+                  <small>
+                    {translateType(financial.type)} •{" "}
+                    {translateCategory(financial.category)} •{" "}
+                    {translatePaymentStatus(
+                      financial.payment?.status || "PENDING",
+                    )}
+                  </small>
+
+                  <p>{formatCurrency(financial.amount)}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
       {error && <Message msg={error} type="error" />}
       {message && <Message msg={message} type="success" />}
     </div>

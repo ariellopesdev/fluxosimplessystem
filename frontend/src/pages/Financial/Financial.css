@@ -4,6 +4,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
   margin-bottom: 20px;
 }
 
@@ -12,6 +13,26 @@
   align-items: center;
   gap: 10px;
   margin: 0;
+}
+
+.financial__headerActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.financial__secondaryBtn {
+  background: #4f46e5;
+  color: #fff;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.financial__secondaryBtn:hover {
+  background: #4338ca;
 }
 
 /************ BUTTONS ************/
@@ -434,6 +455,114 @@
 
 .financial__actionIcon.delete {
   color: #ef4444;
+}
+
+.financial__clearBtn {
+  height: 40px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 8px;
+  background: #6b7280;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.financial__clearBtn:hover {
+  background: #4b5563;
+}
+
+.financial__headerActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.financial__secondaryBtn {
+  background: #4f46e5;
+  color: #fff;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.financial__secondaryBtn:hover {
+  background: #4338ca;
+}
+
+.financial__historyFilters {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.financial__historyList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.financial__historyItem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+
+  background: #fff;
+}
+
+.financial__historyItem div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.financial__historyItem strong {
+  color: #111827;
+}
+
+.financial__historyItem span,
+.financial__historyItem small {
+  color: #4b5563;
+  font-size: 0.84rem;
+}
+
+.financial__historyItem p {
+  margin: 0;
+  font-weight: 700;
+  color: #111827;
+}
+
+.financial__historyItem.income {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.financial__historyItem.expense {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.financial__historyItem.asset {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+@media (max-width: 768px) {
+  .financial__headerActions {
+    flex-direction: column;
+  }
+
+  .financial__historyFilters {
+    grid-template-columns: 1fr;
+  }
 }
 
 /************ ANIMATION ************/
