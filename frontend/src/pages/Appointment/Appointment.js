@@ -13,12 +13,11 @@ import {
   resetMessage,
 } from "../../slices/appointmentSlice";
 import { getAllClients } from "../../slices/clientSlice";
-import { getAllSales } from "../../slices/salesSlice";
-
+import { getServices } from "../../slices/serviceSlice";
 // Components
 import Message from "../../components/Message/Message";
 
-const Appointment = () => {
+const Appointment = ({ setPage }) => {
   const dispatch = useDispatch();
 
   const { appointments, summary, loading, error, message } = useSelector(
@@ -26,11 +25,12 @@ const Appointment = () => {
   );
 
   const { clients } = useSelector((state) => state.client);
-  const { sales } = useSelector((state) => state.sales);
+  const { services } = useSelector((state) => state.service);
 
   const [showModal, setShowModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [viewMode, setViewMode] = useState("DAY");
+  const [clientSearch, setClientSearch] = useState("");
 
   const [formData, setFormData] = useState({
     title: "",
@@ -42,7 +42,7 @@ const Appointment = () => {
     status: "PENDING",
     priority: "MEDIUM",
     client: "",
-    sale: "",
+    service: "",
     notes: "",
   });
 
@@ -50,7 +50,7 @@ const Appointment = () => {
     dispatch(getAllAppointments());
     dispatch(getAppointmentSummary());
     dispatch(getAllClients());
-    dispatch(getAllSales());
+    dispatch(getServices());
   }, [dispatch]);
 
   useEffect(() => {
@@ -65,7 +65,20 @@ const Appointment = () => {
 
   const appointmentsList = Array.isArray(appointments) ? appointments : [];
   const clientsList = Array.isArray(clients) ? clients : [];
-  const salesList = Array.isArray(sales) ? sales : [];
+  const servicesList = Array.isArray(services) ? services : [];
+
+  const availableServices = servicesList.filter(
+    (service) => service.status === "ACTIVE" && service.isSchedulable,
+  );
+
+  const filteredClients = clientsList.filter((client) => {
+    const search = clientSearch.toLowerCase();
+
+    return (
+      client.name?.toLowerCase().includes(search) ||
+      client.cpfCnpj?.toLowerCase().includes(search)
+    );
+  });
 
   const currentMonth = selectedDate.getMonth();
   const currentYear = selectedDate.getFullYear();
@@ -100,14 +113,6 @@ const Appointment = () => {
     return typeof appointment.client === "object"
       ? appointment.client._id
       : appointment.client;
-  };
-
-  const getAppointmentSaleId = (appointment) => {
-    if (!appointment.sale) return "";
-
-    return typeof appointment.sale === "object"
-      ? appointment.sale._id
-      : appointment.sale;
   };
 
   const getClientName = (appointment) => {
@@ -146,23 +151,6 @@ const Appointment = () => {
     return client?.phones?.primary || "-";
   };
 
-  const getSaleLabel = (appointment) => {
-    const saleId = getAppointmentSaleId(appointment);
-
-    if (!saleId) return "Sem venda vinculada";
-
-    const sale = salesList.find((item) => item._id === saleId);
-
-    if (!sale) return "Venda não encontrada";
-
-    return `${sale.saleNumber || "Venda"} - R$ ${Number(
-      sale.total || 0,
-    ).toLocaleString("pt-BR", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })}`;
-  };
-
   const filteredAppointments = useMemo(() => {
     const today = new Date(selectedDate);
     today.setHours(0, 0, 0, 0);
@@ -187,7 +175,9 @@ const Appointment = () => {
       .filter((appointment) => {
         if (!appointment.date) return false;
 
-        const appointmentDate = new Date(`${formatDateToCompare(appointment.date)}T12:00:00`);
+        const appointmentDate = new Date(
+          `${formatDateToCompare(appointment.date)}T12:00:00`,
+        );
 
         return appointmentDate >= today && appointmentDate < endDate;
       })
@@ -236,6 +226,104 @@ const Appointment = () => {
     }
   };
 
+  const getSelectedService = () => {
+    return availableServices.find(
+      (service) => service._id === formData.service,
+    );
+  };
+
+  const calculateEndTime = (startTime, serviceId) => {
+    if (!startTime || !serviceId) return "";
+
+    const selectedService = availableServices.find(
+      (service) => service._id === serviceId,
+    );
+
+    if (!selectedService?.estimatedDuration?.value) return "";
+
+    const [hours, minutes] = startTime.split(":").map(Number);
+
+    const startDate = new Date();
+    startDate.setHours(hours);
+    startDate.setMinutes(minutes);
+    startDate.setSeconds(0);
+
+    const durationValue = Number(selectedService.estimatedDuration.value);
+    const durationUnit = selectedService.estimatedDuration.unit;
+
+    if (durationUnit === "MINUTES") {
+      startDate.setMinutes(startDate.getMinutes() + durationValue);
+    }
+
+    if (durationUnit === "HOURS") {
+      startDate.setHours(startDate.getHours() + durationValue);
+    }
+
+    if (durationUnit === "DAYS") {
+      startDate.setDate(startDate.getDate() + durationValue);
+    }
+
+    const endHours = String(startDate.getHours()).padStart(2, "0");
+    const endMinutes = String(startDate.getMinutes()).padStart(2, "0");
+
+    return `${endHours}:${endMinutes}`;
+  };
+
+  const handleServiceChange = (serviceId) => {
+    const selectedService = availableServices.find(
+      (service) => service._id === serviceId,
+    );
+
+    setFormData((prev) => ({
+      ...prev,
+      service: serviceId,
+      title: selectedService?.name || "",
+      description: selectedService?.description || "",
+      type: "SERVICE",
+      endTime: calculateEndTime(prev.startTime, serviceId),
+    }));
+  };
+
+  const handleStartTimeChange = (startTime) => {
+    setFormData((prev) => ({
+      ...prev,
+      startTime,
+      endTime: calculateEndTime(startTime, prev.service),
+    }));
+  };
+
+  const formatCpfCnpj = (value) => {
+    if (!value) return "";
+
+    const onlyNumbers = value.replace(/\D/g, "");
+
+    if (onlyNumbers.length <= 11) {
+      return onlyNumbers
+        .replace(/(\d{3})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+    }
+
+    return onlyNumbers
+      .replace(/^(\d{2})(\d)/, "$1.$2")
+      .replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3")
+      .replace(/\.(\d{3})(\d)/, ".$1/$2")
+      .replace(/(\d{4})(\d)/, "$1-$2");
+  };
+
+  const selectedClient = clientsList.find(
+    (client) => client._id === formData.client,
+  );
+
+  const handleSelectClient = (client) => {
+    setFormData((prev) => ({
+      ...prev,
+      client: client._id,
+    }));
+
+    setClientSearch(client.name);
+  };
+
   const resetForm = () => {
     setFormData({
       title: "",
@@ -247,7 +335,7 @@ const Appointment = () => {
       status: "PENDING",
       priority: "MEDIUM",
       client: "",
-      sale: "",
+      service: "",
       notes: "",
     });
   };
@@ -255,12 +343,29 @@ const Appointment = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const selectedService = getSelectedService();
+
     const payload = {
-      ...formData,
+      title: selectedService?.name || "Serviço",
+      description: selectedService?.description || "",
+      date: formData.date,
+      startTime: formData.startTime,
+      endTime: formData.endTime,
+      type: "SERVICE",
+      status: formData.status,
+      priority: formData.priority,
       client: formData.client || null,
-      notes: formData.sale
-        ? `${formData.notes || ""}\nVenda vinculada: ${formData.sale}`.trim()
-        : formData.notes,
+      notes: `
+${formData.notes || ""}
+Serviço vinculado: ${selectedService?.name || "-"}
+Valor do serviço: R$ ${Number(selectedService?.unityPrice || 0).toLocaleString(
+        "pt-BR",
+        {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        },
+      )}
+`.trim(),
     };
 
     try {
@@ -323,6 +428,13 @@ const Appointment = () => {
     return "Agendamentos dos próximos 2 meses";
   };
 
+  const todayFormatted = formatDateToCompare(new Date());
+
+  const isPastDate = (day) => {
+    const date = new Date(currentYear, currentMonth, day);
+    return formatDateToCompare(date) < todayFormatted;
+  };
+
   return (
     <div className="appointment">
       <div className="appointment__header">
@@ -355,23 +467,53 @@ const Appointment = () => {
 
       <div className="appointment__content">
         <div className="calendar">
-          <h3>{monthName}</h3>
+          <div className="calendar__header">
+            <button
+              type="button"
+              onClick={() =>
+                setSelectedDate(new Date(currentYear, currentMonth - 1, 1))
+              }
+            >
+              ‹
+            </button>
+
+            <h3>{monthName}</h3>
+
+            <button
+              type="button"
+              onClick={() =>
+                setSelectedDate(new Date(currentYear, currentMonth + 1, 1))
+              }
+            >
+              ›
+            </button>
+          </div>
 
           <div className="calendar__grid">
             {[...Array(daysInMonth)].map((_, i) => {
               const day = i + 1;
               const isSelected = selectedDate.getDate() === day;
               const hasAppointment = getDayHasAppointment(day);
+              const pastDate = isPastDate(day);
 
               return (
                 <div
                   key={day}
-                  className={`calendar__day ${
-                    isSelected ? "selected" : ""
-                  } ${hasAppointment ? "hasAppointment" : ""}`}
-                  onClick={() =>
-                    setSelectedDate(new Date(currentYear, currentMonth, day))
+                  className={`calendar__day 
+      ${isSelected ? "selected" : ""} 
+      ${hasAppointment ? "hasAppointment" : ""} 
+      ${pastDate ? "disabled" : ""}
+    `}
+                  title={
+                    pastDate
+                      ? "Não é possível agendar datas anteriores a hoje"
+                      : ""
                   }
+                  onClick={() => {
+                    if (pastDate) return;
+
+                    setSelectedDate(new Date(currentYear, currentMonth, day));
+                  }}
                 >
                   {day}
                 </div>
@@ -386,9 +528,7 @@ const Appointment = () => {
           {loading && <p>Carregando agendamentos...</p>}
 
           {!loading && filteredAppointments.length === 0 && (
-            <p className="appointment__empty">
-              Nenhum agendamento encontrado.
-            </p>
+            <p className="appointment__empty">Nenhum agendamento encontrado.</p>
           )}
 
           {!loading &&
@@ -421,7 +561,9 @@ const Appointment = () => {
                     <span>Cliente: {getClientName(appointment)}</span>
                     <span>CPF/CNPJ: {getClientDocument(appointment)}</span>
                     <span>Telefone: {getClientPhone(appointment)}</span>
-                    <span>Venda/Serviço: {getSaleLabel(appointment)}</span>
+                    <span>
+                      Serviço: {appointment.title || "Serviço não informado"}
+                    </span>
                   </div>
                 </div>
 
@@ -482,37 +624,85 @@ const Appointment = () => {
 
             <form onSubmit={handleSubmit} className="appointment__form">
               <div className="appointment__formSection">
-                <h4>Dados principais</h4>
+                <h4>Cliente e serviço</h4>
 
-                <div className="appointment__formGroup">
-                  <label>Título</label>
+                <div className="appointment__grid two">
+                  <div className="appointment__formGroup appointment__clientSearchBox">
+                    <label>Pesquisar cliente por nome ou CPF/CNPJ</label>
 
-                  <input
-                    type="text"
-                    value={formData.title}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        title: e.target.value,
-                      }))
-                    }
-                    required
-                  />
+                    <input
+                      type="text"
+                      placeholder="Digite nome ou CPF/CNPJ"
+                      value={clientSearch}
+                      onChange={(e) => {
+                        setClientSearch(e.target.value);
+
+                        setFormData((prev) => ({
+                          ...prev,
+                          client: "",
+                        }));
+                      }}
+                    />
+
+                    {clientSearch &&
+                      !formData.client &&
+                      filteredClients.length > 0 && (
+                        <div className="appointment__clientSuggestions">
+                          {filteredClients.map((client) => (
+                            <button
+                              type="button"
+                              key={client._id}
+                              onClick={() => handleSelectClient(client)}
+                            >
+                              <strong>{client.name}</strong>
+                              <span>{formatCpfCnpj(client.cpfCnpj)}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
+                    <button
+                      type="button"
+                      className="appointment__linkBtn"
+                      onClick={() => {
+                        setShowModal(false);
+                        resetForm();
+
+                        if (typeof setPage === "function") {
+                          setPage("client");
+                        }
+                      }}
+                    >
+                      Cliente não cadastrado? Cadastrar cliente
+                    </button>
+                  </div>
+
+                  <div className="appointment__grid two appointment__selectedClientGrid">
+                    <div className="appointment__formGroup">
+                      <label>Cliente selecionado</label>
+                      <input
+                        type="text"
+                        value={selectedClient?.name || ""}
+                        disabled
+                        placeholder="Nenhum cliente selecionado"
+                      />
+                    </div>
+
+                    <div className="appointment__formGroup">
+                      <label>CPF/CNPJ</label>
+                      <input
+                        type="text"
+                        value={formatCpfCnpj(selectedClient?.cpfCnpj || "")}
+                        disabled
+                        placeholder="-"
+                      />
+                    </div>
+                  </div>
                 </div>
+              </div>
 
-                <div className="appointment__formGroup">
-                  <label>Descrição</label>
-
-                  <textarea
-                    value={formData.description}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        description: e.target.value,
-                      }))
-                    }
-                  />
-                </div>
+              <div className="appointment__formSection">
+                <h4>Data e horário</h4>
 
                 <div className="appointment__grid">
                   <div className="appointment__formGroup">
@@ -520,6 +710,7 @@ const Appointment = () => {
 
                     <input
                       type="date"
+                      min={todayFormatted}
                       value={formData.date}
                       onChange={(e) =>
                         setFormData((prev) => ({
@@ -537,85 +728,15 @@ const Appointment = () => {
                     <input
                       type="time"
                       value={formData.startTime}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          startTime: e.target.value,
-                        }))
-                      }
+                      onChange={(e) => handleStartTimeChange(e.target.value)}
                       required
                     />
                   </div>
 
                   <div className="appointment__formGroup">
-                    <label>Fim</label>
+                    <label>Fim automático</label>
 
-                    <input
-                      type="time"
-                      value={formData.endTime}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          endTime: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="appointment__formSection">
-                <h4>Cliente e venda</h4>
-
-                <div className="appointment__grid two">
-                  <div className="appointment__formGroup">
-                    <label>Cliente</label>
-
-                    <select
-                      value={formData.client}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          client: e.target.value,
-                        }))
-                      }
-                    >
-                      <option value="">Sem cliente vinculado</option>
-
-                      {clientsList.map((client) => (
-                        <option key={client._id} value={client._id}>
-                          {client.name}{" "}
-                          {client.cpfCnpj ? `- ${client.cpfCnpj}` : ""}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="appointment__formGroup">
-                    <label>Venda/Serviço vinculado</label>
-
-                    <select
-                      value={formData.sale}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          sale: e.target.value,
-                          type: e.target.value ? "SERVICE" : prev.type,
-                        }))
-                      }
-                    >
-                      <option value="">Sem venda/serviço vinculado</option>
-
-                      {salesList.map((sale) => (
-                        <option key={sale._id} value={sale._id}>
-                          {sale.saleNumber || "Venda"} - R${" "}
-                          {Number(sale.total || 0).toLocaleString("pt-BR", {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          })}
-                        </option>
-                      ))}
-                    </select>
+                    <input type="time" value={formData.endTime} disabled />
                   </div>
                 </div>
               </div>

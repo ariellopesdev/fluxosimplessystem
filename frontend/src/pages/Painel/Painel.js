@@ -15,7 +15,7 @@ const Painel = () => {
     <div>
       <Navbar />
       <Aside setPage={setPage} page={page} />
-      <Main page={page} />
+      <Main page={page} setPage={setPage}/>
     </div>
   );
 };

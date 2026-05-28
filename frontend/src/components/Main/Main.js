@@ -15,7 +15,7 @@ import Help from "../../pages/Help/Help";
 import Sales from "../../pages/Sales/Sales";
 import UnderConstruction from "../../components/UnderConstruction/UnderConstruction";
 
-const Main = ({ page }) => {
+const Main = ({ page, setPage }) => {
   const renderPage = () => {
     switch (page) {
       case "dashboard":
@@ -32,7 +32,7 @@ const Main = ({ page }) => {
       case "financial":
         return <Financial />;
       case "appointment":
-        return <Appointment />;
+        return <Appointment setPage={setPage} />;
       case "reports":
         return <UnderConstruction />;
       // return <Reports />;
