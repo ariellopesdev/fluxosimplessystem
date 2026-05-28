@@ -34,6 +34,7 @@ const Appointment = ({ setPage }) => {
   const [clientSearch, setClientSearch] = useState("");
   const [showAvailabilityModal, setShowAvailabilityModal] = useState(false);
   const [localError, setLocalError] = useState(null);
+  const [showTimeDropdown, setShowTimeDropdown] = useState(false);
 
   const [availabilityRules, setAvailabilityRules] = useState({
     workingDays: {
@@ -239,21 +240,35 @@ const Appointment = ({ setPage }) => {
   };
 
   const handleStatusUpdate = async (id, status) => {
-    try {
-      await dispatch(
-        updateAppointment({
-          id,
-          appointmentData: {
-            status,
-          },
-        }),
-      ).unwrap();
+  try {
+    const appointment = appointmentsList.find((item) => item._id === id);
 
-      await refreshAppointments();
-    } catch (error) {
-      console.log(error);
+    const appointmentData = {
+      status,
+    };
+
+    if (
+      status === "FINISHED" &&
+      appointment?.payment?.status === "PENDING"
+    ) {
+      appointmentData.payment = {
+        ...appointment.payment,
+        status: "PAID",
+      };
     }
-  };
+
+    await dispatch(
+      updateAppointment({
+        id,
+        appointmentData,
+      }),
+    ).unwrap();
+
+    await refreshAppointments();
+  } catch (error) {
+    console.log(error);
+  }
+};
 
   const getSelectedService = () => {
     return availableServices.find(
@@ -338,6 +353,22 @@ const Appointment = ({ setPage }) => {
       .replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3")
       .replace(/\.(\d{3})(\d)/, ".$1/$2")
       .replace(/(\d{4})(\d)/, "$1-$2");
+  };
+
+  const formatPhone = (value) => {
+    if (!value) return "-";
+
+    const numbers = value.replace(/\D/g, "").slice(0, 11);
+
+    if (numbers.length <= 10) {
+      return numbers
+        .replace(/^(\d{2})(\d)/, "($1) $2")
+        .replace(/(\d{4})(\d)/, "$1-$2");
+    }
+
+    return numbers
+      .replace(/^(\d{2})(\d)/, "($1) $2")
+      .replace(/(\d{5})(\d)/, "$1-$2");
   };
 
   const selectedClient = clientsList.find(
@@ -608,6 +639,80 @@ Parcelas: ${
     ...Array.from({ length: daysInMonth }, (_, index) => index + 1),
   ];
 
+  const generateAvailableTimes = () => {
+    const times = [];
+
+    if (!formData.date || !formData.service) return times;
+
+    const selectedService = getSelectedService();
+    const durationValue = Number(
+      selectedService?.estimatedDuration?.value || 30,
+    );
+    const durationUnit = selectedService?.estimatedDuration?.unit || "MINUTES";
+
+    let durationInMinutes = durationValue;
+
+    if (durationUnit === "HOURS") {
+      durationInMinutes = durationValue * 60;
+    }
+
+    if (durationUnit === "DAYS") {
+      durationInMinutes = durationValue * 24 * 60;
+    }
+
+    const [startHour, startMinute] = availabilityRules.startTime
+      .split(":")
+      .map(Number);
+
+    const [endHour, endMinute] = availabilityRules.endTime
+      .split(":")
+      .map(Number);
+
+    const current = new Date(`${formData.date}T00:00:00`);
+    current.setHours(startHour, startMinute, 0, 0);
+
+    const end = new Date(`${formData.date}T00:00:00`);
+    end.setHours(endHour, endMinute, 0, 0);
+
+    while (current < end) {
+      const possibleEnd = new Date(current);
+      possibleEnd.setMinutes(possibleEnd.getMinutes() + durationInMinutes);
+
+      if (possibleEnd > end) break;
+
+      const hour = String(current.getHours()).padStart(2, "0");
+      const minute = String(current.getMinutes()).padStart(2, "0");
+
+      times.push(`${hour}:${minute}`);
+
+      current.setMinutes(current.getMinutes() + durationInMinutes);
+    }
+
+    return times;
+  };
+
+  const isTimeUnavailable = (time) => {
+    if (!formData.date || !formData.service) return false;
+
+    const calculatedEndTime = calculateEndTime(time, formData.service);
+
+    return appointmentsList.some((appointment) => {
+      const appointmentDate = formatDateToCompare(appointment.date);
+
+      if (appointmentDate !== formData.date) return false;
+      if (appointment.status === "CANCELLED") return false;
+      if (!appointment.startTime || !appointment.endTime) return false;
+
+      return (
+        time < appointment.endTime && calculatedEndTime > appointment.startTime
+      );
+    });
+  };
+
+  const availableTimes = generateAvailableTimes().filter(
+    (time) => !isTimeUnavailable(time),
+  );
+
   return (
     <div className="appointment">
       <div className="appointment__header">
@@ -753,8 +858,13 @@ Parcelas: ${
 
                   <div className="appointment__clientData">
                     <span>Cliente: {getClientName(appointment)}</span>
-                    <span>CPF/CNPJ: {getClientDocument(appointment)}</span>
-                    <span>Telefone: {getClientPhone(appointment)}</span>
+                    <span>
+                      CPF/CNPJ:{" "}
+                      {formatCpfCnpj(getClientDocument(appointment)) || "-"}
+                    </span>
+                    <span>
+                      Telefone: {formatPhone(getClientPhone(appointment))}
+                    </span>
                     <span>
                       Serviço: {appointment.title || "Serviço não informado"}
                     </span>
@@ -948,40 +1058,52 @@ Parcelas: ${
                     />
                   </div>
 
-                  <div className="appointment__formGroup">
-                    <label>Início</label>
+                  <div className="appointment__formGroup appointment__timeGroup">
+                    <label>Horários disponíveis</label>
 
-                    <input
-                      type="time"
-                      min={availabilityRules.startTime}
-                      max={availabilityRules.endTime}
-                      value={formData.startTime}
-                      onChange={(e) => {
-                        const selectedTime = e.target.value;
+                    <button
+                      type="button"
+                      className="appointment__timeSelect"
+                      onClick={() => setShowTimeDropdown((prev) => !prev)}
+                      disabled={!formData.date || !formData.service}
+                    >
+                      {formData.startTime || "Selecione um horário"}
+                    </button>
 
-                        if (
-                          !isTimeBetween(
-                            selectedTime,
-                            availabilityRules.startTime,
-                            availabilityRules.endTime,
-                          )
-                        ) {
-                          setLocalError(
-                            "Horário fora do período disponível para atendimento.",
-                          );
-                          return;
-                        }
-
-                        handleStartTimeChange(selectedTime);
-                      }}
-                      required
-                    />
+                    {showTimeDropdown && formData.date && formData.service && (
+                      <div className="appointment__timeDropdown">
+                        {availableTimes.length > 0 ? (
+                          availableTimes.map((time) => (
+                            <button
+                              type="button"
+                              key={time}
+                              className={
+                                formData.startTime === time ? "active" : ""
+                              }
+                              onClick={() => {
+                                handleStartTimeChange(time);
+                                setShowTimeDropdown(false);
+                              }}
+                            >
+                              {time}
+                            </button>
+                          ))
+                        ) : (
+                          <p>Nenhum horário disponível.</p>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   <div className="appointment__formGroup">
                     <label>Fim automático</label>
 
-                    <input type="time" value={formData.endTime} disabled />
+                    <input
+                      type="time"
+                      value={formData.endTime}
+                      disabled
+                      placeholder="Selecione um horário"
+                    />
                   </div>
                 </div>
               </div>

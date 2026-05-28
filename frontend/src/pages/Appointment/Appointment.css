@@ -649,6 +649,98 @@
   accent-color: var(--primary);
 }
 
+.appointment__timeGroup {
+  position: relative;
+}
+
+.appointment__timeSelect {
+  width: 100%;
+  height: 42px;
+
+  padding: 0 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+
+  color: #374151;
+  font-size: 0.85rem;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.appointment__timeSelect:hover {
+  border-color: var(--primary);
+}
+
+.appointment__timeSelect:disabled {
+  background: #f3f4f6;
+  cursor: not-allowed;
+  color: #6b7280;
+}
+
+.appointment__timeDropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 80;
+
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+
+  max-height: 180px;
+  overflow-y: auto;
+
+  padding: 10px;
+
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.16);
+}
+
+.appointment__timeDropdown button {
+  height: 34px;
+
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+
+  background: #f9fafb;
+  color: #374151;
+
+  font-size: 0.8rem;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.appointment__timeDropdown button:hover {
+  background: #ecfdf5;
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.appointment__timeDropdown button.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.appointment__timeDropdown p {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.82rem;
+}
+
 /************ ANIMATION ************/
 
 @keyframes modalFade {
