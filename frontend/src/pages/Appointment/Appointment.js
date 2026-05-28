@@ -69,6 +69,12 @@ const Appointment = ({ setPage }) => {
     priority: "MEDIUM",
     client: "",
     service: "",
+    payment: {
+      method: "PIX",
+      status: "PENDING",
+      installments: 1,
+    },
+    discount: 0,
     notes: "",
   });
 
@@ -347,6 +353,32 @@ const Appointment = ({ setPage }) => {
     setClientSearch(client.name);
   };
 
+  const formatCurrency = (value) => {
+    return Number(value || 0).toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    });
+  };
+
+  const selectedServiceValue = Number(getSelectedService()?.unityPrice || 0);
+
+  const appointmentTotal = Math.max(
+    selectedServiceValue - Number(formData.discount || 0),
+    0,
+  );
+
+  const handlePaymentChange = (e) => {
+    const { name, value } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      payment: {
+        ...prev.payment,
+        [name]: name === "installments" ? Number(value) : value,
+      },
+    }));
+  };
+
   const resetForm = () => {
     setFormData({
       title: "",
@@ -359,6 +391,12 @@ const Appointment = ({ setPage }) => {
       priority: "MEDIUM",
       client: "",
       service: "",
+      payment: {
+        method: "PIX",
+        status: "PENDING",
+        installments: 1,
+      },
+      discount: 0,
       notes: "",
     });
   };
@@ -378,16 +416,28 @@ const Appointment = ({ setPage }) => {
       status: formData.status,
       priority: formData.priority,
       client: formData.client || null,
+      payment: {
+        ...formData.payment,
+        installments:
+          formData.payment.method === "CREDIT_CARD"
+            ? Number(formData.payment.installments)
+            : 1,
+      },
+      discount: Number(formData.discount || 0),
+      total: appointmentTotal,
       notes: `
 ${formData.notes || ""}
 Serviço vinculado: ${selectedService?.name || "-"}
-Valor do serviço: R$ ${Number(selectedService?.unityPrice || 0).toLocaleString(
-        "pt-BR",
-        {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        },
-      )}
+Valor do serviço: ${formatCurrency(selectedService?.unityPrice || 0)}
+Desconto: ${formatCurrency(formData.discount || 0)}
+Total: ${formatCurrency(appointmentTotal)}
+Pagamento: ${formData.payment.method}
+Status do pagamento: ${formData.payment.status}
+Parcelas: ${
+        formData.payment.method === "CREDIT_CARD"
+          ? formData.payment.installments
+          : 1
+      }x
 `.trim(),
     };
 
@@ -820,28 +870,45 @@ Valor do serviço: R$ ${Number(selectedService?.unityPrice || 0).toLocaleString(
                       Cliente não cadastrado? Cadastrar cliente
                     </button>
                   </div>
+                </div>
 
-                  <div className="appointment__grid two appointment__selectedClientGrid">
-                    <div className="appointment__formGroup">
-                      <label>Cliente selecionado</label>
-                      <input
-                        type="text"
-                        value={selectedClient?.name || ""}
-                        disabled
-                        placeholder="Nenhum cliente selecionado"
-                      />
-                    </div>
-
-                    <div className="appointment__formGroup">
-                      <label>CPF/CNPJ</label>
-                      <input
-                        type="text"
-                        value={formatCpfCnpj(selectedClient?.cpfCnpj || "")}
-                        disabled
-                        placeholder="-"
-                      />
-                    </div>
+                <div className="appointment__grid two appointment__selectedClientGrid">
+                  <div className="appointment__formGroup">
+                    <label>Cliente selecionado</label>
+                    <input
+                      type="text"
+                      value={selectedClient?.name || ""}
+                      disabled
+                      placeholder="Nenhum cliente selecionado"
+                    />
                   </div>
+
+                  <div className="appointment__formGroup">
+                    <label>CPF/CNPJ</label>
+                    <input
+                      type="text"
+                      value={formatCpfCnpj(selectedClient?.cpfCnpj || "")}
+                      disabled
+                      placeholder="-"
+                    />
+                  </div>
+                </div>
+                <div className="appointment__formGroup">
+                  <label>Serviço disponível</label>
+
+                  <select
+                    value={formData.service}
+                    onChange={(e) => handleServiceChange(e.target.value)}
+                    required
+                  >
+                    <option value="">Selecione um serviço</option>
+
+                    {availableServices.map((service) => (
+                      <option key={service._id} value={service._id}>
+                        {service.name} - {formatCurrency(service.unityPrice)}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
@@ -915,6 +982,87 @@ Valor do serviço: R$ ${Number(selectedService?.unityPrice || 0).toLocaleString(
                     <label>Fim automático</label>
 
                     <input type="time" value={formData.endTime} disabled />
+                  </div>
+                </div>
+              </div>
+
+              <div className="appointment__formSection">
+                <h4>Pagamento</h4>
+
+                <div className="appointment__grid">
+                  <div className="appointment__formGroup">
+                    <label>Forma de pagamento</label>
+
+                    <select
+                      name="method"
+                      value={formData.payment.method}
+                      onChange={handlePaymentChange}
+                    >
+                      <option value="CASH">Dinheiro</option>
+                      <option value="PIX">Pix</option>
+                      <option value="CREDIT_CARD">Cartão de crédito</option>
+                      <option value="DEBIT_CARD">Cartão de débito</option>
+                      <option value="BANK_SLIP">Boleto</option>
+                      <option value="TRANSFER">Transferência</option>
+                    </select>
+                  </div>
+
+                  <div className="appointment__formGroup">
+                    <label>Status do pagamento</label>
+
+                    <select
+                      name="status"
+                      value={formData.payment.status}
+                      onChange={handlePaymentChange}
+                    >
+                      <option value="PENDING">Pendente</option>
+                      <option value="PAID">Pago</option>
+                      <option value="CANCELLED">Cancelado</option>
+                      <option value="REFUNDED">Reembolsado</option>
+                    </select>
+                  </div>
+
+                  {formData.payment.method === "CREDIT_CARD" && (
+                    <div className="appointment__formGroup">
+                      <label>Parcelas</label>
+
+                      <input
+                        type="number"
+                        name="installments"
+                        min="1"
+                        max="12"
+                        value={formData.payment.installments}
+                        onChange={handlePaymentChange}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <div className="appointment__grid two">
+                  <div className="appointment__formGroup">
+                    <label>Desconto</label>
+
+                    <input
+                      type="number"
+                      min="0"
+                      value={formData.discount}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          discount: Number(e.target.value),
+                        }))
+                      }
+                    />
+                  </div>
+
+                  <div className="appointment__formGroup">
+                    <label>Total do serviço</label>
+
+                    <input
+                      type="text"
+                      value={formatCurrency(appointmentTotal)}
+                      disabled
+                    />
                   </div>
                 </div>
               </div>
