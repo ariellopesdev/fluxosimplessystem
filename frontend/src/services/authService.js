@@ -43,10 +43,42 @@ const login = async (data) => {
   }
 };
 
+// Forgot password
+const forgotPassword = async (data) => {
+  const config = requestConfig("POST", data);
+
+  try {
+    const res = await fetch(api + "/users/forgot-password", config)
+      .then((res) => res.json())
+      .catch((err) => err);
+
+    return res;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+// Reset password
+const resetPassword = async (data, token) => {
+  const config = requestConfig("PUT", data);
+
+  try {
+    const res = await fetch(api + "/users/reset-password/" + token, config)
+      .then((res) => res.json())
+      .catch((err) => err);
+
+    return res;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 const authService = {
   register,
   logout,
   login,
+  forgotPassword,
+  resetPassword,
 };
 
 export default authService;
