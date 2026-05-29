@@ -9,6 +9,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 //Pages
 import Home from "./pages/Home/Home";
+import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 import Painel from "./pages/Painel/Painel";
 import Register from "./pages/Register/Register";
 import Dashboard from "./pages/Dashboard/Dashboard";
@@ -33,6 +34,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/forgotpassword" element={<ForgotPassword />} />
           <Route
             path="/painel"
             element={auth ? <Painel /> : <Navigate to="/" />}
