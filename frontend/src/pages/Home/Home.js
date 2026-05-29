@@ -37,6 +37,11 @@ const Home = () => {
 
     setLocalError("");
 
+    if (isRateLimited) {
+      setLocalError("");
+      return;
+    }
+
     if (failedAttempts >= 3 && !captchaToken) {
       setLocalError("Confirme que você não é um robô.");
       return;
@@ -71,6 +76,10 @@ const Home = () => {
   useEffect(() => {
     dispatch(reset());
   }, [dispatch]);
+
+  const isRateLimited =
+    typeof error === "string" &&
+    error.toLowerCase().includes("muitas tentativas");
   return (
     <div id="home">
       <div id="home__info">
@@ -113,7 +122,7 @@ const Home = () => {
               {showPassword ? <FiEyeOff /> : <FiEye />}
             </button>
           </div>
-          {failedAttempts >= 3 && (
+          {failedAttempts >= 3 && !isRateLimited && (
             <ReCAPTCHA
               sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
               onChange={(token) => setCaptchaToken(token)}
