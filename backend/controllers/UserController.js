@@ -4,15 +4,28 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
-
 const mongoose = require("mongoose");
-
+const axios = require("axios");
 const jwtSecret = process.env.JWT_SECRET;
 
 const Company = require("../models/Company");
 
-// Generate user token
+const verifyRecaptcha = async (token) => {
+  const response = await axios.post(
+    "https://www.google.com/recaptcha/api/siteverify",
+    null,
+    {
+      params: {
+        secret: process.env.RECAPTCHA_SECRET_KEY,
+        response: token,
+      },
+    },
+  );
 
+  return response.data.success;
+};
+
+// Generate user token
 const generateToken = (user) => {
   return jwt.sign(
     {
@@ -193,9 +206,17 @@ const getUserById = async (req, res) => {
 };
 
 const forgotPassword = async (req, res) => {
-  const { email } = req.body;
+  const { email, captchaToken } = req.body;
 
   try {
+    const isHuman = await verifyRecaptcha(captchaToken);
+
+    if (!isHuman) {
+      return res.status(400).json({
+        errors: ["Falha na verificação do reCAPTCHA."],
+      });
+    }
+
     const user = await User.findOne({ email });
 
     if (!user) {

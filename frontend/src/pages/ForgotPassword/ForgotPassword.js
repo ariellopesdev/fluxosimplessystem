@@ -16,19 +16,29 @@ import Message from "../../components/Message/Message";
 // Icons
 import { MdOutlineMarkEmailRead } from "react-icons/md";
 
+// reCaptcha
+import ReCAPTCHA from "react-google-recaptcha";
+
 const ForgotPassword = () => {
   const dispatch = useDispatch();
 
   const [email, setEmail] = useState("");
-
   const { loading, error, message } = useSelector((state) => state.auth);
+  const [captchaToken, setCaptchaToken] = useState("");
+  const [localError, setLocalError] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    if (!captchaToken) {
+      setLocalError("Confirme que você não é um robô.");
+      return;
+    }
+
     dispatch(
       forgotPassword({
         email,
+        captchaToken,
       }),
     );
   };
@@ -66,6 +76,11 @@ const ForgotPassword = () => {
             onChange={(e) => setEmail(e.target.value)}
           />
 
+          <ReCAPTCHA
+            sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
+            onChange={(token) => setCaptchaToken(token)}
+          />
+
           {!loading && (
             <button type="submit">Enviar link de recuperação</button>
           )}
@@ -77,7 +92,7 @@ const ForgotPassword = () => {
           )}
 
           {error && <Message msg={error} type="error" />}
-
+          {localError && <Message msg={localError} type="error" />}
           {message && <Message msg={message} type="success" />}
         </form>
 

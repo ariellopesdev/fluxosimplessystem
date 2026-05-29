@@ -1,3 +1,4 @@
+//CSS
 import "./ResetPassword.css";
 
 // React
@@ -15,7 +16,6 @@ import Message from "../../components/Message/Message";
 
 // Icons
 import { FiEye, FiEyeOff } from "react-icons/fi";
-
 import { MdLockReset } from "react-icons/md";
 
 const ResetPassword = () => {
@@ -23,14 +23,10 @@ const ResetPassword = () => {
   const navigate = useNavigate();
 
   const { token } = useParams();
-
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-
   const [showPassword, setShowPassword] = useState(false);
-
   const [localError, setLocalError] = useState("");
-
   const { loading, error, success, message } = useSelector(
     (state) => state.auth,
   );
