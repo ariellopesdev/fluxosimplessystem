@@ -22,6 +22,10 @@ const {
 const authGuard = require("../middlewares/authGuard");
 const roleGuard = require("../middlewares/roleGuard");
 const { imageUpload } = require("../middlewares/imageUpload");
+const {
+  loginLimiter,
+  forgotPasswordLimiter,
+} = require("../middlewares/rateLimiters");
 
 // Routes
 router.post(
@@ -32,7 +36,7 @@ router.post(
   validate,
   register,
 );
-router.post("/login", loginValidation(), validate, login);
+router.post("/login", loginLimiter, loginValidation(), validate, login);
 router.get("/profile", authGuard, getCurrentUser);
 router.put(
   "/",
@@ -42,7 +46,7 @@ router.put(
   imageUpload.single("profileImage"),
   update,
 );
-router.post("/forgot-password", forgotPassword);
+router.post("/forgot-password", forgotPasswordLimiter, forgotPassword);
 router.put("/reset-password/:token", resetPassword);
 router.get("/:id", getUserById);
 
