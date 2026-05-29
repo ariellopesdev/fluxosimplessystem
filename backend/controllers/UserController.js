@@ -2,6 +2,8 @@ const User = require("../models/User");
 
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
+const nodemailer = require("nodemailer");
 
 const mongoose = require("mongoose");
 
@@ -76,12 +78,12 @@ const register = async (req, res) => {
   }
 
   res.status(201).json({
-  _id: newUser._id,
-  name: newUser.name,
-  email: newUser.email,
-  role: newUser.role,
-  token: generateToken(newUser),
-});
+    _id: newUser._id,
+    name: newUser.name,
+    email: newUser.email,
+    role: newUser.role,
+    token: generateToken(newUser),
+  });
 };
 
 // Sign user in
@@ -104,13 +106,13 @@ const login = async (req, res) => {
 
   // Return user with token
   res.status(201).json({
-  _id: user._id,
-  name: user.name,
-  email: user.email,
-  profileImage: user.profileImage,
-  role: user.role,
-  token: generateToken(user),
-});
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    profileImage: user.profileImage,
+    role: user.role,
+    token: generateToken(user),
+  });
 };
 
 // Get current logged in user
@@ -190,10 +192,114 @@ const getUserById = async (req, res) => {
   }
 };
 
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(200).json({
+        message:
+          "Se este e-mail estiver cadastrado, enviaremos um link de recuperação.",
+      });
+    }
+
+    const resetToken = crypto.randomBytes(32).toString("hex");
+
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+
+    user.resetPasswordToken = hashedToken;
+    user.resetPasswordExpires = Date.now() + 1000 * 60 * 30;
+
+    await user.save();
+
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+
+    const transporter = nodemailer.createTransport({
+      host: process.env.EMAIL_HOST,
+      port: Number(process.env.EMAIL_PORT),
+      secure: false,
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    await transporter.sendMail({
+      from: `"Fluxo Simples System" <${process.env.EMAIL_USER}>`,
+      to: user.email,
+      subject: "Redefinição de senha",
+      html: `
+        <h2>Redefinição de senha</h2>
+        <p>Você solicitou a redefinição da sua senha.</p>
+        <p>Clique no link abaixo para criar uma nova senha:</p>
+        <a href="${resetUrl}">${resetUrl}</a>
+        <p>Este link expira em 30 minutos.</p>
+      `,
+    });
+
+    res.status(200).json({
+      message:
+        "Se este e-mail estiver cadastrado, enviaremos um link de recuperação.",
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      errors: ["Erro ao enviar e-mail de recuperação."],
+    });
+  }
+};
+
+const resetPassword = async (req, res) => {
+  const { token } = req.params;
+  const { password } = req.body;
+
+  try {
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+    const user = await User.findOne({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        errors: ["Token inválido ou expirado."],
+      });
+    }
+
+    const salt = await bcrypt.genSalt();
+    const passwordHash = await bcrypt.hash(password, salt);
+
+    user.password = passwordHash;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+
+    await user.save();
+
+    res.status(200).json({
+      message: "Senha redefinida com sucesso.",
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      errors: ["Erro ao redefinir senha."],
+    });
+  }
+};
+
 module.exports = {
   register,
   login,
   getCurrentUser,
   update,
   getUserById,
+  forgotPassword,
+  resetPassword,
 };

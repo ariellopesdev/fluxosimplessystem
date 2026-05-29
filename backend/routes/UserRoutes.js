@@ -8,6 +8,8 @@ const {
   getCurrentUser,
   update,
   getUserById,
+  forgotPassword,
+  resetPassword,
 } = require("../controllers/UserController");
 
 // Middlewares
@@ -40,6 +42,8 @@ router.put(
   imageUpload.single("profileImage"),
   update,
 );
+router.post("/forgot-password", forgotPassword);
+router.put("/reset-password/:token", resetPassword);
 router.get("/:id", getUserById);
 
 module.exports = router;
