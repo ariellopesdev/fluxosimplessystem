@@ -16,10 +16,16 @@ import { login, reset } from "../../slices/authSlice.js";
 //Icons
 import { FiEye, FiEyeOff } from "react-icons/fi";
 
+//reCAPTCHA
+import ReCAPTCHA from "react-google-recaptcha";
+
 const Home = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [captchaToken, setCaptchaToken] = useState("");
+  const [localError, setLocalError] = useState("");
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -28,6 +34,13 @@ const Home = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    setLocalError("");
+
+    if (failedAttempts >= 3 && !captchaToken) {
+      setLocalError("Confirme que você não é um robô.");
+      return;
+    }
 
     const user = {
       email,
@@ -39,9 +52,20 @@ const Home = () => {
 
   useEffect(() => {
     if (user) {
+      setFailedAttempts(0);
+      setCaptchaToken("");
+      setLocalError("");
+
       navigate("/painel");
     }
   }, [user, navigate]);
+
+  useEffect(() => {
+    if (error) {
+      setFailedAttempts((prev) => prev + 1);
+      setCaptchaToken("");
+    }
+  }, [error]);
 
   //Clean all auth states
   useEffect(() => {
@@ -89,6 +113,12 @@ const Home = () => {
               {showPassword ? <FiEyeOff /> : <FiEye />}
             </button>
           </div>
+          {failedAttempts >= 3 && (
+            <ReCAPTCHA
+              sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
+              onChange={(token) => setCaptchaToken(token)}
+            />
+          )}
           {!loading && (
             <input
               type="submit"
@@ -105,6 +135,7 @@ const Home = () => {
             />
           )}
           {error && <Message msg={error} type="error" />}
+          {localError && <Message msg={localError} type="error" />}
         </form>
         <Link to="/forgot-password" className="forgotPassword">
           Esqueceu sua senha?
