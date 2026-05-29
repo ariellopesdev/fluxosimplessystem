@@ -10,6 +10,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 //Pages
 import Home from "./pages/Home/Home";
 import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword/ResetPassword";
 import Painel from "./pages/Painel/Painel";
 import Register from "./pages/Register/Register";
 import Dashboard from "./pages/Dashboard/Dashboard";
@@ -34,7 +35,9 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/forgotpassword" element={<ForgotPassword />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route path="/painel" element={<Painel />} />
           <Route
             path="/painel"
             element={auth ? <Painel /> : <Navigate to="/" />}

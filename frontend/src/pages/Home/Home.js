@@ -106,9 +106,9 @@ const Home = () => {
           )}
           {error && <Message msg={error} type="error" />}
         </form>
-        <a href="#" className="forgotPassword">
+        <Link to="/forgot-password" className="forgotPassword">
           Esqueceu sua senha?
-        </a>
+        </Link>
       </div>
       <Footer />
     </div>
