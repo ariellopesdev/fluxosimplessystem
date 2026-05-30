@@ -99,33 +99,78 @@ const register = async (req, res) => {
   });
 };
 
+const loginAttempts = {};
+
 // Sign user in
 const login = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, captchaToken } = req.body;
 
-  const user = await User.findOne({ email });
+  const ip = req.ip;
+  const key = `${email}-${ip}`;
 
-  //Check if user exists
-  if (!user) {
-    res.status(404).json({ errors: ["Usuário não encontrado."] });
-    return;
+  const attempts = loginAttempts[key] || {
+    count: 0,
+    lastAttempt: Date.now(),
+  };
+
+  const fifteenMinutes = 15 * 60 * 1000;
+
+  if (Date.now() - attempts.lastAttempt > fifteenMinutes) {
+    attempts.count = 0;
   }
 
-  //Check if password matches
-  if (!(await bcrypt.compare(password, user.password))) {
-    res.status(422).json({ errors: ["Senha inválida."] });
-    return;
-  }
+  attempts.lastAttempt = Date.now();
 
-  // Return user with token
-  res.status(201).json({
-    _id: user._id,
-    name: user.name,
-    email: user.email,
-    profileImage: user.profileImage,
-    role: user.role,
-    token: generateToken(user),
-  });
+  try {
+    if (attempts.count >= 3) {
+      const isHuman = await verifyRecaptcha(captchaToken);
+
+      if (!isHuman) {
+        loginAttempts[key] = attempts;
+
+        return res.status(400).json({
+          errors: ["Confirme que você não é um robô."],
+        });
+      }
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      attempts.count += 1;
+      loginAttempts[key] = attempts;
+
+      return res.status(404).json({
+        errors: ["Usuário não encontrado."],
+      });
+    }
+
+    if (!(await bcrypt.compare(password, user.password))) {
+      attempts.count += 1;
+      loginAttempts[key] = attempts;
+
+      return res.status(422).json({
+        errors: ["Senha inválida."],
+      });
+    }
+
+    delete loginAttempts[key];
+
+    return res.status(201).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      profileImage: user.profileImage,
+      role: user.role,
+      token: generateToken(user),
+    });
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({
+      errors: ["Erro ao fazer login."],
+    });
+  }
 };
 
 // Get current logged in user

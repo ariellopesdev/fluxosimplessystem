@@ -50,6 +50,7 @@ const Home = () => {
     const user = {
       email,
       password,
+      captchaToken,
     };
 
     dispatch(login(user));
