@@ -13,7 +13,7 @@ import Register from "../../pages/Register/Register";
 import Settings from "../../pages/Settings/Settings";
 import Help from "../../pages/Help/Help";
 import Sales from "../../pages/Sales/Sales";
-import UnderConstruction from "../../components/UnderConstruction/UnderConstruction";
+// import UnderConstruction from "../../components/UnderConstruction/UnderConstruction";
 
 const Main = ({ page, setPage }) => {
   const renderPage = () => {
@@ -39,8 +39,7 @@ const Main = ({ page, setPage }) => {
       case "settings":
         return <Settings />;
       case "help":
-        return <UnderConstruction />;
-      // return <Help />;
+        return <Help />;
     }
   };
   return (
