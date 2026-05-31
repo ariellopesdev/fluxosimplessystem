@@ -8,6 +8,7 @@ router.use("/api/sales", require("./SalesRoutes"));
 router.use("/api/financials", require("./FinancialRoutes"));
 router.use("/api/appointments", require("./AppointmentRoutes"));
 router.use("/api/services", require("./ServiceRoutes"));
+router.use("/api/reports", require("./ReportsRoutes"));
 
 // test route
 router.get("/", (req, res) => {
@@ -15,4 +16,3 @@ router.get("/", (req, res) => {
 });
 
 module.exports = router;
-

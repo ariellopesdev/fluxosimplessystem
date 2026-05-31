@@ -34,8 +34,7 @@ const Main = ({ page, setPage }) => {
       case "appointment":
         return <Appointment setPage={setPage} />;
       case "reports":
-        return <UnderConstruction />;
-      // return <Reports />;
+        return <Reports />;
       case "register":
         return <Register />;
       case "settings":
