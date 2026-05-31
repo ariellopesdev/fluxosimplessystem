@@ -40,6 +40,8 @@ const Main = ({ page, setPage }) => {
         return <Settings />;
       case "help":
         return <Help />;
+      default:
+        return <Dashboard />;
     }
   };
   return (

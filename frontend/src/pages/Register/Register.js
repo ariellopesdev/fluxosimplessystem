@@ -2,7 +2,6 @@
 import "./Register.css";
 
 //Components
-import { Link } from "react-router-dom";
 import Message from "../../components/Message/Message";
 
 //Hooks

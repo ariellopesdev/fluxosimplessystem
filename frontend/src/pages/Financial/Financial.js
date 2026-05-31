@@ -2,7 +2,7 @@
 import "./Financial.css";
 
 // React
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 // Redux
 import { useDispatch, useSelector } from "react-redux";
@@ -30,7 +30,7 @@ import Message from "../../components/Message/Message";
 const Financial = () => {
   const dispatch = useDispatch();
 
-  const { financials, summary, loading, error, message } = useSelector(
+  const { financials, loading, error, message } = useSelector(
     (state) => state.financial,
   );
 

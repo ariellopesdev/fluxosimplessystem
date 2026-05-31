@@ -1,7 +1,7 @@
 import "./Appointment.css";
 
 // React
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 
 // Redux
 import { useDispatch, useSelector } from "react-redux";
@@ -91,13 +91,21 @@ const Appointment = ({ setPage }) => {
     notes: "",
   });
 
-  const appointmentsList = Array.isArray(appointments) ? appointments : [];
-  const clientsList = Array.isArray(clients) ? clients : [];
-  const servicesList = Array.isArray(services) ? services : [];
+  const appointmentsList = useMemo(() => {
+    return Array.isArray(appointments) ? appointments : [];
+  }, [appointments]);
+  const clientsList = useMemo(() => {
+    return Array.isArray(clients) ? clients : [];
+  }, [clients]);
+  const servicesList = useMemo(() => {
+    return Array.isArray(services) ? services : [];
+  }, [services]);
 
-  const availableServices = servicesList.filter(
-    (service) => service.status === "ACTIVE" && service.isSchedulable,
-  );
+  const availableServices = useMemo(() => {
+    return servicesList.filter(
+      (service) => service.status === "ACTIVE" && service.isSchedulable,
+    );
+  }, [servicesList]);
 
   const filteredClients = clientsList.filter((client) => {
     const search = clientSearch.toLowerCase();
@@ -131,16 +139,6 @@ const Appointment = ({ setPage }) => {
     const day = String(date.getDate()).padStart(2, "0");
 
     return `${year}-${month}-${day}`;
-  };
-
-  const selectedDateFormatted = formatDateToCompare(selectedDate);
-
-  const getAppointmentClientId = (appointment) => {
-    if (!appointment.client) return "";
-
-    return typeof appointment.client === "object"
-      ? appointment.client._id
-      : appointment.client;
   };
 
   const getClientName = (appointment) => {
@@ -277,43 +275,6 @@ const Appointment = ({ setPage }) => {
     return availableServices.find(
       (service) => service._id === formData.service,
     );
-  };
-
-  const calculateEndTime = (startTime, serviceId) => {
-    if (!startTime || !serviceId) return "";
-
-    const selectedService = availableServices.find(
-      (service) => service._id === serviceId,
-    );
-
-    if (!selectedService?.estimatedDuration?.value) return "";
-
-    const [hours, minutes] = startTime.split(":").map(Number);
-
-    const startDate = new Date();
-    startDate.setHours(hours);
-    startDate.setMinutes(minutes);
-    startDate.setSeconds(0);
-
-    const durationValue = Number(selectedService.estimatedDuration.value);
-    const durationUnit = selectedService.estimatedDuration.unit;
-
-    if (durationUnit === "MINUTES") {
-      startDate.setMinutes(startDate.getMinutes() + durationValue);
-    }
-
-    if (durationUnit === "HOURS") {
-      startDate.setHours(startDate.getHours() + durationValue);
-    }
-
-    if (durationUnit === "DAYS") {
-      startDate.setDate(startDate.getDate() + durationValue);
-    }
-
-    const endHours = String(startDate.getHours()).padStart(2, "0");
-    const endMinutes = String(startDate.getMinutes()).padStart(2, "0");
-
-    return `${endHours}:${endMinutes}`;
   };
 
   const handleServiceChange = (serviceId) => {
@@ -697,36 +658,33 @@ Parcelas: ${
 
   const todayFormatted = formatDateToCompare(new Date());
 
-  const isPastDate = (day) => {
-    const date = new Date(currentYear, currentMonth, day);
+  const isPastDate = useCallback(
+    (day) => {
+      const date = new Date(currentYear, currentMonth, day);
+      const today = new Date();
 
-    const today = new Date();
+      const formattedDate = formatDateToCompare(date);
+      const formattedToday = formatDateToCompare(today);
 
-    const formattedDate = formatDateToCompare(date);
-    const formattedToday = formatDateToCompare(today);
+      if (formattedDate < formattedToday) return true;
 
-    if (formattedDate < formattedToday) {
-      return true;
-    }
+      if (formattedDate === formattedToday && today.getHours() >= 18) {
+        return true;
+      }
 
-    if (formattedDate === formattedToday && today.getHours() >= 18) {
-      return true;
-    }
+      return false;
+    },
+    [currentYear, currentMonth],
+  );
 
-    return false;
-  };
-
-  const isTimeBetween = (time, start, end) => {
-    if (!time || !start || !end) return true;
-
-    return time >= start && time <= end;
-  };
-
-  const isExceptionDate = (date) => {
-    return availabilityRules.exceptions.some(
-      (exception) => exception.date === date,
-    );
-  };
+  const isExceptionDate = useCallback(
+    (date) => {
+      return availabilityRules.exceptions.some(
+        (exception) => exception.date === date,
+      );
+    },
+    [availabilityRules.exceptions],
+  );
 
   const getExceptionReason = (date) => {
     const exception = availabilityRules.exceptions.find(
@@ -736,20 +694,22 @@ Parcelas: ${
     return exception?.reason || "Indisponível";
   };
 
-  const isAvailableDate = (date) => {
-    if (!date) return false;
+  const isAvailableDate = useCallback(
+    (date) => {
+      if (!date) return false;
 
-    const parsedDate = new Date(`${date}T12:00:00`);
-    const dayOfWeek = parsedDate.getDay();
+      const parsedDate = new Date(`${date}T12:00:00`);
+      const dayOfWeek = parsedDate.getDay();
 
-    const isWorkingDay = availabilityRules.workingDays[dayOfWeek];
+      const isWorkingDay = availabilityRules.workingDays[dayOfWeek];
 
-    if (!isWorkingDay) return false;
+      if (!isWorkingDay) return false;
+      if (isExceptionDate(date)) return false;
 
-    if (isExceptionDate(date)) return false;
-
-    return true;
-  };
+      return true;
+    },
+    [availabilityRules.workingDays, isExceptionDate],
+  );
 
   const isUnavailableDay = (day) => {
     const date = new Date(currentYear, currentMonth, day);
@@ -828,197 +788,88 @@ Parcelas: ${
     ...Array.from({ length: daysInMonth }, (_, index) => index + 1),
   ];
 
-  const generateAvailableTimes = () => {
-    const times = [];
+  const getAvailableTimesByDate = useCallback(
+    (date) => {
+      const times = [];
 
-    if (!formData.date || !formData.service) return times;
+      if (!date) return times;
 
-    const selectedService = getSelectedService();
-    const durationValue = Number(
-      selectedService?.estimatedDuration?.value || 30,
-    );
-    const durationUnit = selectedService?.estimatedDuration?.unit || "MINUTES";
+      const interval = 30;
+      const occupiedTimes = new Set();
 
-    let durationInMinutes = durationValue;
+      appointmentsList.forEach((appointment) => {
+        const appointmentDate = formatDateToCompare(appointment.date);
 
-    if (durationUnit === "HOURS") {
-      durationInMinutes = durationValue * 60;
-    }
+        if (appointmentDate !== date) return;
+        if (appointment.status === "CANCELLED") return;
+        if (appointment.status === "FINISHED") return;
+        if (!appointment.startTime || !appointment.endTime) return;
 
-    if (durationUnit === "DAYS") {
-      durationInMinutes = durationValue * 24 * 60;
-    }
+        let currentBlock = appointment.startTime;
 
-    const [startHour, startMinute] = availabilityRules.startTime
-      .split(":")
-      .map(Number);
+        while (currentBlock < appointment.endTime) {
+          occupiedTimes.add(currentBlock);
 
-    const [endHour, endMinute] = availabilityRules.endTime
-      .split(":")
-      .map(Number);
+          const [h, m] = currentBlock.split(":").map(Number);
 
-    const current = new Date(`${formData.date}T00:00:00`);
-    current.setHours(startHour, startMinute, 0, 0);
+          const next = new Date();
+          next.setHours(h);
+          next.setMinutes(m + interval);
+          next.setSeconds(0);
 
-    const end = new Date(`${formData.date}T00:00:00`);
-    end.setHours(endHour, endMinute, 0, 0);
+          currentBlock = `${String(next.getHours()).padStart(2, "0")}:${String(
+            next.getMinutes(),
+          ).padStart(2, "0")}`;
+        }
+      });
 
-    while (current < end) {
-      const possibleEnd = new Date(current);
-      possibleEnd.setMinutes(possibleEnd.getMinutes() + durationInMinutes);
+      const [startHour, startMinute] = availabilityRules.startTime
+        .split(":")
+        .map(Number);
 
-      if (possibleEnd > end) break;
+      const [endHour, endMinute] = availabilityRules.endTime
+        .split(":")
+        .map(Number);
 
-      const hour = String(current.getHours()).padStart(2, "0");
-      const minute = String(current.getMinutes()).padStart(2, "0");
+      const current = new Date(`${date}T00:00:00`);
+      current.setHours(startHour, startMinute, 0, 0);
 
-      times.push(`${hour}:${minute}`);
+      const end = new Date(`${date}T00:00:00`);
+      end.setHours(endHour, endMinute, 0, 0);
 
-      current.setMinutes(current.getMinutes() + durationInMinutes);
-    }
+      while (current < end) {
+        const hour = String(current.getHours()).padStart(2, "0");
+        const minute = String(current.getMinutes()).padStart(2, "0");
 
-    return times;
-  };
+        const time = `${hour}:${minute}`;
 
-  const isTimeUnavailable = (time) => {
-    if (!formData.date || !formData.service) return false;
+        if (!occupiedTimes.has(time)) {
+          times.push(time);
+        }
 
-    const calculatedEndTime = calculateEndTime(time, formData.service);
-
-    return appointmentsList.some((appointment) => {
-      const appointmentDate = formatDateToCompare(appointment.date);
-
-      if (appointmentDate !== formData.date) return false;
-      if (appointment.status === "CANCELLED") return false;
-      if (!appointment.startTime || !appointment.endTime) return false;
-
-      return (
-        time < appointment.endTime && calculatedEndTime > appointment.startTime
-      );
-    });
-  };
-
-  const getAvailableTimesByDate = (date) => {
-    const times = [];
-
-    if (!date) return times;
-
-    const interval = 30;
-    const occupiedTimes = new Set();
-
-    appointmentsList.forEach((appointment) => {
-      const appointmentDate = formatDateToCompare(appointment.date);
-
-      if (appointmentDate !== date) return;
-      if (appointment.status === "CANCELLED") return;
-      if (appointment.status === "FINISHED") return;
-      if (!appointment.startTime || !appointment.endTime) return;
-
-      let currentBlock = appointment.startTime;
-
-      while (currentBlock < appointment.endTime) {
-        occupiedTimes.add(currentBlock);
-
-        const [h, m] = currentBlock.split(":").map(Number);
-
-        const next = new Date();
-        next.setHours(h);
-        next.setMinutes(m + interval);
-        next.setSeconds(0);
-
-        currentBlock = `${String(next.getHours()).padStart(2, "0")}:${String(
-          next.getMinutes(),
-        ).padStart(2, "0")}`;
-      }
-    });
-
-    const [startHour, startMinute] = availabilityRules.startTime
-      .split(":")
-      .map(Number);
-
-    const [endHour, endMinute] = availabilityRules.endTime
-      .split(":")
-      .map(Number);
-
-    const current = new Date(`${date}T00:00:00`);
-    current.setHours(startHour, startMinute, 0, 0);
-
-    const end = new Date(`${date}T00:00:00`);
-    end.setHours(endHour, endMinute, 0, 0);
-
-    while (current < end) {
-      const hour = String(current.getHours()).padStart(2, "0");
-      const minute = String(current.getMinutes()).padStart(2, "0");
-
-      const time = `${hour}:${minute}`;
-
-      if (!occupiedTimes.has(time)) {
-        times.push(time);
+        current.setMinutes(current.getMinutes() + interval);
       }
 
-      current.setMinutes(current.getMinutes() + interval);
-    }
+      if (!occupiedTimes.has(availabilityRules.endTime)) {
+        times.push(availabilityRules.endTime);
+      }
 
-    if (!occupiedTimes.has(availabilityRules.endTime)) {
-      times.push(availabilityRules.endTime);
-    }
+      return times;
+    },
+    [appointmentsList, availabilityRules.startTime, availabilityRules.endTime],
+  );
 
-    return times;
-  };
+  const isFullyBookedDate = useCallback(
+    (date) => {
+      if (!date) return false;
+      if (!isAvailableDate(date)) return false;
 
-  const isFullyBookedDay = (day) => {
-    const date = new Date(currentYear, currentMonth, day);
-    const formattedDate = formatDateToCompare(date);
+      const available = getAvailableTimesByDate(date);
 
-    if (isPastDate(day)) return false;
-    if (!isAvailableDate(formattedDate)) return false;
-    if (availableServices.length === 0) return true;
-
-    const availableTimesForDay = getAvailableTimesByDate(formattedDate);
-
-    if (availableTimesForDay.length === 0) return true;
-
-    const shortestServiceDuration = Math.min(
-      ...availableServices.map((service) => {
-        const value = Number(service?.estimatedDuration?.value || 30);
-        const unit = service?.estimatedDuration?.unit || "MINUTES";
-
-        if (unit === "HOURS") return value * 60;
-        if (unit === "DAYS") return value * 24 * 60;
-
-        return value;
-      }),
-    );
-
-    return !availableTimesForDay.some((time) => {
-      const calculatedEndTime = (() => {
-        const [hours, minutes] = time.split(":").map(Number);
-
-        const endDate = new Date();
-        endDate.setHours(hours);
-        endDate.setMinutes(minutes + shortestServiceDuration);
-        endDate.setSeconds(0);
-
-        return `${String(endDate.getHours()).padStart(2, "0")}:${String(
-          endDate.getMinutes(),
-        ).padStart(2, "0")}`;
-      })();
-
-      return (
-        calculatedEndTime <= availabilityRules.endTime &&
-        availableTimesForDay.includes(time)
-      );
-    });
-  };
-
-  const isFullyBookedDate = (date) => {
-    if (!date) return false;
-    if (!isAvailableDate(date)) return false;
-
-    const available = getAvailableTimesByDate(date);
-
-    return available.length < 2;
-  };
+      return available.length < 2;
+    },
+    [isAvailableDate, getAvailableTimesByDate],
+  );
 
   const availableTimes = formData.date
     ? formData.startTime && !formData.endTime
@@ -1060,43 +911,6 @@ Parcelas: ${
       return getAppointmentDateTime(a) - getAppointmentDateTime(b);
     });
 
-  const findNextAvailableDate = () => {
-    const today = new Date();
-
-    for (let i = 0; i < 365; i++) {
-      const date = new Date(today);
-      date.setDate(today.getDate() + i);
-
-      const formattedDate = formatDateToCompare(date);
-      const day = date.getDate();
-
-      const originalMonth = currentMonth;
-      const originalYear = currentYear;
-
-      const isSameCalendarMonth =
-        date.getMonth() === originalMonth &&
-        date.getFullYear() === originalYear;
-
-      if (!isAvailableDate(formattedDate)) continue;
-
-      const available = getAvailableTimesByDate(formattedDate);
-
-      if (available.length >= 2) {
-        return date;
-      }
-
-      if (!isSameCalendarMonth) {
-        continue;
-      }
-
-      if (!isPastDate(day) && !isFullyBookedDate(formattedDate)) {
-        return date;
-      }
-    }
-
-    return null;
-  };
-
   useEffect(() => {
     dispatch(getAllAppointments());
     dispatch(getAppointmentSummary());
@@ -1124,7 +938,44 @@ Parcelas: ${
   useEffect(() => {
     if (calendarInitialized) return;
     if (loading) return;
-    if (appointmentsList.length === 0 && availableServices.length === 0) return;
+
+    if (appointmentsList.length === 0 && availableServices.length === 0) {
+      return;
+    }
+
+    const findNextAvailableDate = () => {
+      const today = new Date();
+
+      for (let i = 0; i < 365; i++) {
+        const date = new Date(today);
+        date.setDate(today.getDate() + i);
+
+        const formattedDate = formatDateToCompare(date);
+        const day = date.getDate();
+
+        const isSameCalendarMonth =
+          date.getMonth() === currentMonth &&
+          date.getFullYear() === currentYear;
+
+        if (!isAvailableDate(formattedDate)) continue;
+
+        const available = getAvailableTimesByDate(formattedDate);
+
+        if (available.length >= 2) {
+          return date;
+        }
+
+        if (!isSameCalendarMonth) {
+          continue;
+        }
+
+        if (!isPastDate(day) && !isFullyBookedDate(formattedDate)) {
+          return date;
+        }
+      }
+
+      return null;
+    };
 
     const nextAvailableDate = findNextAvailableDate();
 
@@ -1133,7 +984,18 @@ Parcelas: ${
     }
 
     setCalendarInitialized(true);
-  }, [appointmentsList.length, availableServices.length, loading]);
+  }, [
+    appointmentsList.length,
+    availableServices.length,
+    loading,
+    calendarInitialized,
+    currentMonth,
+    currentYear,
+    isAvailableDate,
+    getAvailableTimesByDate,
+    isPastDate,
+    isFullyBookedDate,
+  ]);
 
   return (
     <div className="appointment">

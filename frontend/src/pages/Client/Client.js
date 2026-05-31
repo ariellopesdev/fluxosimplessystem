@@ -17,19 +17,6 @@ import { getAllSales } from "../../slices/salesSlice";
 //Icons
 import { MdDelete, MdEdit } from "react-icons/md";
 import { IoClose } from "react-icons/io5";
-import {
-  FaUsers,
-  FaRoad,
-  FaHome,
-  FaDoorOpen,
-  FaMapMarkedAlt,
-  FaCity,
-  FaMap,
-  FaMailBulk,
-  FaPhoneAlt,
-  FaMobileAlt,
-  FaExclamationTriangle,
-} from "react-icons/fa";
 
 //Components
 import Message from "../../components/Message/Message";

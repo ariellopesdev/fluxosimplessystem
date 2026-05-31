@@ -5,7 +5,6 @@ import "./Aside.css";
 import {
   FiHome,
   FiUser,
-  FiBox,
   FiPackage,
   FiCalendar,
   FiBarChart2,
@@ -15,9 +14,6 @@ import {
 } from "react-icons/fi";
 import { FaShoppingCart, FaChartLine } from "react-icons/fa";
 import { MdDesignServices } from "react-icons/md";
-
-//Components
-import { NavLink } from "react-router-dom";
 
 //Hooks
 import { useSelector } from "react-redux";

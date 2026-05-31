@@ -2,27 +2,22 @@
 import "./Navbar.css";
 
 //Components
-import { NavLink, Link, useNavigate } from "react-router-dom";
-import Message from "../Message/Message";
+import { Link, useNavigate } from "react-router-dom";
 
 //Icons
 import { FaCircle } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
 
 //Hooks
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { useDispatch, useSelector } from "react-redux";
-import { Navigate } from "react-router-dom";
 
 //Redux
 import { logout, reset } from "../../slices/authSlice";
 import { profile } from "../../slices/userSlice";
 
 const Navbar = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
   const { auth } = useAuth();
   const { user } = useSelector((state) => state.user);
 
@@ -34,10 +29,10 @@ const Navbar = () => {
 
   //Load user data
   useEffect(() => {
-  if (auth) {
-    dispatch(profile());
-  }
-}, [dispatch, auth]);
+    if (auth) {
+      dispatch(profile());
+    }
+  }, [dispatch, auth]);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -72,7 +67,7 @@ const Navbar = () => {
               className="nav__user--id tooltip"
               data-tooltip="Código do usuário"
             >
-              {user?._id?.slice(-4)}
+              {userCode}
             </li>
             <li
               className="nav__user--companyName tooltip"

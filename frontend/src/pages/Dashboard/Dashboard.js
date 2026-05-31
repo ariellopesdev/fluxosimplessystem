@@ -47,7 +47,13 @@ const Dashboard = () => {
   });
 
   useEffect(() => {
-    dispatch(getDashboard(filters));
+    dispatch(
+      getDashboard({
+        period: "CURRENT_MONTH",
+        startDate: "",
+        endDate: "",
+      }),
+    );
   }, [dispatch]);
 
   useEffect(() => {
