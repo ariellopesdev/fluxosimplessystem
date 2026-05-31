@@ -10,6 +10,7 @@ router.use("/api/appointments", require("./AppointmentRoutes"));
 router.use("/api/services", require("./ServiceRoutes"));
 router.use("/api/reports", require("./ReportsRoutes"));
 router.use("/api/dashboard", require("./DashboardRoutes"));
+router.use("/api/support", require("./SupportRoutes"));
 
 // test route
 router.get("/", (req, res) => {
