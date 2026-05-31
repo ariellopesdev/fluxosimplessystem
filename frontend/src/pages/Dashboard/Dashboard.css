@@ -374,6 +374,11 @@
   border-radius: 10px;
 }
 
+.dashboardPage__chartBox {
+  width: 100%;
+  height: 280px;
+}
+
 /************ RESPONSIVE ************/
 
 @media (max-width: 1000px) {

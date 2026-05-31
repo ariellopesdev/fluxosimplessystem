@@ -10,6 +10,22 @@ import { getDashboard, resetMessage } from "../../slices/dashboardSlice";
 // Components
 import Message from "../../components/Message/Message";
 
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+} from "recharts";
+
 const Dashboard = () => {
   const dispatch = useDispatch();
 
@@ -223,39 +239,140 @@ const Dashboard = () => {
           <div className="dashboardPage__chart">
             <h3>Evolução financeira</h3>
 
-            {financialEvolution.length === 0 && (
+            {financialEvolution.length === 0 ? (
               <p className="dashboardPage__empty">Nenhum dado financeiro.</p>
-            )}
-
-            {financialEvolution.map((item) => (
-              <div key={item.date} className="dashboardPage__bar">
-                <div>
-                  <strong>{formatDate(item.date)}</strong>
-                  <small>Lucro: {formatCurrency(item.profit)}</small>
-                </div>
-
-                <span>{formatCurrency(item.revenue)}</span>
+            ) : (
+              <div className="dashboardPage__chartBox">
+                <ResponsiveContainer width="100%" height={260}>
+                  <LineChart data={financialEvolution}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" tickFormatter={formatDate} />
+                    <YAxis />
+                    <Tooltip
+                      formatter={(value) => formatCurrency(value)}
+                      labelFormatter={(label) => formatDate(label)}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="revenue"
+                      name="Receita"
+                      stroke="#10b981"
+                      strokeWidth={3}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="profit"
+                      name="Lucro"
+                      stroke="#3b82f6"
+                      strokeWidth={3}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="expenses"
+                      name="Despesas"
+                      stroke="#ef4444"
+                      strokeWidth={3}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
               </div>
-            ))}
+            )}
           </div>
 
           <div className="dashboardPage__chart">
             <h3>Status dos agendamentos</h3>
 
-            {appointmentStatus.length === 0 && (
+            {appointmentStatus.length === 0 ? (
               <p className="dashboardPage__empty">Nenhum agendamento.</p>
-            )}
-
-            {appointmentStatus.map((item) => (
-              <div key={item.status} className="dashboardPage__bar">
-                <div>
-                  <strong>{item.status}</strong>
-                  <small>Total no período</small>
-                </div>
-
-                <span>{item.total}</span>
+            ) : (
+              <div className="dashboardPage__chartBox">
+                <ResponsiveContainer width="100%" height={260}>
+                  <PieChart>
+                    <Pie
+                      data={appointmentStatus}
+                      dataKey="total"
+                      nameKey="status"
+                      outerRadius={90}
+                      label
+                    >
+                      {appointmentStatus.map((_, index) => (
+                        <Cell
+                          key={index}
+                          fill={
+                            [
+                              "#10b981", // concluídos
+                              "#f59e0b", // pendentes
+                              "#3b82f6", // confirmados
+                              "#ef4444", // cancelados
+                              "#8b5cf6",
+                            ][index % 5]
+                          }
+                        />
+                      ))}
+                    </Pie>
+                    <Legend />
+                    <Tooltip
+                      contentStyle={{
+                        borderRadius: "10px",
+                        border: "1px solid #e5e7eb",
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
               </div>
-            ))}
+            )}
+          </div>
+        </div>
+
+        <div className="dashboardPage__charts">
+          <div className="dashboardPage__chart">
+            <h3>Produtos em destaque</h3>
+
+            {topProducts.length === 0 ? (
+              <p className="dashboardPage__empty">Nenhum produto vendido.</p>
+            ) : (
+              <div className="dashboardPage__chartBox">
+                <ResponsiveContainer width="100%" height={260}>
+                  <BarChart data={topProducts}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip formatter={(value) => formatCurrency(value)} />
+                    <Bar
+                      dataKey="revenue"
+                      name="Receita"
+                      fill="#10b981"
+                      radius={[8, 8, 0, 0]}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </div>
+
+          <div className="dashboardPage__chart">
+            <h3>Clientes em destaque</h3>
+
+            {topClients.length === 0 ? (
+              <p className="dashboardPage__empty">Nenhum cliente encontrado.</p>
+            ) : (
+              <div className="dashboardPage__chartBox">
+                <ResponsiveContainer width="100%" height={260}>
+                  <BarChart data={topClients}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip formatter={(value) => formatCurrency(value)} />
+                    <Bar
+                      dataKey="totalSpent"
+                      name="Total gasto"
+                      fill="#6366f1"
+                      radius={[8, 8, 0, 0]}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            )}
           </div>
         </div>
 

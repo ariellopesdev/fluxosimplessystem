@@ -49,11 +49,7 @@ const formatDateKey = (date) => {
 };
 
 const getDashboard = async (req, res) => {
-  const {
-    period = "CURRENT_MONTH",
-    startDate,
-    endDate,
-  } = req.query;
+  const { period = "CURRENT_MONTH", startDate, endDate } = req.query;
 
   try {
     const reqUser = req.user;
@@ -114,13 +110,34 @@ const getDashboard = async (req, res) => {
       totalRevenueFromSales +
       totalRevenueFromAppointments;
 
-    const totalExpenses = financials
+    const totalExpensesFromFinancial = financials
       .filter((item) => item.type === "EXPENSE")
       .reduce((acc, item) => acc + Number(item.amount || 0), 0);
 
-    const totalAssets = financials
+    const totalExpensesFromProducts = products
+      .filter((product) => product.category !== "ASSET")
+      .filter((product) => {
+        const createdAt = new Date(product.createdAt);
+        return createdAt >= start && createdAt <= end;
+      })
+      .reduce((acc, product) => acc + Number(product.totalPrice || 0), 0);
+
+    const totalExpenses =
+      totalExpensesFromFinancial + totalExpensesFromProducts;
+
+    const totalAssetsFromFinancial = financials
       .filter((item) => item.type === "ASSET")
       .reduce((acc, item) => acc + Number(item.amount || 0), 0);
+
+    const totalAssetsFromProducts = products
+      .filter((product) => product.category === "ASSET")
+      .filter((product) => {
+        const createdAt = new Date(product.createdAt);
+        return createdAt >= start && createdAt <= end;
+      })
+      .reduce((acc, product) => acc + Number(product.totalPrice || 0), 0);
+
+    const totalAssets = totalAssetsFromFinancial + totalAssetsFromProducts;
 
     const finishedSales = sales.filter((sale) => sale.status === "FINISHED");
 
@@ -459,8 +476,9 @@ const getDashboard = async (req, res) => {
           (item) => item.status === "CANCELLED",
         ).length,
         totalServices: services.length,
-        activeServices: services.filter((service) => service.status === "ACTIVE")
-          .length,
+        activeServices: services.filter(
+          (service) => service.status === "ACTIVE",
+        ).length,
         lowStockProducts: lowStockProducts.length,
       },
       charts: {
