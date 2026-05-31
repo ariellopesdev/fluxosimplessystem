@@ -20,7 +20,10 @@ const appointmentCreateValidation = () => {
       .notEmpty()
       .withMessage("O horário inicial é obrigatório."),
 
-    body("endTime").optional().trim(),
+    body("endTime")
+      .trim()
+      .notEmpty()
+      .withMessage("O horário final é obrigatório."),
 
     body("type")
       .optional()

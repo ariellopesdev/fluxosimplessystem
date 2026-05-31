@@ -39,6 +39,8 @@ const Appointment = ({ setPage }) => {
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [showOverdueModal, setShowOverdueModal] = useState(false);
   const [lastClickedDay, setLastClickedDay] = useState(null);
+  const [calendarInitialized, setCalendarInitialized] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
 
   const [historyFilters, setHistoryFilters] = useState({
     date: "",
@@ -524,11 +526,71 @@ const Appointment = ({ setPage }) => {
       return dateB.localeCompare(dateA);
     });
 
+  const hasAppointmentConflict = (date, startTime, endTime) => {
+    return appointmentsList.some((appointment) => {
+      if (editId && appointment._id === editId) return false;
+
+      if (appointment.status === "CANCELLED") return false;
+      if (appointment.status === "FINISHED") return false;
+
+      if (formatDateToCompare(appointment.date) !== date) return false;
+
+      if (!appointment.startTime || !appointment.endTime) return false;
+
+      return startTime < appointment.endTime && endTime > appointment.startTime;
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const errors = {};
+
+    if (!clientSearch.trim()) {
+      errors.clientSearch = "Informe o nome do cliente.";
+    }
+
+    if (!formData.client) {
+      errors.clientSearch = "Selecione um cliente cadastrado.";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      return;
+    }
+
+    setFieldErrors({});
+
+    if (!formData.client) {
+      setLocalError("Selecione um cliente.");
+      return;
+    }
+
+    if (!formData.service) {
+      setLocalError("Selecione um serviço.");
+      return;
+    }
+
+    if (!formData.date) {
+      setLocalError("Selecione a data do agendamento.");
+      return;
+    }
+
     if (!formData.startTime || !formData.endTime) {
       setLocalError("Selecione o horário de início e o horário de fim.");
+      return;
+    }
+
+    if (
+      hasAppointmentConflict(
+        formData.date,
+        formData.startTime,
+        formData.endTime,
+      )
+    ) {
+      setLocalError(
+        "Este intervalo de horário já possui outro agendamento. Escolha outro horário.",
+      );
       return;
     }
 
@@ -960,9 +1022,15 @@ Parcelas: ${
 
   const availableTimes = formData.date
     ? formData.startTime && !formData.endTime
-      ? getAvailableTimesByDate(formData.date).filter(
-          (time) => time > formData.startTime,
-        )
+      ? getAvailableTimesByDate(formData.date).filter((time) => {
+          if (time <= formData.startTime) return false;
+
+          return !hasAppointmentConflict(
+            formData.date,
+            formData.startTime,
+            time,
+          );
+        })
       : getAvailableTimesByDate(formData.date)
     : [];
 
@@ -992,6 +1060,43 @@ Parcelas: ${
       return getAppointmentDateTime(a) - getAppointmentDateTime(b);
     });
 
+  const findNextAvailableDate = () => {
+    const today = new Date();
+
+    for (let i = 0; i < 365; i++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() + i);
+
+      const formattedDate = formatDateToCompare(date);
+      const day = date.getDate();
+
+      const originalMonth = currentMonth;
+      const originalYear = currentYear;
+
+      const isSameCalendarMonth =
+        date.getMonth() === originalMonth &&
+        date.getFullYear() === originalYear;
+
+      if (!isAvailableDate(formattedDate)) continue;
+
+      const available = getAvailableTimesByDate(formattedDate);
+
+      if (available.length >= 2) {
+        return date;
+      }
+
+      if (!isSameCalendarMonth) {
+        continue;
+      }
+
+      if (!isPastDate(day) && !isFullyBookedDate(formattedDate)) {
+        return date;
+      }
+    }
+
+    return null;
+  };
+
   useEffect(() => {
     dispatch(getAllAppointments());
     dispatch(getAppointmentSummary());
@@ -1015,6 +1120,20 @@ Parcelas: ${
       setShowOverdueModal(true);
     }
   }, [overdueAppointments.length]);
+
+  useEffect(() => {
+    if (calendarInitialized) return;
+    if (loading) return;
+    if (appointmentsList.length === 0 && availableServices.length === 0) return;
+
+    const nextAvailableDate = findNextAvailableDate();
+
+    if (nextAvailableDate) {
+      setSelectedDate(nextAvailableDate);
+    }
+
+    setCalendarInitialized(true);
+  }, [appointmentsList.length, availableServices.length, loading]);
 
   return (
     <div className="appointment">
@@ -1292,6 +1411,11 @@ Parcelas: ${
                         }));
                       }}
                     />
+                    {fieldErrors.clientSearch && (
+                      <span className="appointment__fieldError">
+                        {fieldErrors.clientSearch}
+                      </span>
+                    )}
 
                     {clientSearch &&
                       !formData.client &&
@@ -1447,7 +1571,22 @@ Parcelas: ${
                             </button>
                           ))
                         ) : (
-                          <p>Nenhum horário disponível.</p>
+                          <div className="appointment__noTimes">
+                            <p>Nenhum horário disponível para finalizar.</p>
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  startTime: "",
+                                  endTime: "",
+                                }));
+                              }}
+                            >
+                              Escolher outro início
+                            </button>
+                          </div>
                         )}
                       </div>
                     )}
