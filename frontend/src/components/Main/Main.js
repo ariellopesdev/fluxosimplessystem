@@ -46,7 +46,11 @@ const Main = ({ page, setPage }) => {
   };
   return (
     <main id="main">
-      <div className="main__container">{renderPage()}</div>
+      <div className="main__container">
+        <div key={page} className="pageTransition">
+          {renderPage()}
+        </div>
+      </div>
     </main>
   );
 };
