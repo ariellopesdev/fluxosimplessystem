@@ -560,6 +560,48 @@
   border-radius: 10px;
 }
 
+.purchase__servicesTitle {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.purchase__servicesTitle h4 {
+  margin: 0;
+  color: #111827;
+}
+
+.purchase__serviceCard {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-left: 4px solid var(--primary);
+  border-radius: 10px;
+  padding: 14px;
+}
+
+.purchase__serviceCard div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.purchase__serviceCard strong {
+  color: #111827;
+}
+
+.purchase__serviceCard span,
+.purchase__serviceCard small {
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+.purchase__serviceCard p {
+  margin: 8px 0 0;
+  font-weight: 700;
+  color: var(--primary);
+}
+
 /************ ANIMATION ************/
 
 @keyframes modalFade {

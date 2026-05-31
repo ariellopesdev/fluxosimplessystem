@@ -13,6 +13,7 @@ import {
   resetMessage,
 } from "../../slices/clientSlice";
 import { getAllSales } from "../../slices/salesSlice";
+import { getAllAppointments } from "../../slices/appointmentSlice";
 
 //Icons
 import { MdDelete, MdEdit } from "react-icons/md";
@@ -26,6 +27,7 @@ const Clients = () => {
 
   const { clients, error, message } = useSelector((state) => state.client);
   const { sales } = useSelector((state) => state.sales);
+  const { appointments } = useSelector((state) => state.appointment);
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [selectedAddress, setSelectedAddress] = useState(null);
@@ -327,6 +329,7 @@ const Clients = () => {
   useEffect(() => {
     dispatch(getAllClients());
     dispatch(getAllSales());
+    dispatch(getAllAppointments());
   }, [dispatch]);
 
   useEffect(() => {
@@ -472,6 +475,17 @@ const Clients = () => {
         typeof sale.client === "object" ? sale.client?._id : sale.client;
 
       return saleClientId === client._id;
+    });
+  };
+
+  const getClientServices = (client) => {
+    return appointments?.filter((appointment) => {
+      const appointmentClientId =
+        typeof appointment.client === "object"
+          ? appointment.client?._id
+          : appointment.client;
+
+      return appointmentClientId === client._id;
     });
   };
 
@@ -979,7 +993,7 @@ const Clients = () => {
         <div className="clients__modalOverlay">
           <div className="clients__modal purchaseHistoryModal">
             <div className="clients__modalHeader">
-              <h3>Histórico de Compras</h3>
+              <h3>Histórico do Cliente</h3>
 
               <button
                 className="clients__closeBtn"
@@ -998,6 +1012,10 @@ const Clients = () => {
               <div>
                 <strong>Total de compras</strong>
                 <p>{getClientSales(selectedPurchaseHistory)?.length || 0}</p>
+              </div>
+              <div>
+                <strong>Serviços solicitados</strong>
+                <p>{getClientServices(selectedPurchaseHistory)?.length || 0}</p>
               </div>
 
               <div>
@@ -1138,6 +1156,60 @@ const Clients = () => {
               ) : (
                 <p className="purchase__empty">
                   Nenhuma compra encontrada para este cliente.
+                </p>
+              )}
+              <div className="purchase__servicesTitle">
+                <h4>Serviços e agendamentos</h4>
+              </div>
+
+              {getClientServices(selectedPurchaseHistory)?.length > 0 ? (
+                getClientServices(selectedPurchaseHistory).map(
+                  (appointment) => (
+                    <div
+                      className="purchase__serviceCard"
+                      key={appointment._id}
+                    >
+                      <div>
+                        <strong>{appointment.title || "Serviço"}</strong>
+
+                        <span>
+                          {appointment.date
+                            ? new Date(appointment.date).toLocaleDateString(
+                                "pt-BR",
+                              )
+                            : "-"}{" "}
+                          das {appointment.startTime || "--:--"} às{" "}
+                          {appointment.endTime || "--:--"}
+                        </span>
+                      </div>
+
+                      <small>
+                        Status:{" "}
+                        {appointment.status === "FINISHED"
+                          ? "Concluído"
+                          : appointment.status === "CANCELLED"
+                            ? "Cancelado"
+                            : appointment.status === "CONFIRMED"
+                              ? "Confirmado"
+                              : "Pendente"}
+                      </small>
+
+                      <p>
+                        Total: R${" "}
+                        {Number(appointment.total || 0).toLocaleString(
+                          "pt-BR",
+                          {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          },
+                        )}
+                      </p>
+                    </div>
+                  ),
+                )
+              ) : (
+                <p className="purchase__empty">
+                  Nenhum serviço encontrado para este cliente.
                 </p>
               )}
             </div>
