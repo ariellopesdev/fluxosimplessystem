@@ -19,8 +19,7 @@ const Main = ({ page, setPage }) => {
   const renderPage = () => {
     switch (page) {
       case "dashboard":
-        return <UnderConstruction />;
-      // return <Dashboard />;
+        return <Dashboard />;
       case "client":
         return <Client />;
       case "sales":
