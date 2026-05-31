@@ -80,7 +80,7 @@ const Reports = () => {
       GENERAL: "Geral",
     };
 
-    return types[type] || "-";
+    return types[type] || type || "-";
   };
 
   const translatePeriod = (period) => {
@@ -603,7 +603,7 @@ const Reports = () => {
       </head>
 
       <body>
-        <h1>${reportData?.title || "Relatório"}</h1>
+        <h1>Relatório ${translateType(reportData?.type)}</h1>
 
         <p class="meta">
           Tipo: ${translateType(reportData?.type)} |
@@ -755,7 +755,7 @@ const Reports = () => {
         <>
           <div className="reports__toolbar">
             <div>
-              <strong>{currentReport.title}</strong>
+              <strong>Relatório {translateType(currentReport.type)}</strong>
               <span>
                 {translateType(currentReport.type)} •{" "}
                 {formatDate(currentReport.period?.startDate)} até{" "}
@@ -1022,7 +1022,7 @@ const Reports = () => {
 
                 {reportsList.map((item) => (
                   <tr key={item._id}>
-                    <td>{item.title}</td>
+                    <td>Relatório {translateType(item.type)}</td>
                     <td>{translateType(item.type)}</td>
                     <td>{translatePeriod(item.period?.label)}</td>
                     <td>{formatDate(item.createdAt)}</td>
