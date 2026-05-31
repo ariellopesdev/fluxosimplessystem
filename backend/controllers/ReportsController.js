@@ -95,22 +95,17 @@ const generateReport = async (req, res) => {
     });
 
     const sales = await Sale.find({
-      company: companyId,
+      seller: reqUser._id,
       createdAt: { $gte: start, $lte: end },
-    });
+    })
+      .populate("client", "name cpfCnpj phones email")
+      .populate("products.product", "name stock unityPrice category");
 
     const products = await Product.find({
       company: companyId,
     });
 
-    const clients = await Client.find({
-      company: companyId,
-    });
-
-    const newClients = clients.filter((client) => {
-      const createdAt = new Date(client.createdAt);
-      return createdAt >= start && createdAt <= end;
-    });
+    const clients = await Client.find();
 
     const appointments = await Appointment.find({
       company: companyId,
@@ -121,60 +116,137 @@ const generateReport = async (req, res) => {
       company: companyId,
     });
 
-    const totalRevenue = financials
-      .filter((item) => item.type === "INCOME" || item.type === "RECEITA")
-      .reduce((acc, item) => acc + Number(item.amount || item.value || 0), 0);
+    const newClients = clients.filter((client) => {
+      const createdAt = new Date(client.createdAt);
+      return createdAt >= start && createdAt <= end;
+    });
+
+    const totalRevenueFromFinancial = financials
+      .filter((item) => item.type === "INCOME")
+      .reduce((acc, item) => acc + Number(item.amount || 0), 0);
+
+    const totalRevenueFromSales = sales
+      .filter((sale) => sale.status !== "CANCELLED")
+      .reduce((acc, sale) => acc + Number(sale.total || 0), 0);
+
+    const totalRevenueFromAppointments = appointments
+      .filter(
+        (appointment) =>
+          appointment.status === "FINISHED" &&
+          appointment.payment?.status === "PAID",
+      )
+      .reduce((acc, appointment) => acc + Number(appointment.total || 0), 0);
+
+    const totalRevenue =
+      totalRevenueFromFinancial +
+      totalRevenueFromSales +
+      totalRevenueFromAppointments;
 
     const totalExpenses = financials
-      .filter((item) => item.type === "EXPENSE" || item.type === "DESPESA")
-      .reduce((acc, item) => acc + Number(item.amount || item.value || 0), 0);
+      .filter((item) => item.type === "EXPENSE")
+      .reduce((acc, item) => acc + Number(item.amount || 0), 0);
 
-    const totalSales = sales.length;
+    const totalAssets = financials
+      .filter((item) => item.type === "ASSET")
+      .reduce((acc, item) => acc + Number(item.amount || 0), 0);
 
-    const totalProductsSold = sales.reduce((acc, sale) => {
-      if (Array.isArray(sale.products)) {
-        return (
-          acc +
-          sale.products.reduce(
-            (sum, product) => sum + Number(product.quantity || 0),
-            0,
-          )
-        );
-      }
+    const finishedSales = sales.filter((sale) => sale.status === "FINISHED");
 
-      return acc + Number(sale.quantity || 0);
+    const totalSales = finishedSales.length;
+
+    const totalProductsSold = finishedSales.reduce((acc, sale) => {
+      return (
+        acc +
+        sale.products.reduce(
+          (sum, product) => sum + Number(product.quantity || 0),
+          0,
+        )
+      );
     }, 0);
 
     const financialData = financials.map((item) => ({
-      title: item.title || item.name || "-",
+      title: item.title || "-",
+      description: item.description || "",
       type: item.type || "-",
       category: item.category || "-",
-      amount: Number(item.amount || item.value || 0),
-      paymentMethod: item.paymentMethod || item.payment?.method || "-",
-      paymentStatus: item.paymentStatus || item.payment?.status || "-",
-      date: item.date || item.createdAt,
+      amount: Number(item.amount || 0),
+      paymentMethod: item.payment?.method || "-",
+      paymentStatus: item.payment?.status || "-",
+      installments: item.payment?.installments || 1,
+      paidAt: item.payment?.paidAt || null,
+      dueDate: item.payment?.dueDate || null,
+      isRecurring: item.isRecurring || false,
+      recurrence: item.recurrence || null,
+      date: item.createdAt,
     }));
 
-    const salesData = sales.map((sale) => ({
-      saleId: sale._id,
-      clientName: sale.clientName || sale.client?.name || "-",
-      productName: sale.productName || "-",
-      quantity: sale.quantity || 0,
-      total: Number(sale.total || sale.totalPrice || 0),
-      paymentMethod: sale.paymentMethod || sale.payment?.method || "-",
-      paymentStatus: sale.paymentStatus || sale.payment?.status || "-",
-      date: sale.date || sale.createdAt,
-    }));
+    const salesData = [];
 
-    const productsData = products.map((product) => ({
-      productId: product._id,
-      name: product.name,
-      quantitySold: 0,
-      revenue: 0,
-      currentStock: product.stock || 0,
-    }));
+    sales.forEach((sale) => {
+      sale.products.forEach((item) => {
+        salesData.push({
+          saleId: sale._id,
+          saleNumber: sale.saleNumber,
+          clientName: sale.client?.name || "-",
+          customerDocument:
+            sale.customerDocument || sale.client?.cpfCnpj || "-",
+          productId: item.product?._id || item.product || null,
+          productName: item.name || item.product?.name || "-",
+          quantity: Number(item.quantity || 0),
+          unityPrice: Number(item.unityPrice || 0),
+          total: Number(item.totalPrice || 0),
+          paymentMethod: sale.payment?.method || "-",
+          paymentStatus: sale.payment?.status || "-",
+          saleStatus: sale.status || "-",
+          date: sale.createdAt,
+        });
+      });
+    });
+
+    const productsData = products.map((product) => {
+      const productSales = salesData.filter(
+        (sale) =>
+          sale.productId &&
+          sale.productId.toString() === product._id.toString() &&
+          sale.saleStatus !== "CANCELLED",
+      );
+
+      const quantitySold = productSales.reduce(
+        (acc, sale) => acc + Number(sale.quantity || 0),
+        0,
+      );
+
+      const revenue = productSales.reduce(
+        (acc, sale) => acc + Number(sale.total || 0),
+        0,
+      );
+
+      return {
+        productId: product._id,
+        name: product.name,
+        category: product.category || "-",
+        unityPrice: Number(product.unityPrice || 0),
+        quantitySold,
+        revenue,
+        currentStock: Number(product.stock || 0),
+        stockValue: Number(product.totalPrice || 0),
+      };
+    });
 
     const clientsData = clients.map((client) => {
+      const clientSales = sales.filter((sale) => {
+        const saleClientId =
+          typeof sale.client === "object"
+            ? sale.client?._id?.toString()
+            : sale.client?.toString();
+
+        return saleClientId === client._id.toString();
+      });
+
+      const validClientSales = clientSales.filter(
+        (sale) => sale.status !== "CANCELLED",
+      );
+
       const clientAppointments = appointments.filter((appointment) => {
         const appointmentClientId =
           typeof appointment.client === "object"
@@ -184,16 +256,33 @@ const generateReport = async (req, res) => {
         return appointmentClientId === client._id.toString();
       });
 
+      const totalPurchases = validClientSales.length;
+
+      const totalSpent = validClientSales.reduce(
+        (acc, sale) => acc + Number(sale.total || 0),
+        0,
+      );
+
+      const sortedSales = [...validClientSales].sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+      );
+
+      const sortedAppointments = [...clientAppointments].sort(
+        (a, b) => new Date(b.date) - new Date(a.date),
+      );
+
       return {
         clientId: client._id,
         name: client.name,
         cpfCnpj: client.cpfCnpj,
         phone: client.phones?.primary || "",
         email: client.email || "",
-        totalPurchases: 0,
-        totalSpent: 0,
-        lastPurchaseDate: null,
-        lastAppointmentDate: clientAppointments[0]?.date || null,
+        type: client.type || "PERSON",
+        financial: client.financial || "ACTIVE",
+        totalPurchases,
+        totalSpent,
+        lastPurchaseDate: sortedSales[0]?.createdAt || null,
+        lastAppointmentDate: sortedAppointments[0]?.date || null,
         activeAppointments: clientAppointments.filter(
           (item) => item.status !== "FINISHED" && item.status !== "CANCELLED",
         ).length,
@@ -209,15 +298,52 @@ const generateReport = async (req, res) => {
     const appointmentsData = appointments.map((appointment) => ({
       appointmentId: appointment._id,
       title: appointment.title,
+      description: appointment.description || "",
       clientName: appointment.client?.name || "-",
+      clientDocument: appointment.client?.cpfCnpj || "-",
+      clientPhone: appointment.client?.phones?.primary || "-",
       serviceName: appointment.title || "-",
       status: appointment.status,
+      priority: appointment.priority,
+      paymentMethod: appointment.payment?.method || "-",
       paymentStatus: appointment.payment?.status || "-",
+      installments: appointment.payment?.installments || 1,
+      discount: Number(appointment.discount || 0),
       total: Number(appointment.total || 0),
       date: appointment.date,
       startTime: appointment.startTime,
       endTime: appointment.endTime,
+      notes: appointment.notes || "",
     }));
+
+    const servicesData = services.map((service) => {
+      const serviceAppointments = appointments.filter(
+        (appointment) => appointment.title === service.name,
+      );
+
+      const completedServiceAppointments = serviceAppointments.filter(
+        (appointment) => appointment.status === "FINISHED",
+      );
+
+      return {
+        serviceId: service._id,
+        name: service.name,
+        description: service.description || "",
+        unityPrice: Number(service.unityPrice || 0),
+        estimatedDuration: service.estimatedDuration,
+        category: service.category,
+        status: service.status,
+        isSchedulable: service.isSchedulable,
+        isSellable: service.isSellable,
+        requiresClient: service.requiresClient,
+        totalAppointments: serviceAppointments.length,
+        completedAppointments: completedServiceAppointments.length,
+        revenue: completedServiceAppointments.reduce(
+          (acc, appointment) => acc + Number(appointment.total || 0),
+          0,
+        ),
+      };
+    });
 
     const report = await Report.create({
       title: `Relatório ${type}`,
@@ -246,12 +372,15 @@ const generateReport = async (req, res) => {
         pendingAppointments: appointments.filter(
           (item) => item.status === "PENDING" || item.status === "CONFIRMED",
         ).length,
+        totalAssets,
+        totalServices: services.length,
       },
       financialData,
       salesData,
       productsData,
       clientsData,
       appointmentsData,
+      servicesData,
       generatedBy: reqUser._id,
       company: companyId,
       cnpj: reqUser.company?.cnpj,

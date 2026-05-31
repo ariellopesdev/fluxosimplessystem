@@ -45,81 +45,35 @@ const reportsSchema = new Schema(
       pendingAppointments: { type: Number, default: 0 },
     },
 
-    financialData: [
-      {
-        title: String,
-        type: String,
-        category: String,
-        amount: Number,
-        paymentMethod: String,
-        paymentStatus: String,
-        date: Date,
-      },
-    ],
+    financialData: {
+      type: [Schema.Types.Mixed],
+      default: [],
+    },
 
-    salesData: [
-      {
-        saleId: String,
-        clientName: String,
-        productName: String,
-        quantity: Number,
-        total: Number,
-        paymentMethod: String,
-        paymentStatus: String,
-        date: Date,
-      },
-    ],
+    salesData: {
+      type: [Schema.Types.Mixed],
+      default: [],
+    },
 
-    productsData: [
-      {
-        productId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Product",
-        },
-        name: String,
-        quantitySold: { type: Number, default: 0 },
-        revenue: { type: Number, default: 0 },
-        currentStock: { type: Number, default: 0 },
-      },
-    ],
+    productsData: {
+      type: [Schema.Types.Mixed],
+      default: [],
+    },
 
-    clientsData: [
-      {
-        clientId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Client",
-        },
-        name: String,
-        cpfCnpj: String,
-        phone: String,
-        email: String,
-        totalPurchases: { type: Number, default: 0 },
-        totalSpent: { type: Number, default: 0 },
-        lastPurchaseDate: Date,
-        lastAppointmentDate: Date,
-        activeAppointments: { type: Number, default: 0 },
-        completedAppointments: { type: Number, default: 0 },
-        cancelledAppointments: { type: Number, default: 0 },
-      },
-    ],
+    clientsData: {
+      type: [Schema.Types.Mixed],
+      default: [],
+    },
 
-    appointmentsData: [
-      {
-        appointmentId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Appointment",
-        },
-        title: String,
-        clientName: String,
-        serviceName: String,
-        status: String,
-        paymentStatus: String,
-        total: Number,
-        date: Date,
-        startTime: String,
-        endTime: String,
-      },
-    ],
+    appointmentsData: {
+      type: [Schema.Types.Mixed],
+      default: [],
+    },
+
+    servicesData: {
+      type: [Schema.Types.Mixed],
+      default: [],
+    },
 
     generatedBy: {
       type: mongoose.Schema.Types.ObjectId,
@@ -146,6 +100,9 @@ reportsSchema.index({
   createdAt: -1,
 });
 
-const Reports = mongoose.model("Reports", reportsSchema);
+delete mongoose.connection.models.Report;
+delete mongoose.connection.models.Reports;
+
+const Reports = mongoose.model("Report", reportsSchema, "reports");
 
 module.exports = Reports;
