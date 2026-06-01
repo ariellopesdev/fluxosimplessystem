@@ -2,39 +2,255 @@
 
 #footer {
   position: absolute;
+  bottom: -140px;
+  left: 0;
+
+  width: 100%;
+  padding: 14px 10px;
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  bottom: -140px;
-  left: 0;
-  height: fit-content;
-  width: 100%;
-  padding: 10px;
+  gap: 6px;
+
   border-top: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.5);
 }
 
-#footer a,
-#footer p {
+.footer--links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.footer--links button {
+  border: none;
+  background: transparent;
+
   color: var(--text-light);
-  font-size: clamp(0.75rem, 1.2vw, 0.95rem);
-  text-decoration: none;
-  background-color: transparent;
-  margin: 0 5px;
-}
+  font-size: clamp(0.75rem, 1.2vw, 0.9rem);
 
-#footer a:hover {
   cursor: pointer;
-  color: var(--text);
+  transition: color 0.2s ease, transform 0.2s ease;
 }
 
-.footer--links,
-.footer--copyright {
-  padding: 10px;
+.footer--links button:hover {
+  color: var(--primary);
+  transform: translateY(-1px);
 }
+
+.footer--copyright p {
+  margin: 0;
+  color: var(--text-light);
+  font-size: clamp(0.72rem, 1vw, 0.85rem);
+}
+
+.footer--copyright a {
+  color: var(--text-light);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.footer--copyright a:hover {
+  color: var(--primary);
+}
+
+/************ MODAL ************/
+
+.footer__modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+
+  background: rgba(0, 0, 0, 0.68);
+  backdrop-filter: blur(3px);
+}
+
+.footer__modal {
+  position: relative;
+
+  width: min(760px, 100%);
+  max-height: calc(100dvh - 48px);
+  overflow-y: auto;
+
+  background: #fff;
+  border-radius: 18px;
+
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
+
+  animation: footerModalEnter 0.22s ease both;
+}
+
+.footer__modalHero {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+
+  padding: 28px 32px;
+
+  background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+  color: #fff;
+
+  border-radius: 18px 18px 0 0;
+}
+
+.footer__modalHero span {
+  width: 58px;
+  height: 58px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 16px;
+
+  font-size: 1.7rem;
+}
+
+.footer__modalHero h2 {
+  margin: 0 0 4px;
+  font-size: 1.45rem;
+}
+
+.footer__modalHero p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.footer__modalBody {
+  padding: 28px 32px;
+}
+
+.footer__modalBody > p {
+  margin: 0 0 18px;
+
+  color: #4b5563;
+  line-height: 1.7;
+}
+
+.footer__infoGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+
+  margin: 22px 0;
+}
+
+.footer__infoGrid div {
+  padding: 16px;
+
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+}
+
+.footer__infoGrid strong {
+  display: block;
+  margin-bottom: 8px;
+
+  color: #111827;
+  font-size: 0.92rem;
+}
+
+.footer__infoGrid p {
+  margin: 0;
+
+  color: #6b7280;
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.footer__modalFooter {
+  display: flex;
+  justify-content: flex-end;
+
+  padding: 18px 32px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.footer__modalFooter button {
+  border: none;
+  border-radius: 10px;
+
+  background: var(--primary);
+  color: #fff;
+
+  padding: 11px 18px;
+
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.footer__modalFooter button:hover {
+  background: var(--primary-hover);
+}
+
+.footer__close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+
+  width: 36px;
+  height: 36px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+
+  font-size: 1.45rem;
+  line-height: 1;
+
+  cursor: pointer;
+}
+
+.footer__close:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+@keyframes footerModalEnter {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/************ RESPONSIVE ************/
 
 @media (max-width: 768px) {
-    #footer {
+  #footer {
     position: relative;
     bottom: -40px;
+  }
+
+  .footer__infoGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .footer__modalHero {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .footer__modalBody,
+  .footer__modalFooter,
+  .footer__modalHero {
+    padding-left: 22px;
+    padding-right: 22px;
   }
 }
