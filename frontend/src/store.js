@@ -10,6 +10,7 @@ import appointmentReducer from "./slices/appointmentSlice";
 import serviceReducer from "./slices/serviceSlice";
 import reportsReducer from "./slices/reportsSlice";
 import dashboardReducer from "./slices/dashboardSlice";
+import supportReducer from "./slices/supportSlice";
 
 export const store = configureStore({
   reducer: {
@@ -23,5 +24,6 @@ export const store = configureStore({
     service: serviceReducer,
     reports: reportsReducer,
     dashboard: dashboardReducer,
+    support: supportReducer,
   },
 });
