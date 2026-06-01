@@ -5,119 +5,57 @@ import "./Register.css";
 import Message from "../../components/Message/Message";
 
 //Hooks
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useRegisterForm } from "../../hooks/useRegisterForm";
 
 //Redux
 import { reset } from "../../slices/authSlice";
 import { createUser } from "../../slices/userSlice";
 import { resetMessage } from "../../slices/userSlice";
 
+//Icons
+import { FiUsers } from "react-icons/fi";
+
 const Register = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [companyName, setCompanyName] = useState("");
-  const [cnpj, setCnpj] = useState("");
-  const [role, setRole] = useState("USER");
-  const [cnpjError, setCnpjError] = useState("");
-  const [errors, setErrors] = useState({});
-
-  const formatCNPJ = (value) => {
-    value = value.replace(/\D/g, "");
-
-    value = value.replace(/^(\d{2})(\d)/, "$1.$2");
-    value = value.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
-    value = value.replace(/\.(\d{3})(\d)/, ".$1/$2");
-    value = value.replace(/(\d{4})(\d)/, "$1-$2");
-
-    return value;
-  };
-
-  const validateCNPJ = (cnpj) => {
-    const cleaned = cnpj.replace(/\D/g, "");
-    if (cleaned.length < 14) {
-      setCnpjError("CNPJ incompleto.");
-      return;
-    }
-    setCnpjError("");
-  };
-
-  const validateField = (name, value) => {
-    let error = "";
-
-    switch (name) {
-      case "name":
-        if (value.length < 3) {
-          error = "O nome deve ter no mínimo 3 caracteres.";
-        }
-        break;
-      case "email":
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(value)) {
-          error = "Insira um e-mail válido.";
-        }
-        break;
-      case "password":
-        if (value.length < 6) {
-          error = "A senha deve ter no mínimo 6 caracteres.";
-        }
-        break;
-      case "confirmPassword":
-        if (value !== password) {
-          error = "As senhas não coincidem.";
-        }
-        break;
-      case "companyName":
-        if (value.length < 2) {
-          error = "O nome da empresa deve ter no mínimo 2 caracteres.";
-        }
-        break;
-      default:
-        break;
-    }
-    setErrors((prev) => ({
-      ...prev,
-      [name]: error,
-    }));
-  };
-
   const dispatch = useDispatch();
 
+  // Register form state and validations
+  const { formData, errors, hasErrors, handleChange, validateForm, resetForm } =
+    useRegisterForm();
+
+  // Redux state
   const { loading, error, success, message } = useSelector(
     (state) => state.user,
   );
+
+  // Authenticated user
   const { user: loggedUser } = useSelector((state) => state.auth);
 
-  //Clean all auth states
+  //Reset auth states on mount
   useEffect(() => {
     dispatch(reset());
   }, [dispatch]);
 
-  //Clean all register states
+  //Clear form after succestul registration
   useEffect(() => {
     if (success) {
-      setName("");
-      setEmail("");
-      setPassword("");
-      setConfirmPassword("");
-      setCompanyName("");
-      setCnpj("");
-      setRole("USER");
+      resetForm();
     }
-  }, [success]);
+  }, [success, resetForm]);
 
+  //Auto clear messages
   useEffect(() => {
     if (error || message) {
       const timer = setTimeout(() => {
         dispatch(resetMessage());
-      }, 2000);
+      }, 2500);
 
       return () => clearTimeout(timer);
     }
   }, [error, message, dispatch]);
 
+  //Check user permissions
   const canAccess =
     loggedUser?.role === "SUPER_ADMIN" || loggedUser?.role === "ADMIN";
 
@@ -128,17 +66,21 @@ const Register = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const user = {
-      name,
-      email,
-      password,
-      confirmPassword,
-      companyName,
-      cnpj,
-      role,
-    };
+    const isValid = validateForm();
 
-    console.log(user);
+    if (!isValid) {
+      return;
+    }
+
+    const user = {
+      name: formData.name.trim(),
+      email: formData.email.trim(),
+      password: formData.password,
+      confirmPassword: formData.confirmPassword,
+      companyName: formData.companyName.trim(),
+      cnpj: formData.cnpj,
+      role: formData.role,
+    };
 
     dispatch(createUser(user));
   };
@@ -146,71 +88,93 @@ const Register = () => {
   return (
     <div id="register">
       <main id="register__main">
+        {/* HEADER */}
         <div className="register__header">
-          <h2>Cadastre um usuário</h2>
-          <p>Preencha os dados para criar um novo acesso.</p>
+          <div className="register__headerTop">
+            <span className="register__headerIcon">
+              <FiUsers />
+            </span>
+            <h2>Cadastro de usuários</h2>
+          </div>
+          <p>
+            Crie novos acessos para colaboradores e administradores da empresa.
+          </p>
         </div>
+
+        {/* REGISTER FORM */}
         <form onSubmit={handleSubmit} className="form__register">
+          {/* USER ROLE */}
           <div className="form__group--register">
             <label>Tipo de usuário</label>
-            <select onChange={(e) => setRole(e.target.value)} value={role}>
+            <select
+              value={formData.role}
+              onChange={(e) => handleChange("role", e.target.value)}
+            >
               <option value="USER">Usuário</option>
               <option value="ADMIN">Administrador</option>
             </select>
           </div>
+
+          {/* USER FULL NAME */}
           <div className="form__group--register">
             <label>Nome completo</label>
             <input
               type="text"
               placeholder="Digite o nome completo"
-              value={name || ""}
+              value={formData.name}
               onChange={(e) => {
-                setName(e.target.value);
-                validateField("name", e.target.value);
+                handleChange("name", e.target.value);
               }}
+              className={errors.name ? "input__error" : ""}
             />
             {errors.name && <Message msg={errors.name} type="error" />}
           </div>
+
+          {/* EMAIL */}
           <div className="form__group--register">
             <label>E-mail</label>
             <input
               type="email"
               placeholder="Digite o e-mail"
-              value={email || ""}
+              value={formData.email}
               onChange={(e) => {
-                setEmail(e.target.value);
-                validateField("email", e.target.value);
+                handleChange("email", e.target.value);
               }}
+              className={errors.email ? "input__error" : ""}
             />
             {errors.email && <Message msg={errors.email} type="error" />}
           </div>
+
+          {/* PASSWORD */}
           <div className="form__group--register">
             <label>Senha</label>
             <input
               type="password"
               placeholder="Digite a senha"
-              value={password || ""}
+              value={formData.password}
               onChange={(e) => {
-                setPassword(e.target.value);
-                validateField("password", e.target.value);
+                handleChange("password", e.target.value);
               }}
+              className={errors.password ? "input__error" : ""}
             />
+
+            {/* PASSWORD STRENGTH */}
             <div className="password__strength">
               <div
                 className="password__strength--bar"
                 style={{
                   width:
-                    password.length >= 10
+                    formData.password.length >= 10
                       ? "100%"
-                      : password.length >= 6
+                      : formData.password.length >= 6
                         ? "70%"
-                        : password.length > 0
+                        : formData.password.length > 0
                           ? "40%"
                           : "0%",
                   backgroundColor:
-                    password.length >= 10
+                    formData.password.length >= 10
                       ? "#10b981"
-                      : password.length >= 6
+                      : formData.password.length >= 6
                         ? "#f59e0b"
                         : "#ef4444",
                 }}
@@ -218,56 +182,64 @@ const Register = () => {
             </div>
             {errors.password && <Message msg={errors.password} type="error" />}
           </div>
+
+          {/* CONFIRM PASSWORD */}
           <div className="form__group--register">
             <label>Confirmar senha</label>
             <input
               type="password"
               placeholder="Confirme sua senha"
-              value={confirmPassword || ""}
+              value={formData.confirmPassword}
               onChange={(e) => {
-                setConfirmPassword(e.target.value);
-                validateField("confirmPassword", e.target.value);
+                handleChange("confirmPassword", e.target.value);
               }}
+              className={errors.confirmPassword ? "input__error" : ""}
             />
             {errors.confirmPassword && (
               <Message msg={errors.confirmPassword} type="error" />
             )}
           </div>
+
+          {/* COMPANY NAME */}
           <div className="form__group--register">
-            <label>Noma da empresa</label>
+            <label>Nome da empresa</label>
             <input
               type="text"
               placeholder="Digite o nome da empresa"
-              value={companyName || ""}
+              value={formData.companyName}
               onChange={(e) => {
-                setCompanyName(e.target.value);
-                validateField("companyName", e.target.value);
+                handleChange("companyName", e.target.value);
               }}
+              className={errors.companyName ? "input__error" : ""}
             />
             {errors.companyName && (
               <Message msg={errors.companyName} type="error" />
             )}
           </div>
+
+          {/* CNPJ */}
           <div className="form__group--register">
             <label>CNPJ da empresa</label>
             <input
               type="text"
               placeholder="Digite o CNPJ da empresa"
-              value={cnpj}
+              value={formData.cnpj}
               maxLength={18}
               onChange={(e) => {
-                const formatted = formatCNPJ(e.target.value);
-                setCnpj(formatted);
-                validateCNPJ(formatted);
+                handleChange("cnpj", e.target.value);
               }}
+              className={errors.cnpj ? "input__error" : ""}
             />
-            {cnpjError && <Message msg={cnpjError} type="error" />}
+            {errors.cnpj && <Message msg={errors.cnpj} type="error" />}
           </div>
+
+          {/* SUBMIT BUTTON */}
           {!loading && (
             <input
               type="submit"
               value="Cadastrar usuário"
               className="register__btn--primary"
+              disabled={hasErrors}
             />
           )}
           {loading && (
@@ -278,6 +250,8 @@ const Register = () => {
               disabled
             />
           )}
+
+          {/* GLOBAL BACKEND MESSAGES */}
           {error && <Message msg={error} type="error" />}
           {message && <Message msg={message} type="success" />}
         </form>

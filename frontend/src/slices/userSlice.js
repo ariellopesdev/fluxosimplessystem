@@ -72,6 +72,8 @@ export const userSlice = createSlice({
   reducers: {
     resetMessage: (state) => {
       state.message = null;
+      state.error = false;
+      state.success = false;
     },
   },
   extraReducers: (builder) => {
@@ -114,7 +116,9 @@ export const userSlice = createSlice({
       })
       .addCase(createUser.pending, (state) => {
         state.loading = true;
+        state.success = false;
         state.error = null;
+        state.message = null;
       })
       .addCase(createUser.fulfilled, (state) => {
         state.loading = false;
@@ -124,6 +128,7 @@ export const userSlice = createSlice({
       })
       .addCase(createUser.rejected, (state, action) => {
         state.loading = false;
+        state.success = false;
         state.error = action.payload;
       });
   },
