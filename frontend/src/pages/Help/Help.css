@@ -415,6 +415,264 @@
   border-radius: 12px;
 }
 
+/************ SUPPORT TICKETS ************/
+
+.help__tickets {
+  margin-top: 20px;
+}
+
+.help__ticketItem {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-left: 4px solid var(--primary);
+  border-radius: 12px;
+
+  padding: 14px;
+  margin-bottom: 10px;
+
+  text-align: left;
+  cursor: pointer;
+}
+
+.help__ticketItem:hover {
+  background: #ecfdf5;
+}
+
+.help__ticketItem div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.help__ticketItem strong {
+  color: #111827;
+}
+
+.help__ticketItem small,
+.help__ticketItem span {
+  color: #6b7280;
+  font-size: 0.82rem;
+}
+
+/************ SUPPORT MODAL ************/
+
+.help__modalOverlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  z-index: 99999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+
+  background: rgba(0, 0, 0, 0.68);
+  backdrop-filter: blur(3px);
+
+  overflow-y: auto;
+}
+
+.help__modal {
+  width: min(620px, 100%);
+  max-height: calc(100dvh - 48px);
+  overflow-y: auto;
+
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.help__modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+
+  padding-bottom: 14px;
+  margin-bottom: 18px;
+
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.help__modalHeader h3 {
+  margin: 0;
+}
+
+.help__modalHeader small {
+  color: #6b7280;
+}
+
+.help__modalHeader button {
+  width: 34px;
+  height: 34px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: #f3f4f6;
+  color: #111827;
+
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+
+.help__supportForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.help__supportForm label {
+  font-weight: 700;
+  color: #374151;
+  font-size: 0.84rem;
+}
+
+.help__supportForm input,
+.help__supportForm select,
+.help__supportForm textarea {
+  width: 100%;
+
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+
+  padding: 10px 12px;
+
+  background: #fff;
+  color: #111827;
+}
+
+.help__supportForm textarea {
+  min-height: 120px;
+  resize: none;
+}
+
+.help__supportForm input:focus,
+.help__supportForm select:focus,
+.help__supportForm textarea:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.12);
+}
+
+.help__supportForm button,
+.help__chatForm button {
+  border: none;
+  border-radius: 10px;
+
+  background: var(--primary);
+  color: #fff;
+
+  padding: 11px 14px;
+
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.help__supportForm button:hover,
+.help__chatForm button:hover {
+  background: var(--primary-hover);
+}
+
+/************ CHAT ************/
+
+.help__chatModal {
+  max-width: 720px;
+}
+
+.help__chat {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  max-height: 430px;
+  overflow-y: auto;
+
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 12px;
+}
+
+.help__chatMessage {
+  max-width: 78%;
+
+  padding: 12px;
+  border-radius: 12px;
+
+  background: #fff;
+  border: 1px solid #e5e7eb;
+}
+
+.help__chatMessage.user {
+  align-self: flex-end;
+  background: #ecfdf5;
+  border-color: #bbf7d0;
+}
+
+.help__chatMessage.admin {
+  align-self: flex-start;
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.help__chatMessage strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #111827;
+}
+
+.help__chatMessage p {
+  margin: 0;
+  color: #374151;
+  line-height: 1.45;
+}
+
+.help__chatMessage small {
+  display: block;
+  margin-top: 6px;
+  color: #6b7280;
+  font-size: 0.74rem;
+}
+
+.help__chatForm {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+
+  margin-top: 14px;
+}
+
+.help__chatForm input {
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+
+  padding: 10px 12px;
+}
+
+.help__chatForm input:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.12);
+}
+
+@media (max-width: 640px) {
+  .help__chatMessage {
+    max-width: 100%;
+  }
+
+  .help__chatForm {
+    grid-template-columns: 1fr;
+  }
+}
+
 /************ RESPONSIVE ************/
 
 @media (max-width: 1100px) {
