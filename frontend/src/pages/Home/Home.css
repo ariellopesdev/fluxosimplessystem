@@ -7,7 +7,7 @@
 }
 
 #home__info--title {
-  color: var(--primary);
+  color: var(--color-primary);
   font-size: clamp(2.5rem, 5vw, 4rem);
   letter-spacing: var(--spacing-small);
   margin-bottom: 1.2rem;
@@ -15,12 +15,13 @@
 
 #home__info--title--highlight {
   font-size: clamp(0.7rem, 1vw, 0.85rem);
-  font-weight: var(--weight-200);
+  font-weight: var(--weight-light);
 }
 
 #home__info--description {
   font-size: clamp(1rem, 2vw, 1.5rem);
-  color: var(--text);
+  color: var(--color-text);
+  line-height: 1.45;
 }
 
 /************ AUTH-FORM ************/
@@ -29,11 +30,11 @@
   width: 380px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  background-color: var(--surface);
-  padding: 20px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  gap: var(--space-md);
+  background: var(--color-surface);
+  padding: var(--space-xl);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
   box-shadow:
     0 2px 4px rgba(0, 0, 0, 0.1),
     0 8px 16px rgba(0, 0, 0, 0.1);
@@ -43,49 +44,83 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-md);
 }
 
 .form__login input {
+  width: 100%;
   height: 50px;
-  padding: 0 12px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
+  padding: 0 var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   font-size: clamp(0.9rem, 1.5vw, 1rem);
-  color: var(--text);
-  background-color: var(--surface);
+  color: var(--color-text);
+  background: var(--color-surface);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.form__login input:hover {
+  border-color: var(--color-primary);
 }
 
 .form__login input:focus {
-  border-color: var(--primary);
+  border-color: var(--color-primary);
   outline: none;
+  box-shadow: 0 0 0 4px var(--color-primary-soft);
 }
+
+.form__login input::placeholder {
+  color: var(--color-text-light);
+}
+
+/************ BUTTON ************/
 
 .form__login .login__btn--primary {
   height: 48px;
-  background-color: var(--primary);
-  color: var(--surface);
+  background: var(--color-primary);
+  color: var(--color-white);
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   font-size: clamp(1rem, 1.8vw, 1.125rem);
-  font-weight: bold;
+  font-weight: var(--weight-bold);
   cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease,
+    opacity 0.2s ease;
 }
 
 .form__login .login__btn--primary:hover {
-  background-color: var(--primary-hover);
+  background: var(--color-primary-hover);
 }
+
+.form__login .login__btn--primary:active {
+  transform: scale(0.98);
+}
+
+.form__login .login__btn--primary:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/************ FORGOT PASSWORD ************/
 
 .auth__container .forgotPassword {
   text-align: center;
+  color: var(--color-text-muted);
   font-size: clamp(0.75rem, 1.2vw, 0.875rem);
-  color: var(--text-light);
   text-decoration: none;
+  transition: color 0.2s ease;
 }
 
 .auth__container .forgotPassword:hover {
+  color: var(--color-primary);
   text-decoration: underline;
 }
+
+/************ PASSWORD ************/
 
 .password__container {
   position: relative;
@@ -93,57 +128,53 @@
 }
 
 .password__container input {
-  width: 100%;
   padding-right: 50px;
 }
 
 .password__toggle {
   position: absolute;
   top: 50%;
-  right: 12px;
+  right: var(--space-md);
   transform: translateY(-50%);
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   background: transparent;
   border: none;
-
-  cursor: pointer;
-
-  color: var(--text-light);
-
+  color: var(--color-text-muted);
   font-size: 1.2rem;
+  cursor: pointer;
+  transition: color 0.2s ease;
 }
 
 .password__toggle:hover {
-  color: var(--primary);
+  color: var(--color-primary);
 }
 
-.password__hidden {
-  -webkit-text-security: disc;
-  text-security: disc;
-}
+/************ RESPONSIVE ************/
 
 @media (max-width: 768px) {
   #home {
     flex-direction: column;
-    gap: 40px;
-    padding: 20px;
+    gap: var(--space-4xl);
     height: auto;
+    padding: var(--space-xl);
   }
 
   #home__info {
     width: 100%;
     min-width: unset;
+    margin-top: var(--space-4xl);
+    margin-bottom: var(--space-sm);
     text-align: center;
-    margin-top: 40px;
-    margin-bottom: 10px;
+  }
+
+  .auth__container {
+    width: 100%;
+    max-width: 400px;
   }
 
   .form__login {
     width: 100%;
-    max-width: 400px;
   }
 }

@@ -6,45 +6,95 @@
 }
 
 body {
-  background-color: var(--background);
-  color: var(--text);
+  background-color: var(--color-background);
+  color: var(--color-text);
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
 }
 
 :root {
-  /* cor principal */
-  --primary: #059669;
-  --primary-hover: #047857;
-  --primary-light: #10b981;
+  /* Brand */
+  --color-primary: #059669;
+  --color-primary-hover: #047857;
+  --color-primary-light: #10b981;
+  --color-primary-soft: rgba(16, 185, 129, 0.12);
 
-  /* fundo */
-  --background: #f0f2f5;
-  --surface: #ffffff;
+  /* Layout */
+  --color-background: #f0f2f5;
+  --color-surface: #ffffff;
+  --color-surface-soft: #f9fafb;
 
-  /* texto */
-  --text: #111827;
-  --text-light: #6b7280;
+  /* Text */
+  --color-text: #111827;
+  --color-text-muted: #6b7280;
+  --color-text-light: #9ca3af;
+  --color-white: #ffffff;
 
-  /* borda */
-  --border: #e5e7eb;
+  /* Border */
+  --color-border: #e5e7eb;
+  --color-border-dark: #d1d5db;
 
-  /* estados */
-  --success: #16a34a;
-  --successBackground: #d4edda;
-  --danger: #dc2626;
-  --dangerBackground: #ebc9cb;
-  --warning: #d97706;
+  /* Status */
+  --color-success: #16a34a;
+  --color-success-bg: #dcfce7;
+  --color-danger: #dc2626;
+  --color-danger-bg: #fee2e2;
+  --color-warning: #d97706;
+  --color-warning-bg: #fef3c7;
+  --color-info: #2563eb;
+  --color-info-bg: #eff6ff;
 
-  /* espaçamento */
-  --spacing-large: 2px;
-  --spacing-medium: 1px;
-  --spacing-small: 0.5px;
+  /* Shadow */
+  --shadow-sm: 0 2px 6px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 20px 50px rgba(15, 23, 42, 0.18);
 
-  /* letter wheight*/
-  --weight-200: 200;
-  --weight-300: 300;
-  --weight-400: 400;
-  --weight-500: 500;
-  --weight-700: 700;
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 14px;
+  --radius-2xl: 18px;
+  --radius-pill: 999px;
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 20px;
+  --space-2xl: 24px;
+  --space-3xl: 32px;
+  --space-4xl: 40px;
+
+  /* Font weight */
+  --weight-light: 300;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-black: 800;
+
+  /* Compatibility with old CSS */
+  --primary: var(--color-primary);
+  --primary-hover: var(--color-primary-hover);
+  --primary-light: var(--color-primary-light);
+  --background: var(--color-background);
+  --surface: var(--color-surface);
+  --text: var(--color-text);
+  --text-light: var(--color-text-muted);
+  --text-secondary: var(--color-text-muted);
+  --border: var(--color-border);
+  --success: var(--color-success);
+  --successBackground: var(--color-success-bg);
+  --danger: var(--color-danger);
+  --dangerBackground: var(--color-danger-bg);
+  --warning: var(--color-warning);
 }
 
 /************ HOME ************/
@@ -56,7 +106,7 @@ body {
   gap: 80px;
   justify-content: center;
   align-items: center;
-  background-color: var(--background);
+  background-color: var(--color-background);
 }
 
 #register {
@@ -64,11 +114,11 @@ body {
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  background-color: var(--background);
+  background-color: var(--color-background);
 }
 
 .main__container {
-  background-color: var(--background);
+  background-color: var(--color-background);
   height: calc(100% - 80px);
   width: calc(100% - 250px);
   float: right;
