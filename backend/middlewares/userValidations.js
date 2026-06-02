@@ -17,8 +17,7 @@ const userCreateValidation = () => {
       .notEmpty()
       .withMessage("O e-mail é obrigatório.")
       .isEmail()
-      .withMessage("Insira um e-mail inválido.")
-      .normalizeEmail(),
+      .withMessage("Insira um e-mail inválido."),
 
     body("password")
       .trim()
@@ -78,8 +77,7 @@ const loginValidation = () => {
       .notEmpty()
       .withMessage("O e-mail é obrigatório.")
       .isEmail()
-      .withMessage("E-mail inválido.")
-      .normalizeEmail(),
+      .withMessage("E-mail inválido."),
 
     body("password").trim().notEmpty().withMessage("A senha é obrigatória."),
   ];
@@ -93,12 +91,7 @@ const userUpdateValidation = () => {
       .isLength({ min: 3 })
       .withMessage("O nome deve ter no mínimo 3 caracteres."),
 
-    body("email")
-      .optional()
-      .trim()
-      .isEmail()
-      .withMessage("E-mail inválido.")
-      .normalizeEmail(),
+    body("email").optional().trim().isEmail().withMessage("E-mail inválido."),
 
     body("password")
       .optional()
