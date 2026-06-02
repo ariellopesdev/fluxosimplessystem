@@ -7,8 +7,9 @@ import Message from "../../components/Message/Message";
 import Footer from "../../components/Footer/Footer";
 
 //Hooks
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useLoginForm } from "../../hooks/useLoginForm.js";
 
 //Redux
 import { login, reset } from "../../slices/authSlice.js";
@@ -20,67 +21,75 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 import ReCAPTCHA from "react-google-recaptcha";
 
 const Home = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [failedAttempts, setFailedAttempts] = useState(0);
-  const [captchaToken, setCaptchaToken] = useState("");
-  const [localError, setLocalError] = useState("");
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  //Login form state and validations
+  const {
+    formData,
+    errors,
+    showPassword,
+    hasErrors,
+    shouldShowCaptcha,
+    setShowPassword,
+    handleChange,
+    handleCaptchaChange,
+    increaseFailedAttempts,
+    validateForm,
+    resetForm,
+  } = useLoginForm();
+
+  //Redux state
   const { loading, error, user } = useSelector((state) => state.auth);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  //Detect temporary login rate limit
+  const isRateLimited =
+    typeof error === "string" &&
+    error.toLowerCase().includes("muitas tentativas");
 
-    setLocalError("");
-
-    if (isRateLimited) {
-      setLocalError("");
-      return;
-    }
-
-    if (failedAttempts >= 3 && !captchaToken) {
-      setLocalError("Confirme que você não é um robô.");
-      return;
-    }
-
-    const user = {
-      email,
-      password,
-      captchaToken,
-    };
-
-    dispatch(login(user));
-  };
-
-  useEffect(() => {
-    if (user) {
-      setFailedAttempts(0);
-      setCaptchaToken("");
-      setLocalError("");
-
-      navigate("/painel");
-    }
-  }, [user, navigate]);
-
-  useEffect(() => {
-    if (error) {
-      setFailedAttempts((prev) => prev + 1);
-      setCaptchaToken("");
-    }
-  }, [error]);
-
-  //Clean all auth states
+  //Clean auth states on mount
   useEffect(() => {
     dispatch(reset());
   }, [dispatch]);
 
-  const isRateLimited =
-    typeof error === "string" &&
-    error.toLowerCase().includes("muitas tentativas");
+  //Redirect after sucessful login
+  useEffect(() => {
+    if (user) {
+      resetForm();
+      navigate("/painel");
+    }
+  }, [user, navigate, resetForm]);
+
+  //Handle field login attempts
+  useEffect(() => {
+    if (error) {
+      increaseFailedAttempts();
+    }
+  }, [error, increaseFailedAttempts]);
+
+  //Sign in user
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const isValid = validateForm(shouldShowCaptcha);
+
+    if (!isValid) {
+      return;
+    }
+
+    if (isRateLimited) {
+      return;
+    }
+
+    const userData = {
+      email: formData.email.trim(),
+      password: formData.password,
+      captchaToken: formData.captchaToken,
+    };
+
+    dispatch(login(userData));
+  };
+
   return (
     <div id="home">
       <div id="home__info">
@@ -92,27 +101,33 @@ const Home = () => {
           organiza agendamentos, prazos e entregas em um só lugar.
         </p>
       </div>
+
       <div className="auth__container">
         <form onSubmit={handleSubmit} className="form__login">
+          {/* EMAIL */}
           <input
             type="email"
             placeholder="E-mail"
-            onChange={(e) => setEmail(e.target.value)}
-            value={email || ""}
+            value={formData.email}
+            onChange={(e) => handleChange("email", e.target.value)}
             autoComplete="off"
             name="login_email_custom"
             id="login_email_custom"
+            className={errors.email ? "input__error" : ""}
           />
+          {errors.email && <Message msg={errors.email} type="error" />}
+
+          {/* PASSWORD */}
           <div className="password__container">
             <input
-              type="text"
+              type={showPassword ? "text" : "password"}
               placeholder="Senha"
-              onChange={(e) => setPassword(e.target.value)}
-              value={password || ""}
+              value={formData.password}
+              onChange={(e) => handleChange("password", e.target.value)}
               autoComplete="off"
               name="fake_field_not_password"
               id="fake_field_not_password"
-              className={!showPassword ? "password__hidden" : ""}
+              className={errors.password ? "input__error" : ""}
             />
 
             <button
@@ -123,30 +138,40 @@ const Home = () => {
               {showPassword ? <FiEyeOff /> : <FiEye />}
             </button>
           </div>
-          {failedAttempts >= 3 && !isRateLimited && (
+          {errors.password && <Message msg={errors.password} type="error" />}
+
+          {/* RECAPTCHA */}
+          {shouldShowCaptcha && !isRateLimited && (
             <ReCAPTCHA
               sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
-              onChange={(token) => setCaptchaToken(token)}
+              onChange={handleCaptchaChange}
             />
           )}
+          {errors.captcha && <Message msg={errors.captcha} type="error" />}
+
+          {/* SUBMIT BUTTON */}
           {!loading && (
             <input
               type="submit"
               value="Entrar"
-              className="auth__btn--primary"
+              className="login__btn--primary"
+              disabled={hasErrors}
             />
           )}
           {loading && (
             <input
               type="submit"
               value="Aguarde..."
-              className="auth__btn--primary"
+              className="login__btn--primary"
               disabled
             />
           )}
+
+          {/* GLOBAL MESSAGES */}
           {error && <Message msg={error} type="error" />}
-          {localError && <Message msg={localError} type="error" />}
         </form>
+
+        {/* FORGOT PASSWORD */}
         <Link to="/forgot-password" className="forgotPassword">
           Esqueceu sua senha?
         </Link>

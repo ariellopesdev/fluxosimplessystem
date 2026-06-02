@@ -1,15 +1,19 @@
+//Models
 const User = require("../models/User");
+const Company = require("../models/Company");
 
+//Libraries
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const mongoose = require("mongoose");
 const axios = require("axios");
+
+//Environment variables
 const jwtSecret = process.env.JWT_SECRET;
 
-const Company = require("../models/Company");
-
+//Validate Google reCAPTCHA token
 const verifyRecaptcha = async (token) => {
   const response = await axios.post(
     "https://www.google.com/recaptcha/api/siteverify",
@@ -25,7 +29,7 @@ const verifyRecaptcha = async (token) => {
   return response.data.success;
 };
 
-// Generate user token
+// Generate JWT authentication token
 const generateToken = (user) => {
   return jwt.sign(
     {
@@ -39,7 +43,7 @@ const generateToken = (user) => {
   );
 };
 
-// Register user and sign in
+// Register a new user account
 const register = async (req, res) => {
   const { name, email, password, companyName, cnpj, role } = req.body;
 
@@ -99,9 +103,10 @@ const register = async (req, res) => {
   });
 };
 
+//Store login attempts for rate limiting
 const loginAttempts = {};
 
-// Sign user in
+// Sign in an user, authenticate user credentials
 const login = async (req, res) => {
   const { email, password, captchaToken } = req.body;
 
@@ -173,7 +178,7 @@ const login = async (req, res) => {
   }
 };
 
-// Get current logged in user
+// Get authenticated user profile
 const getCurrentUser = async (req, res) => {
   const user = await User.findById(req.user._id)
     .populate("company")
@@ -182,7 +187,7 @@ const getCurrentUser = async (req, res) => {
   res.status(200).json(user);
 };
 
-// Update an user
+// Update authenticated user profile
 const update = async (req, res) => {
   const { name, password, company } = req.body;
 
@@ -228,7 +233,7 @@ const update = async (req, res) => {
   res.status(200).json(updatedUser);
 };
 
-// Get user by id
+// Get user details by id
 const getUserById = async (req, res) => {
   const { id } = req.params;
 
@@ -250,6 +255,7 @@ const getUserById = async (req, res) => {
   }
 };
 
+//Generate password recovery request
 const forgotPassword = async (req, res) => {
   const { email, captchaToken } = req.body;
 
@@ -321,6 +327,7 @@ const forgotPassword = async (req, res) => {
   }
 };
 
+//Reset user password using recovery token
 const resetPassword = async (req, res) => {
   const { token } = req.params;
   const { password } = req.body;
@@ -360,6 +367,7 @@ const resetPassword = async (req, res) => {
   }
 };
 
+//Export user controller actions
 module.exports = {
   register,
   login,

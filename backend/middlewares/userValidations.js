@@ -17,7 +17,7 @@ const userCreateValidation = () => {
       .notEmpty()
       .withMessage("O e-mail é obrigatório.")
       .isEmail()
-      .withMessage("E-mail inválido.")
+      .withMessage("Insira um e-mail inválido.")
       .normalizeEmail(),
 
     body("password")

@@ -61,7 +61,7 @@
   outline: none;
 }
 
-.form__login .auth__btn--primary {
+.form__login .login__btn--primary {
   height: 48px;
   background-color: var(--primary);
   color: var(--surface);
@@ -72,7 +72,7 @@
   cursor: pointer;
 }
 
-.form__login .auth__btn--primary:hover {
+.form__login .login__btn--primary:hover {
   background-color: var(--primary-hover);
 }
 
