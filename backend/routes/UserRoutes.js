@@ -18,6 +18,8 @@ const {
   userCreateValidation,
   loginValidation,
   userUpdateValidation,
+  forgotPasswordValidation,
+  resetPasswordValidation,
 } = require("../middlewares/userValidations");
 const authGuard = require("../middlewares/authGuard");
 const roleGuard = require("../middlewares/roleGuard");
@@ -46,8 +48,19 @@ router.put(
   imageUpload.single("profileImage"),
   update,
 );
-router.post("/forgot-password", forgotPasswordLimiter, forgotPassword);
-router.put("/reset-password/:token", resetPassword);
+router.post(
+  "/forgot-password",
+  forgotPasswordLimiter,
+  forgotPasswordValidation(),
+  validate,
+  forgotPassword,
+);
+router.put(
+  "/reset-password/:token",
+  resetPasswordValidation(),
+  validate,
+  resetPassword,
+);
 router.get("/:id", getUserById);
 
 module.exports = router;

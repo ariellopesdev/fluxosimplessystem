@@ -129,8 +129,41 @@ const userUpdateValidation = () => {
   ];
 };
 
+const forgotPasswordValidation = () => {
+  return [
+    body("email")
+      .trim()
+      .notEmpty()
+      .withMessage("O e-mail é obrigatório.")
+      .isEmail()
+      .withMessage("Informe um e-mail válido."),
+    body("captchaToken")
+      .notEmpty()
+      .withMessage("Confirme que você não é um robô."),
+  ];
+};
+
+const resetPasswordValidation = () => {
+  return [
+    body("password")
+      .trim()
+      .notEmpty()
+      .withMessage("A senha é obrigatória.")
+      .isLength({ min: 6 })
+      .withMessage("A senha precisa ter no mínimo 6 caracteres.")
+      .matches(/[A-Z]/)
+      .withMessage("A senha deve conter ao menos uma letra maiúscula.")
+      .matches(/[a-z]/)
+      .withMessage("A senha deve conter ao menos uma letra minúscula.")
+      .matches(/[0-9]/)
+      .withMessage("A senha deve conter ao menos um número."),
+  ];
+};
+
 module.exports = {
   userCreateValidation,
   loginValidation,
   userUpdateValidation,
+  forgotPasswordValidation,
+  resetPasswordValidation,
 };

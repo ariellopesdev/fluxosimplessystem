@@ -2,7 +2,7 @@
 import "./ResetPassword.css";
 
 // React
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 // Router
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -14,6 +14,9 @@ import { resetPassword, reset } from "../../slices/authSlice";
 // Components
 import Message from "../../components/Message/Message";
 
+// Hooks
+import { useResetPasswordForm } from "../../hooks/useResetPasswordForm";
+
 // Icons
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { MdLockReset } from "react-icons/md";
@@ -23,49 +26,56 @@ const ResetPassword = () => {
   const navigate = useNavigate();
 
   const { token } = useParams();
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [localError, setLocalError] = useState("");
+
+  // Redux state
   const { loading, error, success, message } = useSelector(
     (state) => state.auth,
   );
 
+  // Reset password form state and validations
+  const {
+    formData,
+    errors,
+    hasErrors,
+    showPassword,
+    setShowPassword,
+    handleChange,
+    validateForm,
+    resetForm,
+  } = useResetPasswordForm();
+
+  // Reset user password
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    setLocalError("");
+    const isValid = validateForm();
 
-    if (password.length < 6) {
-      setLocalError("A senha precisa ter no mínimo 6 caracteres.");
-
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setLocalError("As senhas precisam ser iguais.");
-
+    if (!isValid) {
       return;
     }
 
     dispatch(
       resetPassword({
-        password,
+        password: formData.password,
         token,
       }),
     );
   };
 
+  // Redirect after successful password reset
   useEffect(() => {
     if (success) {
+      resetForm();
+
       const timer = setTimeout(() => {
         navigate("/");
       }, 2500);
 
       return () => clearTimeout(timer);
     }
-  }, [success, navigate]);
+  }, [success, navigate, resetForm]);
 
+  // Clean auth states on unmount
   useEffect(() => {
     return () => {
       dispatch(reset());
@@ -80,7 +90,9 @@ const ResetPassword = () => {
           <span> system</span>
         </h1>
       </div>
+
       <div className="resetPassword__container">
+        {/* HEADER */}
         <div className="resetPassword__header">
           <MdLockReset />
 
@@ -89,13 +101,16 @@ const ResetPassword = () => {
           <p>Crie uma nova senha para acessar sua conta.</p>
         </div>
 
+        {/* FORM */}
         <form onSubmit={handleSubmit}>
+          {/* PASSWORD */}
           <div className="resetPassword__inputContainer">
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Nova senha"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={formData.password}
+              onChange={(e) => handleChange("password", e.target.value)}
+              className={errors.password ? "input__error" : ""}
             />
 
             <button
@@ -107,16 +122,29 @@ const ResetPassword = () => {
             </button>
           </div>
 
+          {errors.password && <Message msg={errors.password} type="error" />}
+
+          {/* CONFIRM PASSWORD */}
           <div className="resetPassword__inputContainer">
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Confirmar senha"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              value={formData.confirmPassword}
+              onChange={(e) => handleChange("confirmPassword", e.target.value)}
+              className={errors.confirmPassword ? "input__error" : ""}
             />
           </div>
 
-          {!loading && <button type="submit">Redefinir senha</button>}
+          {errors.confirmPassword && (
+            <Message msg={errors.confirmPassword} type="error" />
+          )}
+
+          {/* SUBMIT BUTTON */}
+          {!loading && (
+            <button type="submit" disabled={hasErrors}>
+              Redefinir senha
+            </button>
+          )}
 
           {loading && (
             <button type="submit" disabled>
@@ -124,10 +152,8 @@ const ResetPassword = () => {
             </button>
           )}
 
-          {localError && <Message msg={localError} type="error" />}
-
+          {/* GLOBAL MESSAGES */}
           {error && <Message msg={error} type="error" />}
-
           {message && <Message msg={message} type="success" />}
         </form>
 
