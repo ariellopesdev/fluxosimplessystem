@@ -1,166 +1,181 @@
-#settings-page {
-  padding: 30px;
-  min-height: 100vh;
-}
+/************ SETTINGS PAGE ************/
 
-/************ CONTAINER ************/
+#settings-page {
+  width: 100%;
+  padding: 0;
+}
 
 .settingsPage__container {
   width: 100%;
-  max-width: 1400px;
-
-  margin: 0 auto;
-
-  display: flex;
-  flex-direction: column;
-  gap: 25px;
+  max-width: 600px;
 }
 
 /************ HEADER ************/
 
 .settingsPage__header {
+  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xl);
 }
 
 .settingsPage__header h2 {
-  font-size: 2rem;
-  font-weight: 700;
-
-  color: var(--text);
+  margin: 0;
+  color: var(--color-text);
+  font-size: clamp(1.5rem, 2vw, 1.9rem);
+  font-weight: var(--weight-bold);
 }
 
 .settingsPage__header p {
-  color: #6b7280;
-  font-size: 0.95rem;
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: clamp(0.85rem, 1vw, 0.95rem);
+  line-height: 1.5;
 }
 
-/************ PROFILE IMAGE ************/
-
-.editProfile__image {
-  width: 120px;
-  height: 120px;
-
-  object-fit: cover;
-
-  border-radius: 50%;
-
-  border: 4px solid white;
-
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-
-  margin-bottom: 10px;
+.settingsPage__headerTop {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
 }
 
-/************ GRID ************/
-
-.settingsPage__grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 20px;
+.settingsPage__headerIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text);
+  font-size: clamp(1.15rem, 1.5vw, 1.35rem);
 }
+
 /************ PROFILE SECTION ************/
 
 .settingsPage__profileSection {
+  width: 100%;
   display: flex;
   align-items: center;
-  gap: 25px;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-lg);
+  padding: var(--space-xl);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+}
 
-  margin-bottom: 10px;
+.editProfile__image {
+  width: clamp(90px, 10vw, 120px);
+  height: clamp(90px, 10vw, 120px);
+  object-fit: cover;
+  flex-shrink: 0;
+  border-radius: var(--radius-pill);
+  border: 4px solid var(--color-white);
+  box-shadow: var(--shadow-md);
 }
 
 .settingsPage__profileUpload {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--space-sm);
 }
 
 .settingsPage__profileUpload label {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 10px;
+  gap: var(--space-sm);
 }
 
 .settingsPage__profileUpload span {
-  font-weight: 600;
-  color: var(--text);
+  color: var(--color-text-muted);
+  font-size: clamp(0.75rem, 0.9vw, 0.82rem);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.2px;
 }
 
-/************ PROFILE IMAGE ************/
+.settingsPage__profileUpload input[type="file"] {
+  width: 100%;
+  max-width: 320px;
+  padding: 10px;
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border-dark);
+  border-radius: var(--radius-md);
+  font-size: clamp(0.82rem, 1vw, 0.9rem);
+  cursor: pointer;
+}
 
-.editProfile__image {
-  width: 120px;
-  height: 120px;
+/************ FORM ************/
 
-  object-fit: cover;
+.settingsPage__container form {
+  width: 100%;
+}
 
-  border-radius: 50%;
+/************ GRID ************/
 
-  border: 4px solid white;
-
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+.settingsPage__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-lg);
 }
 
 /************ CARD ************/
 
 .settingsPage__card {
-  background: white;
-
-  border-radius: 16px;
-
-  padding: 25px;
-
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
-
-  border: 1px solid #f1f5f9;
-
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: var(--space-md);
+  padding: var(--space-2xl);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+}
+
+.settingsPage__card h3 {
+  margin: 0 0 var(--space-xs);
+  color: var(--color-text);
+  font-size: clamp(1rem, 1.3vw, 1.15rem);
+  font-weight: var(--weight-bold);
 }
 
 /************ INPUTS ************/
 
 .settingsPage__card input[type="text"],
 .settingsPage__card input[type="email"],
-.settingsPage__card input[type="password"],
-.settingsPage__card input[type="file"] {
+.settingsPage__card input[type="password"] {
   width: 100%;
-
-  padding: 12px 14px;
-
-  border-radius: 10px;
-
-  border: 1px solid #d1d5db;
-
-  background: #fff;
-
-  font-size: 0.95rem;
-
+  height: 44px;
+  padding: 0 var(--space-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border-dark);
+  border-radius: var(--radius-md);
+  font-size: clamp(0.88rem, 1vw, 0.94rem);
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease,
     background-color 0.2s ease;
 }
 
-.settingsPage__card input:focus {
-  outline: none;
-
-  border-color: var(--primary);
-
-  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.12);
+.settingsPage__card input:hover {
+  border-color: var(--color-primary);
 }
 
-.settingsPage__card input:hover {
-  border-color: var(--primary);
+.settingsPage__card input:focus {
+  border-color: var(--color-primary);
+  outline: none;
+  box-shadow: 0 0 0 4px var(--color-primary-soft);
 }
 
 .settingsPage__card input:disabled {
-  background: #f3f4f6;
-  color: #6b7280;
+  background: var(--color-background);
+  color: var(--color-text-muted);
   cursor: not-allowed;
+}
+
+.settingsPage__card input::placeholder {
+  color: var(--color-text-light);
 }
 
 /************ LABELS ************/
@@ -168,15 +183,10 @@
 .settingsPage__card label {
   display: flex;
   align-items: center;
-  gap: 10px;
-
-  font-size: 0.95rem;
-
-  color: var(--text);
-}
-
-.settingsPage__card label span {
-  font-weight: 600;
+  gap: var(--space-sm);
+  color: var(--color-text);
+  font-size: clamp(0.88rem, 1vw, 0.94rem);
+  line-height: 1.4;
 }
 
 /************ CHECKBOX ************/
@@ -184,37 +194,36 @@
 .settingsPage__card input[type="checkbox"] {
   width: 16px;
   height: 16px;
-
+  accent-color: var(--color-primary);
   cursor: pointer;
 }
 
-/************ ACTION BUTTON ************/
+/************ BUTTON ************/
 
 .auth__btn--primary {
   width: fit-content;
-
-  padding: 14px 24px;
-
-  border: none;
-  border-radius: 10px;
-
-  background: var(--primary);
-  color: white;
-
-  font-weight: 600;
-  font-size: 0.95rem;
-
+  min-width: 190px;
+  height: 46px;
+  margin-top: var(--space-xl);
+  padding: 0 var(--space-xl);
+  background: var(--color-primary) !important;
+  color: var(--color-white) !important;
+  border: none !important;
+  border-radius: var(--radius-lg) !important;
+  font-size: clamp(0.9rem, 1vw, 0.98rem);
+  font-weight: var(--weight-black);
   cursor: pointer;
-
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
   transition:
-    transform 0.15s ease,
     background-color 0.2s ease,
-    opacity 0.2s ease;
-  margin-top: 20px;
+    transform 0.1s ease,
+    opacity 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .auth__btn--primary:hover {
-  background: var(--primary-hover);
+  background: var(--color-primary-hover) !important;
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.28);
 }
 
 .auth__btn--primary:active {
@@ -222,36 +231,66 @@
 }
 
 .auth__btn--primary:disabled {
-  opacity: 0.7;
+  opacity: 0.65;
   cursor: not-allowed;
+  box-shadow: none;
+}
+
+/************ MESSAGES ************/
+
+.settingsPage__container .message {
+  margin-top: var(--space-md);
 }
 
 /************ RESPONSIVE ************/
 
-@media (max-width: 768px) {
-  #settings-page {
-    padding: 20px;
-  }
-
+@media (max-width: 900px) {
   .settingsPage__grid {
     grid-template-columns: 1fr;
   }
+}
+
+@media (max-width: 768px) {
+  .settingsPage__header {
+    margin-bottom: var(--space-lg);
+  }
+
+  .settingsPage__profileSection {
+    align-items: flex-start;
+    padding: var(--space-lg);
+    border-radius: var(--radius-lg);
+  }
 
   .settingsPage__card {
-    padding: 20px;
+    padding: var(--space-lg);
+    border-radius: var(--radius-lg);
   }
 
   .auth__btn--primary {
     width: 100%;
   }
-
-  .editProfile__image {
-    width: 100px;
-    height: 100px;
-  }
-  .settingsPage__profileSection {
-    flex-direction: column;
-    align-items: flex-start;
-  }
 }
 
+@media (max-width: 480px) {
+  .settingsPage__headerTop {
+    align-items: flex-start;
+  }
+  
+  .settingsPage__profileSection {
+    flex-direction: column;
+  }
+
+  .settingsPage__profileUpload,
+  .settingsPage__profileUpload label,
+  .settingsPage__profileUpload input[type="file"] {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .settingsPage__card input[type="text"],
+  .settingsPage__card input[type="email"],
+  .settingsPage__card input[type="password"],
+  .auth__btn--primary {
+    height: 42px;
+  }
+}

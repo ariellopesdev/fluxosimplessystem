@@ -14,6 +14,9 @@ import { profile, resetMessage, updateProfile } from "../../slices/userSlice";
 //Components
 import Message from "../../components/Message/Message";
 
+//Icons
+import { FiSettings } from "react-icons/fi";
+
 const Settings = () => {
   const dispatch = useDispatch();
 
@@ -87,7 +90,13 @@ const Settings = () => {
       <div className="settingsPage__container">
         {/* HEADER */}
         <div className="settingsPage__header">
-          <h2>Configurações</h2>
+          <div className="settingsPage__headerTop">
+            <span className="settingsPage__headerIcon">
+              <FiSettings />
+            </span>
+            <h2>Configurações</h2>
+          </div>
+
           <p>Gerencie seus dados e preferências</p>
         </div>
         <div className="settingsPage__profileSection">
