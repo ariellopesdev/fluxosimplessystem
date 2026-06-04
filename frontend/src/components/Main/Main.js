@@ -13,42 +13,31 @@ import Register from "../../pages/Register/Register";
 import Settings from "../../pages/Settings/Settings";
 import Help from "../../pages/Help/Help";
 import Sales from "../../pages/Sales/Sales";
-// import UnderConstruction from "../../components/UnderConstruction/UnderConstruction";
 
 const Main = ({ page, setPage }) => {
-  const renderPage = () => {
-    switch (page) {
-      case "dashboard":
-        return <Dashboard />;
-      case "client":
-        return <Client />;
-      case "sales":
-        return <Sales />;
-      case "products":
-        return <Product />;
-      case "service":
-        return <Service />;
-      case "financial":
-        return <Financial />;
-      case "appointment":
-        return <Appointment setPage={setPage} />;
-      case "reports":
-        return <Reports />;
-      case "register":
-        return <Register />;
-      case "settings":
-        return <Settings />;
-      case "help":
-        return <Help />;
-      default:
-        return <Dashboard />;
-    }
+  //Application pages map
+  const pages = {
+    dashboard: <Dashboard />,
+    client: <Client />,
+    sales: <Sales />,
+    products: <Product />,
+    service: <Service />,
+    financial: <Financial />,
+    appointment: <Appointment setPage={setPage} />,
+    reports: <Reports />,
+    register: <Register />,
+    settings: <Settings />,
+    help: <Help />,
   };
+
+  //Render selected page or fallback to dashboard
+  const currentPage = pages[page] || pages.dashboard;
+
   return (
     <main id="main">
       <div className="main__container">
         <div key={page} className="pageTransition">
-          {renderPage()}
+          {currentPage}
         </div>
       </div>
     </main>
