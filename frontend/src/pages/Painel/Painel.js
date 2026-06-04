@@ -10,12 +10,14 @@ import Main from "../../components/Main/Main";
 import { useState } from "react";
 
 const Painel = () => {
+  //Current active page
   const [page, setPage] = useState("dashboard");
+
   return (
-    <div>
+    <div id="painel">
       <Navbar />
       <Aside setPage={setPage} page={page} />
-      <Main page={page} setPage={setPage}/>
+      <Main page={page} setPage={setPage} />
     </div>
   );
 };
