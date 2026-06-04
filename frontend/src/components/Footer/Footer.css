@@ -4,18 +4,13 @@
   position: absolute;
   bottom: -140px;
   left: 0;
-
   width: 100%;
-
   padding: 14px 10px;
-
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
-
   border-top: 1px solid var(--border);
-
   background: rgba(255, 255, 255, 0.55);
   backdrop-filter: blur(8px);
 }
@@ -31,13 +26,9 @@
 .footer--links button {
   border: none;
   background: transparent;
-
   color: var(--text-light);
-
   font-size: clamp(0.75rem, 1.2vw, 0.9rem);
-
   cursor: pointer;
-
   transition:
     color 0.2s ease,
     transform 0.2s ease;
@@ -69,32 +60,22 @@
   position: fixed;
   inset: 0;
   z-index: 99999;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   padding: 24px;
-
   background: rgba(0, 0, 0, 0.68);
-
   backdrop-filter: blur(4px);
 }
 
 .footer__modal {
   position: relative;
-
   width: min(760px, 100%);
   max-height: calc(100dvh - 48px);
-
   overflow-y: auto;
-
   background: var(--surface);
-
   border-radius: 18px;
-
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
-
   animation: footerModalEnter 0.22s ease both;
 }
 
@@ -102,38 +83,26 @@
   display: flex;
   align-items: center;
   gap: 18px;
-
   padding: 28px 32px;
-
-  background: linear-gradient(
-    135deg,
-    var(--primary),
-    var(--primary-hover)
-  );
-
+  background: linear-gradient(135deg, var(--primary), var(--primary-hover));
   color: var(--surface);
-
   border-radius: 18px 18px 0 0;
 }
 
 .footer__modalHero span {
   width: 58px;
   height: 58px;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   background: rgba(255, 255, 255, 0.18);
-
   border-radius: 16px;
-
   font-size: 1.7rem;
 }
 
 .footer__modalHero h2 {
   margin-bottom: 4px;
-  font-size: 1.45rem;
+  font-size: clamp(1.2rem, 2vw, 1.45rem);
 }
 
 .footer__modalHero p {
@@ -146,9 +115,7 @@
 
 .footer__modalBody > p {
   margin-bottom: 18px;
-
   color: var(--text-light);
-
   line-height: 1.7;
 }
 
@@ -157,37 +124,28 @@
 .footer__infoGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-
   gap: 14px;
-
   margin: 22px 0;
 }
 
 .footer__infoGrid > div,
 .footer__requestCard {
   padding: 16px;
-
   border: 1px solid var(--border);
-
   border-radius: 14px;
-
   background: #f9fafb;
 }
 
 .footer__infoGrid strong {
   display: block;
   margin-bottom: 8px;
-
   color: var(--text);
-
   font-size: 0.92rem;
 }
 
 .footer__infoGrid p {
   color: var(--text-light);
-
-  font-size: 0.84rem;
-
+  font-size: clamp(0.78rem, 0.9vw, 0.84rem);
   line-height: 1.5;
 }
 
@@ -195,9 +153,7 @@
 
 .footer__requestCard {
   text-align: left;
-
   cursor: pointer;
-
   transition:
     transform 0.2s ease,
     border-color 0.2s ease,
@@ -207,19 +163,14 @@
 
 .footer__requestCard:hover {
   transform: translateY(-3px);
-
   border-color: var(--primary);
-
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
-
   background: rgba(5, 150, 105, 0.04);
 }
 
 .footer__requestCard.active {
   border-color: var(--primary);
-
   background: rgba(5, 150, 105, 0.08);
-
   box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.1);
 }
 
@@ -227,27 +178,20 @@
 
 .footer__privacyRequest {
   margin-top: 18px;
-
   padding: 18px;
-
   background: rgba(59, 130, 246, 0.08);
-
   border: 1px solid rgba(59, 130, 246, 0.18);
-
   border-radius: 12px;
 }
 
 .footer__privacyRequest strong {
   display: block;
-
   margin-bottom: 8px;
-
   color: #2563eb;
 }
 
 .footer__privacyRequest p {
   color: var(--text-light);
-
   line-height: 1.6;
 }
 
@@ -256,26 +200,18 @@
 .footer__modalFooter {
   display: flex;
   justify-content: flex-end;
-
   padding: 18px 32px;
-
   border-top: 1px solid var(--border);
 }
 
 .footer__modalFooter button {
   border: none;
   border-radius: 10px;
-
   padding: 11px 18px;
-
   background: var(--primary);
-
   color: var(--surface);
-
   font-weight: var(--weight-700);
-
   cursor: pointer;
-
   transition:
     background-color 0.2s ease,
     transform 0.15s ease;
@@ -293,25 +229,16 @@
 
 .footer__close {
   position: absolute;
-
   top: 14px;
   right: 14px;
-
   width: 38px;
   height: 38px;
-
   border: none;
-
   border-radius: 50%;
-
   background: rgba(255, 255, 255, 0.18);
-
   color: var(--surface);
-
-  font-size: 1.4rem;
-
+  font-size: clamp(1.2rem, 2vw, 1.4rem);
   cursor: pointer;
-
   transition: background-color 0.2s ease;
 }
 
@@ -370,12 +297,6 @@
   .footer__modalHero span {
     width: 48px;
     height: 48px;
-
-    font-size: 1.3rem;
-  }
-
-  .footer__modalHero h2 {
-    font-size: 1.2rem;
   }
 
   .footer__modalFooter {

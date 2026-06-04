@@ -18,7 +18,7 @@
   flex-direction: column;
   gap: 6px;
   list-style: none;
-  font-size: clamp(0.75rem, 2vw, 1.05rem);
+  font-size: clamp(0.75rem, 1vw, 1.05rem);
 }
 
 .dashboard__menu--item {
@@ -42,7 +42,7 @@
   align-items: center;
   justify-content: center;
   min-width: 18px;
-  font-size: 1rem;
+  font-size: clamp(0.9rem, 1vw, 1rem);
   color: inherit;
   transition: color 0.2s ease;
 }
@@ -100,11 +100,11 @@
 
   .dashboard__menu--item {
     padding: 10px 6px;
-    font-size: 0.9rem;
+    font-size: clamp(0.82rem, 3vw, 0.9rem);
   }
 
   .dashboard__icons {
     min-width: 16px;
-    font-size: 0.95rem;
+    font-size: clamp(0.85rem, 2.5vw, 0.95rem);
   }
 }
