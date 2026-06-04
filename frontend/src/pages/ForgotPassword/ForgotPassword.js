@@ -1,7 +1,7 @@
 import "./ForgotPassword.css";
 
 // React
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 // Redux
 import { useDispatch, useSelector } from "react-redux";
@@ -13,6 +13,9 @@ import { Link } from "react-router-dom";
 // Components
 import Message from "../../components/Message/Message";
 
+// Hooks
+import { useForgotPasswordForm } from "../../hooks/useForgotPasswordForm";
+
 // Icons
 import { MdOutlineMarkEmailRead } from "react-icons/md";
 
@@ -22,27 +25,46 @@ import ReCAPTCHA from "react-google-recaptcha";
 const ForgotPassword = () => {
   const dispatch = useDispatch();
 
-  const [email, setEmail] = useState("");
+  // Redux state
   const { loading, error, message } = useSelector((state) => state.auth);
-  const [captchaToken, setCaptchaToken] = useState("");
-  const [localError, setLocalError] = useState("");
 
+  // Forgot password form state and validations
+  const {
+    formData,
+    errors,
+    hasErrors,
+    handleChange,
+    handleCaptchaChange,
+    validateForm,
+    resetForm,
+  } = useForgotPasswordForm();
+
+  // Send recovery email
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!captchaToken) {
-      setLocalError("Confirme que você não é um robô.");
+    const isValid = validateForm();
+
+    if (!isValid) {
       return;
     }
 
     dispatch(
       forgotPassword({
-        email,
-        captchaToken,
+        email: formData.email.trim(),
+        captchaToken: formData.captchaToken,
       }),
     );
   };
 
+  // Reset form after success
+  useEffect(() => {
+    if (message) {
+      resetForm();
+    }
+  }, [message, resetForm]);
+
+  // Clean auth states on unmount
   useEffect(() => {
     return () => {
       dispatch(reset());
@@ -57,32 +79,42 @@ const ForgotPassword = () => {
           <span> system</span>
         </h1>
       </div>
+
       <div className="forgotPassword__container">
+        {/* HEADER */}
         <div className="forgotPassword__header">
           <MdOutlineMarkEmailRead />
-
           <h2>Recuperar senha</h2>
-
           <p>
             Informe o e-mail da sua conta para receber o link de redefinição.
           </p>
         </div>
 
+        {/* FORM */}
         <form onSubmit={handleSubmit}>
           <input
             type="email"
             placeholder="Seu e-mail"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={formData.email}
+            onChange={(e) => handleChange("email", e.target.value)}
+            className={errors.email ? "input__error" : ""}
           />
 
-          <ReCAPTCHA
-            sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
-            onChange={(token) => setCaptchaToken(token)}
-          />
+          {errors.email && <Message msg={errors.email} type="error" />}
+
+          <div className="forgotPassword__captcha">
+            <ReCAPTCHA
+              sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
+              onChange={handleCaptchaChange}
+            />
+          </div>
+
+          {errors.captcha && <Message msg={errors.captcha} type="error" />}
 
           {!loading && (
-            <button type="submit">Enviar link de recuperação</button>
+            <button type="submit" disabled={hasErrors}>
+              Enviar link de recuperação
+            </button>
           )}
 
           {loading && (
@@ -91,8 +123,8 @@ const ForgotPassword = () => {
             </button>
           )}
 
+          {/* GLOBAL MESSAGES */}
           {error && <Message msg={error} type="error" />}
-          {localError && <Message msg={localError} type="error" />}
           {message && <Message msg={message} type="success" />}
         </form>
 

@@ -260,11 +260,17 @@ const forgotPassword = async (req, res) => {
   const { email, captchaToken } = req.body;
 
   try {
+    if (!captchaToken) {
+      return res.status(400).json({
+        errors: ["Confirme que você não é um robô."],
+      });
+    }
+
     const isHuman = await verifyRecaptcha(captchaToken);
 
     if (!isHuman) {
       return res.status(400).json({
-        errors: ["Falha na verificação do reCAPTCHA."],
+        errors: ["Confirme que você não é um robô."],
       });
     }
 
