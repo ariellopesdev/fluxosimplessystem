@@ -1,5 +1,4 @@
 const Support = require("../models/Support");
-const User = require("../models/User");
 const sendEmail = require("../utils/sendEmail");
 
 const getCompanyId = (reqUser) => {
@@ -144,6 +143,10 @@ const getAllSupportTickets = async (req, res) => {
 
     const query = {};
 
+    if (req.user.role !== "SUPER_ADMIN") {
+      query.company = getCompanyId(req.user);
+    }
+
     if (status) query.status = status;
     if (category) query.category = category;
     if (priority) query.priority = priority;
@@ -180,7 +183,10 @@ const getSupportTicketById = async (req, res) => {
     const isOwner =
       support.openedBy?._id?.toString() === req.user._id.toString();
 
-    if (!isOwner && !isAdminUser(req.user)) {
+    const sameCompany =
+      support.company?.toString() === getCompanyId(req.user)?.toString();
+
+    if (!isOwner && req.user.role !== "SUPER_ADMIN" && !sameCompany) {
       return res.status(403).json({
         errors: ["Acesso negado."],
       });
@@ -212,7 +218,13 @@ const addSupportMessage = async (req, res) => {
     const isOwner = support.openedBy.toString() === req.user._id.toString();
     const isAdmin = isAdminUser(req.user);
 
-    if (!isOwner && !isAdmin) {
+    const sameCompany =
+      support.company?.toString() === getCompanyId(req.user)?.toString();
+
+    const canAccess =
+      isOwner || req.user.role === "SUPER_ADMIN" || (isAdmin && sameCompany);
+
+    if (!canAccess) {
       return res.status(403).json({
         errors: ["Acesso negado."],
       });
@@ -281,10 +293,21 @@ const updateSupportStatus = async (req, res) => {
       });
     }
 
+    const sameCompany =
+      support.company?.toString() === getCompanyId(req.user)?.toString();
+
+    if (req.user.role !== "SUPER_ADMIN" && !sameCompany) {
+      return res.status(403).json({
+        errors: ["Acesso negado."],
+      });
+    }
+
     support.status = status;
 
     if (status === "CLOSED") {
       support.closedAt = new Date();
+    } else {
+      support.closedAt = undefined;
     }
 
     if (status === "IN_PROGRESS") {
