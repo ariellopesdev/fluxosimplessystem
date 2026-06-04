@@ -1,61 +1,70 @@
 #aside {
   position: fixed;
-  background-color: var(--text);
   left: 0;
   bottom: 0;
-  height: calc(100dvh - 80px);
   width: 250px;
-  color: var(--border);
+  height: calc(100dvh - 80px);
+  background: var(--color-text);
+  color: var(--color-border);
 }
 
 .dashboard__container--menu {
-  padding: 20px;
+  height: 100%;
+  padding: var(--space-xl);
 }
 
 .dashboard__menu {
-  list-style-type: none;
-  font-size: clamp(0.75rem, 2vw, 1.1rem);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  list-style: none;
+  font-size: clamp(0.75rem, 2vw, 1.05rem);
 }
 
 .dashboard__menu--item {
-  padding: 10px 8px;
-  margin-bottom: 6px;
-  border-radius: 6px;
   position: relative;
-  font-weight: var(--weight-400);
   display: flex;
   align-items: center;
-
+  gap: 10px;
+  padding: 10px 8px;
+  border-radius: var(--radius-sm);
+  color: var(--color-border);
+  font-weight: var(--weight-regular);
   cursor: pointer;
-
   transition:
     background-color 0.2s ease,
     color 0.2s ease,
     transform 0.15s ease;
 }
 
-.dashboard__icons{
-    margin-right: 10px;
+.dashboard__icons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  font-size: 1rem;
+  color: inherit;
+  transition: color 0.2s ease;
 }
 
 .dashboard__menu--item:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-  color: var(--surface);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-white);
   transform: translateX(4px);
 }
 
 .dashboard__menu--item:hover .dashboard__icons {
-  color: var(--primary);
+  color: var(--color-primary-light);
 }
 
 .dashboard__menu--item--active {
-  background-color: var(--primary);
-  color: var(--surface);
-  font-weight: var(--weight-700);
+  background: var(--color-primary);
+  color: var(--color-white);
+  font-weight: var(--weight-bold);
 }
 
 .dashboard__menu--item--active .dashboard__icons {
-  color: var(--surface);
+  color: var(--color-white);
 }
 
 .dashboard__menu--item--active::before {
@@ -64,6 +73,6 @@
   left: 0;
   width: 4px;
   height: 80%;
-  background-color: var(--surface);
+  background: var(--color-white);
   border-radius: 0 4px 4px 0;
 }

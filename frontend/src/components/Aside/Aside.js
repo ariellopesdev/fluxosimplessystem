@@ -21,108 +21,95 @@ import { useSelector } from "react-redux";
 const Aside = ({ setPage, page }) => {
   const { user } = useSelector((state) => state.auth);
 
-  const canRegisterUsers =
+  //Check user permissions
+  const canManageUsers =
     user?.role === "SUPER_ADMIN" || user?.role === "ADMIN";
+
   const canAccessFinancial =
     user?.role === "SUPER_ADMIN" || user?.role === "ADMIN";
+
+  //Sidebar menu items
+  const menuItems = [
+    {
+      page: "dashboard",
+      label: "Dashboard",
+      icon: <FiHome />,
+    },
+    {
+      page: "client",
+      label: "Clientes",
+      icon: <FiUser />,
+    },
+    {
+      page: "sales",
+      label: "Vendas",
+      icon: <FaShoppingCart />,
+    },
+    {
+      page: "products",
+      label: "Produtos",
+      icon: <FiPackage />,
+    },
+    {
+      page: "service",
+      label: "Serviços",
+      icon: <MdDesignServices />,
+    },
+    {
+      page: "financial",
+      label: "Financeiro",
+      icon: <FaChartLine />,
+      visible: canAccessFinancial,
+    },
+    {
+      page: "appointment",
+      label: "Agendamentos",
+      icon: <FiCalendar />,
+    },
+    {
+      page: "reports",
+      label: "Relatórios",
+      icon: <FiBarChart2 />,
+    },
+    {
+      page: "register",
+      label: "Acessos",
+      icon: <FiUsers />,
+      visible: canManageUsers,
+    },
+    {
+      page: "settings",
+      label: "Configurações",
+      icon: <FiSettings />,
+    },
+    {
+      page: "help",
+      label: "Ajuda",
+      icon: <FiHelpCircle />,
+    },
+  ];
+
+  //Filter menu by permissions
+  const visibleMenuItems = menuItems.filter((item) => item.visible !== false);
+
   return (
     <aside id="aside">
-      <div className="dashboard__container--menu">
+      <nav className="dashboard__container--menu">
         <ul className="dashboard__menu">
-          <li
-            className={`dashboard__menu--item ${
-              page === "dashboard" ? "dashboard__menu--item--active" : ""
-            }`}
-            onClick={() => setPage("dashboard")}
-          >
-            <FiHome className="dashboard__icons" /> Dashboard
-          </li>
-          <li
-            className={`dashboard__menu--item ${
-              page === "client" ? "dashboard__menu--item--active" : ""
-            }`}
-            onClick={() => setPage("client")}
-          >
-            <FiUser className="dashboard__icons" /> Clientes
-          </li>
-          <li
-            className={`dashboard__menu--item ${
-              page === "sales" ? "dashboard__menu--item--active" : ""
-            }`}
-            onClick={() => setPage("sales")}
-          >
-            <FaShoppingCart className="dashboard__icons" /> Vendas
-          </li>
-          <li
-            className={`dashboard__menu--item ${
-              page === "products" ? "dashboard__menu--item--active" : ""
-            }`}
-            onClick={() => setPage("products")}
-          >
-            <FiPackage className="dashboard__icons" /> Produtos
-          </li>
-          <li
-            className={`dashboard__menu--item ${
-              page === "service" ? "dashboard__menu--item--active" : ""
-            }`}
-            onClick={() => setPage("service")}
-          >
-            <MdDesignServices className="dashboard__icons" /> Serviços
-          </li>
-          {canAccessFinancial && (
+          {visibleMenuItems.map((item) => (
             <li
+              key={item.page}
               className={`dashboard__menu--item ${
-                page === "financial" ? "dashboard__menu--item--active" : ""
+                page === item.page ? "dashboard__menu--item--active" : ""
               }`}
-              onClick={() => setPage("financial")}
+              onClick={() => setPage(item.page)}
             >
-              <FaChartLine className="dashboard__icons" /> Financeiro
+              <span className="dashboard__icons">{item.icon}</span>
+              {item.label}
             </li>
-          )}
-          <li
-            className={`dashboard__menu--item ${
-              page === "appointment" ? "dashboard__menu--item--active" : ""
-            }`}
-            onClick={() => setPage("appointment")}
-          >
-            <FiCalendar className="dashboard__icons" /> Agendamentos
-          </li>
-          <li
-            className={`dashboard__menu--item ${
-              page === "reports" ? "dashboard__menu--item--active" : ""
-            }`}
-            onClick={() => setPage("reports")}
-          >
-            <FiBarChart2 className="dashboard__icons" /> Relatórios
-          </li>
-          {canRegisterUsers && (
-            <li
-              className={`dashboard__menu--item ${
-                page === "register" ? "dashboard__menu--item--active" : ""
-              }`}
-              onClick={() => setPage("register")}
-            >
-              <FiUsers className="dashboard__icons" /> Acessos
-            </li>
-          )}
-          <li
-            className={`dashboard__menu--item ${
-              page === "settings" ? "dashboard__menu--item--active" : ""
-            }`}
-            onClick={() => setPage("settings")}
-          >
-            <FiSettings className="dashboard__icons" /> Configurações
-          </li>
-          <li
-            className={`dashboard__menu--item ${
-              page === "help" ? "dashboard__menu--item--active" : ""
-            }`}
-            onClick={() => setPage("help")}
-          >
-            <FiHelpCircle className="dashboard__icons" /> Ajuda
-          </li>
+          ))}
         </ul>
-      </div>
+      </nav>
     </aside>
   );
 };
