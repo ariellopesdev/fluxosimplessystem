@@ -125,3 +125,9 @@ textarea {
   margin-top: 80px;
   padding: 40px;
 }
+
+@media (max-width: 768px) {
+  .main__container {
+    width: 100%;
+  }
+}

@@ -18,12 +18,11 @@ import { MdDesignServices } from "react-icons/md";
 //Hooks
 import { useSelector } from "react-redux";
 
-const Aside = ({ setPage, page }) => {
+const Aside = ({ setPage, page, isAsideOpen, closeAside }) => {
   const { user } = useSelector((state) => state.auth);
 
   //Check user permissions
-  const canManageUsers =
-    user?.role === "SUPER_ADMIN" || user?.role === "ADMIN";
+  const canManageUsers = user?.role === "SUPER_ADMIN" || user?.role === "ADMIN";
 
   const canAccessFinancial =
     user?.role === "SUPER_ADMIN" || user?.role === "ADMIN";
@@ -93,7 +92,7 @@ const Aside = ({ setPage, page }) => {
   const visibleMenuItems = menuItems.filter((item) => item.visible !== false);
 
   return (
-    <aside id="aside">
+    <aside id="aside" className={isAsideOpen ? "aside--open" : ""}>
       <nav className="dashboard__container--menu">
         <ul className="dashboard__menu">
           {visibleMenuItems.map((item) => (
@@ -102,7 +101,10 @@ const Aside = ({ setPage, page }) => {
               className={`dashboard__menu--item ${
                 page === item.page ? "dashboard__menu--item--active" : ""
               }`}
-              onClick={() => setPage(item.page)}
+              onClick={() => {
+                setPage(item.page);
+                closeAside();
+              }}
             >
               <span className="dashboard__icons">{item.icon}</span>
               {item.label}

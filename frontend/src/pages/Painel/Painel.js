@@ -13,10 +13,28 @@ const Painel = () => {
   //Current active page
   const [page, setPage] = useState("dashboard");
 
+  //Mobile sidebar state
+  const [isAsideOpen, setIsAsideOpen] = useState(false);
+
+  //Toggle mobile sidebar
+  const toggleAside = () => {
+    setIsAsideOpen((prev) => !prev);
+  };
+
+  //Close mobile sidebar
+  const closeAside = () => {
+    setIsAsideOpen(false);
+  };
+
   return (
     <div id="painel">
-      <Navbar />
-      <Aside setPage={setPage} page={page} />
+      <Navbar toggleAside={toggleAside} />
+      <Aside
+        setPage={setPage}
+        page={page}
+        isAsideOpen={isAsideOpen}
+        closeAside={closeAside}
+      />
       <Main page={page} setPage={setPage} />
     </div>
   );

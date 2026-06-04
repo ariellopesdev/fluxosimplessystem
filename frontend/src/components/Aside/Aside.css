@@ -76,3 +76,35 @@
   background: var(--color-white);
   border-radius: 0 4px 4px 0;
 }
+
+/************ MOBILE SIDEBAR ************/
+
+@media (max-width: 768px) {
+  #aside {
+    z-index: 19;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+  }
+
+  #aside.aside--open {
+    transform: translateX(0);
+  }
+
+  .dashboard__container--menu {
+    padding: 18px 12px 12px 12px;
+  }
+
+  .dashboard__menu {
+    gap: 2px;
+  }
+
+  .dashboard__menu--item {
+    padding: 10px 6px;
+    font-size: 0.9rem;
+  }
+
+  .dashboard__icons {
+    min-width: 16px;
+    font-size: 0.95rem;
+  }
+}
