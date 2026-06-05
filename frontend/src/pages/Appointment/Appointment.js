@@ -1,7 +1,9 @@
+//CSS
 import "./Appointment.css";
 
 // React
 import { useEffect, useMemo, useState, useCallback } from "react";
+import { createPortal } from "react-dom";
 
 // Redux
 import { useDispatch, useSelector } from "react-redux";
@@ -14,8 +16,16 @@ import {
 } from "../../slices/appointmentSlice";
 import { getAllClients } from "../../slices/clientSlice";
 import { getServices } from "../../slices/serviceSlice";
+
 // Components
 import Message from "../../components/Message/Message";
+
+//Hooks
+import { useModal } from "../../hooks/useModal";
+
+//Icons
+import { FaCalendarAlt } from "react-icons/fa";
+import { IoClose } from "react-icons/io5";
 
 const Appointment = ({ setPage }) => {
   const dispatch = useDispatch();
@@ -28,19 +38,39 @@ const Appointment = ({ setPage }) => {
   const { services } = useSelector((state) => state.service);
   const { user } = useSelector((state) => state.auth);
 
-  const [showModal, setShowModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [viewMode, setViewMode] = useState("DAY");
   const [clientSearch, setClientSearch] = useState("");
-  const [showAvailabilityModal, setShowAvailabilityModal] = useState(false);
   const [localError, setLocalError] = useState(null);
   const [showTimeDropdown, setShowTimeDropdown] = useState(false);
   const [editId, setEditId] = useState(null);
-  const [showHistoryModal, setShowHistoryModal] = useState(false);
-  const [showOverdueModal, setShowOverdueModal] = useState(false);
   const [lastClickedDay, setLastClickedDay] = useState(null);
   const [calendarInitialized, setCalendarInitialized] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
+
+  const {
+    isOpen: showModal,
+    openModal: openAppointmentModal,
+    closeModal: closeAppointmentModalState,
+  } = useModal();
+
+  const {
+    isOpen: showAvailabilityModal,
+    openModal: openAvailabilityModal,
+    closeModal: closeAvailabilityModal,
+  } = useModal();
+
+  const {
+    isOpen: showHistoryModal,
+    openModal: openHistoryModal,
+    closeModal: closeHistoryModal,
+  } = useModal();
+
+  const {
+    isOpen: showOverdueModal,
+    openModal: openOverdueModal,
+    closeModal: closeOverdueModal,
+  } = useModal();
 
   const [historyFilters, setHistoryFilters] = useState({
     date: "",
@@ -449,11 +479,12 @@ const Appointment = ({ setPage }) => {
     });
 
     setClientSearch(getClientName(appointment));
-    setShowModal(true);
+    openAppointmentModal();
   };
 
   const closeAppointmentModal = () => {
-    setShowModal(false);
+    closeAppointmentModalState();
+
     setEditId(null);
     setClientSearch("");
     resetForm();
@@ -931,7 +962,7 @@ Parcelas: ${
 
   useEffect(() => {
     if (overdueAppointments.length > 0) {
-      setShowOverdueModal(true);
+      openOverdueModal();
     }
   }, [overdueAppointments.length]);
 
@@ -1000,28 +1031,28 @@ Parcelas: ${
   return (
     <div className="appointment">
       <div className="appointment__header">
-        <h2>Agendamentos</h2>
+        <h2>
+          <FaCalendarAlt />
+          Agendamentos
+        </h2>
 
         <div className="appointment__headerActions">
           {canManageAvailability && (
             <button
               className="appointment__secondaryBtn"
-              onClick={() => setShowAvailabilityModal(true)}
+              onClick={openAvailabilityModal}
             >
               Disponibilidade
             </button>
           )}
           <button
             className="appointment__secondaryBtn history"
-            onClick={() => setShowHistoryModal(true)}
+            onClick={openHistoryModal}
           >
             Histórico
           </button>
 
-          <button
-            className="appointment__btn"
-            onClick={() => setShowModal(true)}
-          >
+          <button className="appointment__btn" onClick={openAppointmentModal}>
             + Novo Agendamento
           </button>
         </div>
@@ -1128,7 +1159,7 @@ Parcelas: ${
                     setEditId(null);
                     setClientSearch("");
 
-                    setShowModal(true);
+                    openAppointmentModal();
 
                     setLastClickedDay(null);
                   }}
@@ -1238,179 +1269,182 @@ Parcelas: ${
         </div>
       </div>
 
-      {showModal && (
-        <div className="appointment__modalOverlay">
-          <div className="appointment__modal">
-            <div className="appointment__modalHeader">
-              <h3>{editId ? "Editar Agendamento" : "Novo Agendamento"}</h3>
+      {showModal &&
+        createPortal(
+          <div className="appointment__modalOverlay">
+            <div className="appointment__modal">
+              <div className="appointment__modalHeader">
+                <h3>{editId ? "Editar Agendamento" : "Novo Agendamento"}</h3>
 
-              <button
-                className="appointment__closeBtn"
-                onClick={closeAppointmentModal}
-              >
-                ×
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit} className="appointment__form">
-              <div className="appointment__formSection">
-                <h4>Cliente e serviço</h4>
-
-                <div className="appointment__grid two">
-                  <div className="appointment__formGroup appointment__clientSearchBox">
-                    <label>Pesquisar cliente por nome ou CPF/CNPJ</label>
-
-                    <input
-                      type="text"
-                      placeholder="Digite nome ou CPF/CNPJ"
-                      value={clientSearch}
-                      onChange={(e) => {
-                        setClientSearch(e.target.value);
-
-                        setFormData((prev) => ({
-                          ...prev,
-                          client: "",
-                        }));
-                      }}
-                    />
-                    {fieldErrors.clientSearch && (
-                      <span className="appointment__fieldError">
-                        {fieldErrors.clientSearch}
-                      </span>
-                    )}
-
-                    {clientSearch &&
-                      !formData.client &&
-                      filteredClients.length > 0 && (
-                        <div className="appointment__clientSuggestions">
-                          {filteredClients.map((client) => (
-                            <button
-                              type="button"
-                              key={client._id}
-                              onClick={() => handleSelectClient(client)}
-                            >
-                              <strong>{client.name}</strong>
-                              <span>{formatCpfCnpj(client.cpfCnpj)}</span>
-                            </button>
-                          ))}
-                        </div>
-                      )}
-
-                    <button
-                      type="button"
-                      className="appointment__linkBtn"
-                      onClick={() => {
-                        setShowModal(false);
-                        resetForm();
-
-                        if (typeof setPage === "function") {
-                          setPage("client");
-                        }
-                      }}
-                    >
-                      Cliente não cadastrado? Cadastrar cliente
-                    </button>
-                  </div>
-                </div>
-
-                <div className="appointment__grid two appointment__selectedClientGrid">
-                  <div className="appointment__formGroup">
-                    <label>Cliente selecionado</label>
-                    <input
-                      type="text"
-                      value={selectedClient?.name || ""}
-                      disabled
-                      placeholder="Nenhum cliente selecionado"
-                    />
-                  </div>
-
-                  <div className="appointment__formGroup">
-                    <label>CPF/CNPJ</label>
-                    <input
-                      type="text"
-                      value={formatCpfCnpj(selectedClient?.cpfCnpj || "")}
-                      disabled
-                      placeholder="-"
-                    />
-                  </div>
-                </div>
-                <div className="appointment__formGroup">
-                  <label>Serviço disponível</label>
-
-                  <select
-                    value={formData.service}
-                    onChange={(e) => handleServiceChange(e.target.value)}
-                    required
-                  >
-                    <option value="">Selecione um serviço</option>
-
-                    {availableServices.map((service) => (
-                      <option key={service._id} value={service._id}>
-                        {service.name} - {formatCurrency(service.unityPrice)}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <button
+                  className="appointment__closeBtn"
+                  onClick={closeAppointmentModal}
+                >
+                   <IoClose />
+                </button>
               </div>
 
-              <div className="appointment__formSection">
-                <h4>Data e horário</h4>
+              <form onSubmit={handleSubmit} className="appointment__form">
+                <div className="appointment__formSection">
+                  <h4>Cliente e serviço</h4>
 
-                <div className="appointment__grid">
-                  <div className="appointment__formGroup">
-                    <label>Data</label>
+                  <div className="appointment__grid two">
+                    <div className="appointment__formGroup appointment__clientSearchBox">
+                      <label>Pesquisar cliente por nome ou CPF/CNPJ</label>
 
-                    <input
-                      type="date"
-                      min={todayFormatted}
-                      value={formData.date}
-                      onChange={(e) => {
-                        const selected = e.target.value;
-
-                        if (!isAvailableDate(selected)) {
-                          setLocalError(
-                            "Esta data não está disponível para atendimento.",
-                          );
+                      <input
+                        type="text"
+                        placeholder="Digite nome ou CPF/CNPJ"
+                        value={clientSearch}
+                        onChange={(e) => {
+                          setClientSearch(e.target.value);
 
                           setFormData((prev) => ({
                             ...prev,
-                            date: "",
+                            client: "",
                           }));
+                        }}
+                      />
+                      {fieldErrors.clientSearch && (
+                        <span className="appointment__fieldError">
+                          {fieldErrors.clientSearch}
+                        </span>
+                      )}
 
-                          return;
-                        }
+                      {clientSearch &&
+                        !formData.client &&
+                        filteredClients.length > 0 && (
+                          <div className="appointment__clientSuggestions">
+                            {filteredClients.map((client) => (
+                              <button
+                                type="button"
+                                key={client._id}
+                                onClick={() => handleSelectClient(client)}
+                              >
+                                <strong>{client.name}</strong>
+                                <span>{formatCpfCnpj(client.cpfCnpj)}</span>
+                              </button>
+                            ))}
+                          </div>
+                        )}
 
-                        setFormData((prev) => ({
-                          ...prev,
-                          date: selected,
-                        }));
-                      }}
-                      required
-                    />
+                      <button
+                        type="button"
+                        className="appointment__linkBtn"
+                        onClick={() => {
+                          closeAppointmentModal();
+                          resetForm();
+
+                          if (typeof setPage === "function") {
+                            setPage("client");
+                          }
+                        }}
+                      >
+                        Cliente não cadastrado? Cadastrar cliente
+                      </button>
+                    </div>
                   </div>
 
-                  <div className="appointment__formGroup appointment__timeGroup">
-                    <label>Horários disponíveis</label>
-                    <button
-                      type="button"
-                      className="appointment__timeSelect"
-                      onClick={() => setShowTimeDropdown((prev) => !prev)}
-                      disabled={!formData.date || !formData.service}
+                  <div className="appointment__grid two appointment__selectedClientGrid">
+                    <div className="appointment__formGroup">
+                      <label>Cliente selecionado</label>
+                      <input
+                        type="text"
+                        value={selectedClient?.name || ""}
+                        disabled
+                        placeholder="Nenhum cliente selecionado"
+                      />
+                    </div>
+
+                    <div className="appointment__formGroup">
+                      <label>CPF/CNPJ</label>
+                      <input
+                        type="text"
+                        value={formatCpfCnpj(selectedClient?.cpfCnpj || "")}
+                        disabled
+                        placeholder="-"
+                      />
+                    </div>
+                  </div>
+                  <div className="appointment__formGroup">
+                    <label>Serviço disponível</label>
+
+                    <select
+                      value={formData.service}
+                      onChange={(e) => handleServiceChange(e.target.value)}
+                      required
                     >
-                      {formData.startTime && formData.endTime
-                        ? `${formData.startTime} às ${formData.endTime}`
-                        : formData.startTime
-                          ? `Início: ${formData.startTime} - selecione o fim`
-                          : "Selecione início e fim"}
-                    </button>
-                    {showTimeDropdown && formData.date && formData.service && (
-                      <div className="appointment__timeDropdown">
-                        {availableTimes.length > 0 ? (
-                          availableTimes.map((time) => (
-                            <button
-                              type="button"
-                              key={time}
-                              className={`
+                      <option value="">Selecione um serviço</option>
+
+                      {availableServices.map((service) => (
+                        <option key={service._id} value={service._id}>
+                          {service.name} - {formatCurrency(service.unityPrice)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="appointment__formSection">
+                  <h4>Data e horário</h4>
+
+                  <div className="appointment__grid">
+                    <div className="appointment__formGroup">
+                      <label>Data</label>
+
+                      <input
+                        type="date"
+                        min={todayFormatted}
+                        value={formData.date}
+                        onChange={(e) => {
+                          const selected = e.target.value;
+
+                          if (!isAvailableDate(selected)) {
+                            setLocalError(
+                              "Esta data não está disponível para atendimento.",
+                            );
+
+                            setFormData((prev) => ({
+                              ...prev,
+                              date: "",
+                            }));
+
+                            return;
+                          }
+
+                          setFormData((prev) => ({
+                            ...prev,
+                            date: selected,
+                          }));
+                        }}
+                        required
+                      />
+                    </div>
+
+                    <div className="appointment__formGroup appointment__timeGroup">
+                      <label>Horários disponíveis</label>
+                      <button
+                        type="button"
+                        className="appointment__timeSelect"
+                        onClick={() => setShowTimeDropdown((prev) => !prev)}
+                        disabled={!formData.date || !formData.service}
+                      >
+                        {formData.startTime && formData.endTime
+                          ? `${formData.startTime} às ${formData.endTime}`
+                          : formData.startTime
+                            ? `Início: ${formData.startTime} - selecione o fim`
+                            : "Selecione início e fim"}
+                      </button>
+                      {showTimeDropdown &&
+                        formData.date &&
+                        formData.service && (
+                          <div className="appointment__timeDropdown">
+                            {availableTimes.length > 0 ? (
+                              availableTimes.map((time) => (
+                                <button
+                                  type="button"
+                                  key={time}
+                                  className={`
             ${
               formData.startTime === time || formData.endTime === time
                 ? "active"
@@ -1425,567 +1459,575 @@ Parcelas: ${
                 : ""
             }
           `}
-                              onClick={() => {
-                                handleTimeSelection(time);
-                              }}
-                            >
-                              {time}
-                            </button>
-                          ))
-                        ) : (
-                          <div className="appointment__noTimes">
-                            <p>Nenhum horário disponível para finalizar.</p>
+                                  onClick={() => {
+                                    handleTimeSelection(time);
+                                  }}
+                                >
+                                  {time}
+                                </button>
+                              ))
+                            ) : (
+                              <div className="appointment__noTimes">
+                                <p>Nenhum horário disponível para finalizar.</p>
 
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setFormData((prev) => ({
-                                  ...prev,
-                                  startTime: "",
-                                  endTime: "",
-                                }));
-                              }}
-                            >
-                              Escolher outro início
-                            </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setFormData((prev) => ({
+                                      ...prev,
+                                      startTime: "",
+                                      endTime: "",
+                                    }));
+                                  }}
+                                >
+                                  Escolher outro início
+                                </button>
+                              </div>
+                            )}
                           </div>
                         )}
+                    </div>
+
+                    <div className="appointment__formGroup">
+                      <label>Fim automático</label>
+
+                      <input
+                        type="time"
+                        value={formData.endTime}
+                        disabled
+                        placeholder="Selecione um horário"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="appointment__formSection">
+                  <h4>Pagamento</h4>
+
+                  <div className="appointment__grid">
+                    <div className="appointment__formGroup">
+                      <label>Forma de pagamento</label>
+
+                      <select
+                        name="method"
+                        value={formData.payment.method}
+                        onChange={handlePaymentChange}
+                      >
+                        <option value="CASH">Dinheiro</option>
+                        <option value="PIX">Pix</option>
+                        <option value="CREDIT_CARD">Cartão de crédito</option>
+                        <option value="DEBIT_CARD">Cartão de débito</option>
+                        <option value="BANK_SLIP">Boleto</option>
+                        <option value="TRANSFER">Transferência</option>
+                      </select>
+                    </div>
+
+                    <div className="appointment__formGroup">
+                      <label>Status do pagamento</label>
+
+                      <select
+                        name="status"
+                        value={formData.payment.status}
+                        onChange={handlePaymentChange}
+                      >
+                        <option value="PENDING">Pendente</option>
+                        <option value="PAID">Pago</option>
+                        <option value="CANCELLED">Cancelado</option>
+                        <option value="REFUNDED">Reembolsado</option>
+                      </select>
+                    </div>
+
+                    {formData.payment.method === "CREDIT_CARD" && (
+                      <div className="appointment__formGroup">
+                        <label>Parcelas</label>
+
+                        <input
+                          type="number"
+                          name="installments"
+                          min="1"
+                          max="12"
+                          value={formData.payment.installments}
+                          onChange={handlePaymentChange}
+                        />
                       </div>
                     )}
                   </div>
 
-                  <div className="appointment__formGroup">
-                    <label>Fim automático</label>
-
-                    <input
-                      type="time"
-                      value={formData.endTime}
-                      disabled
-                      placeholder="Selecione um horário"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="appointment__formSection">
-                <h4>Pagamento</h4>
-
-                <div className="appointment__grid">
-                  <div className="appointment__formGroup">
-                    <label>Forma de pagamento</label>
-
-                    <select
-                      name="method"
-                      value={formData.payment.method}
-                      onChange={handlePaymentChange}
-                    >
-                      <option value="CASH">Dinheiro</option>
-                      <option value="PIX">Pix</option>
-                      <option value="CREDIT_CARD">Cartão de crédito</option>
-                      <option value="DEBIT_CARD">Cartão de débito</option>
-                      <option value="BANK_SLIP">Boleto</option>
-                      <option value="TRANSFER">Transferência</option>
-                    </select>
-                  </div>
-
-                  <div className="appointment__formGroup">
-                    <label>Status do pagamento</label>
-
-                    <select
-                      name="status"
-                      value={formData.payment.status}
-                      onChange={handlePaymentChange}
-                    >
-                      <option value="PENDING">Pendente</option>
-                      <option value="PAID">Pago</option>
-                      <option value="CANCELLED">Cancelado</option>
-                      <option value="REFUNDED">Reembolsado</option>
-                    </select>
-                  </div>
-
-                  {formData.payment.method === "CREDIT_CARD" && (
+                  <div className="appointment__grid two">
                     <div className="appointment__formGroup">
-                      <label>Parcelas</label>
+                      <label>Desconto</label>
 
                       <input
                         type="number"
-                        name="installments"
-                        min="1"
-                        max="12"
-                        value={formData.payment.installments}
-                        onChange={handlePaymentChange}
-                      />
-                    </div>
-                  )}
-                </div>
-
-                <div className="appointment__grid two">
-                  <div className="appointment__formGroup">
-                    <label>Desconto</label>
-
-                    <input
-                      type="number"
-                      min="0"
-                      value={formData.discount}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          discount: Number(e.target.value),
-                        }))
-                      }
-                    />
-                  </div>
-
-                  <div className="appointment__formGroup">
-                    <label>Total do serviço</label>
-
-                    <input
-                      type="text"
-                      value={formatCurrency(appointmentTotal)}
-                      disabled
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="appointment__formSection">
-                <h4>Classificação</h4>
-
-                <div className="appointment__grid">
-                  <div className="appointment__formGroup">
-                    <label>Tipo</label>
-
-                    <select
-                      value={formData.type}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          type: e.target.value,
-                        }))
-                      }
-                    >
-                      <option value="DELIVERY">Entrega</option>
-                      <option value="MEETING">Reunião</option>
-                      <option value="SERVICE">Serviço</option>
-                      <option value="FOLLOW_UP">Retorno</option>
-                      <option value="PAYMENT">Pagamento</option>
-                      <option value="OTHER">Outro</option>
-                    </select>
-                  </div>
-
-                  <div className="appointment__formGroup">
-                    <label>Status</label>
-
-                    <select
-                      value={formData.status}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          status: e.target.value,
-                        }))
-                      }
-                    >
-                      <option value="PENDING">Pendente</option>
-                      <option value="CONFIRMED">Confirmado</option>
-                      <option value="FINISHED">Concluído</option>
-                      <option value="CANCELLED">Cancelado</option>
-                    </select>
-                  </div>
-
-                  <div className="appointment__formGroup">
-                    <label>Prioridade</label>
-
-                    <select
-                      value={formData.priority}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          priority: e.target.value,
-                        }))
-                      }
-                    >
-                      <option value="LOW">Baixa</option>
-                      <option value="MEDIUM">Média</option>
-                      <option value="HIGH">Alta</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              <div className="appointment__formSection">
-                <h4>Observações</h4>
-
-                <div className="appointment__formGroup">
-                  <label>Observações</label>
-
-                  <textarea
-                    value={formData.notes}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        notes: e.target.value,
-                      }))
-                    }
-                  />
-                </div>
-              </div>
-
-              {!loading && (
-                <button type="submit" className="appointment__btn">
-                  {editId ? "Salvar Alterações" : "Cadastrar Agendamento"}
-                </button>
-              )}
-
-              {loading && (
-                <button type="submit" className="appointment__btn" disabled>
-                  Aguarde...
-                </button>
-              )}
-            </form>
-          </div>
-        </div>
-      )}
-      {showAvailabilityModal && (
-        <div className="appointment__modalOverlay">
-          <div className="appointment__modal">
-            <div className="appointment__modalHeader">
-              <h3>Disponibilidade de Atendimento</h3>
-
-              <button
-                className="appointment__closeBtn"
-                onClick={() => setShowAvailabilityModal(false)}
-              >
-                ×
-              </button>
-            </div>
-
-            <div className="appointment__form">
-              <div className="appointment__formSection">
-                <h4>Dias disponíveis</h4>
-
-                <div className="availability__days">
-                  {[
-                    { key: 0, label: "Domingo" },
-                    { key: 1, label: "Segunda" },
-                    { key: 2, label: "Terça" },
-                    { key: 3, label: "Quarta" },
-                    { key: 4, label: "Quinta" },
-                    { key: 5, label: "Sexta" },
-                    { key: 6, label: "Sábado" },
-                  ].map((day) => (
-                    <label key={day.key} className="availability__day">
-                      <input
-                        type="checkbox"
-                        checked={availabilityRules.workingDays[day.key]}
+                        min="0"
+                        value={formData.discount}
                         onChange={(e) =>
-                          setAvailabilityRules((prev) => ({
+                          setFormData((prev) => ({
                             ...prev,
-                            workingDays: {
-                              ...prev.workingDays,
-                              [day.key]: e.target.checked,
-                            },
+                            discount: Number(e.target.value),
                           }))
                         }
                       />
+                    </div>
 
-                      {day.label}
-                    </label>
-                  ))}
-                </div>
-              </div>
+                    <div className="appointment__formGroup">
+                      <label>Total do serviço</label>
 
-              <div className="appointment__formSection">
-                <h4>Horário de trabalho</h4>
-
-                <div className="appointment__grid two">
-                  <div className="appointment__formGroup">
-                    <label>Início do expediente</label>
-
-                    <input
-                      type="time"
-                      value={availabilityRules.startTime}
-                      onChange={(e) =>
-                        setAvailabilityRules((prev) => ({
-                          ...prev,
-                          startTime: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-
-                  <div className="appointment__formGroup">
-                    <label>Fim do expediente</label>
-
-                    <input
-                      type="time"
-                      value={availabilityRules.endTime}
-                      onChange={(e) =>
-                        setAvailabilityRules((prev) => ({
-                          ...prev,
-                          endTime: e.target.value,
-                        }))
-                      }
-                    />
+                      <input
+                        type="text"
+                        value={formatCurrency(appointmentTotal)}
+                        disabled
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="appointment__formSection">
-                <h4>Exceções</h4>
+                <div className="appointment__formSection">
+                  <h4>Classificação</h4>
 
-                <div className="appointment__grid two">
+                  <div className="appointment__grid">
+                    <div className="appointment__formGroup">
+                      <label>Tipo</label>
+
+                      <select
+                        value={formData.type}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            type: e.target.value,
+                          }))
+                        }
+                      >
+                        <option value="DELIVERY">Entrega</option>
+                        <option value="MEETING">Reunião</option>
+                        <option value="SERVICE">Serviço</option>
+                        <option value="FOLLOW_UP">Retorno</option>
+                        <option value="PAYMENT">Pagamento</option>
+                        <option value="OTHER">Outro</option>
+                      </select>
+                    </div>
+
+                    <div className="appointment__formGroup">
+                      <label>Status</label>
+
+                      <select
+                        value={formData.status}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            status: e.target.value,
+                          }))
+                        }
+                      >
+                        <option value="PENDING">Pendente</option>
+                        <option value="CONFIRMED">Confirmado</option>
+                        <option value="FINISHED">Concluído</option>
+                        <option value="CANCELLED">Cancelado</option>
+                      </select>
+                    </div>
+
+                    <div className="appointment__formGroup">
+                      <label>Prioridade</label>
+
+                      <select
+                        value={formData.priority}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            priority: e.target.value,
+                          }))
+                        }
+                      >
+                        <option value="LOW">Baixa</option>
+                        <option value="MEDIUM">Média</option>
+                        <option value="HIGH">Alta</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="appointment__formSection">
+                  <h4>Observações</h4>
+
                   <div className="appointment__formGroup">
-                    <label>Data indisponível</label>
+                    <label>Observações</label>
 
-                    <input
-                      type="date"
-                      min={todayFormatted}
-                      value={exceptionForm.date}
+                    <textarea
+                      value={formData.notes}
                       onChange={(e) =>
-                        setExceptionForm((prev) => ({
+                        setFormData((prev) => ({
                           ...prev,
-                          date: e.target.value,
+                          notes: e.target.value,
                         }))
                       }
                     />
                   </div>
+                </div>
 
-                  <div className="appointment__formGroup">
-                    <label>Motivo</label>
+                {!loading && (
+                  <button type="submit" className="appointment__btn">
+                    {editId ? "Salvar Alterações" : "Cadastrar Agendamento"}
+                  </button>
+                )}
 
-                    <input
-                      type="text"
-                      placeholder="Viagem, doença, compromisso..."
-                      value={exceptionForm.reason}
-                      onChange={(e) =>
-                        setExceptionForm((prev) => ({
-                          ...prev,
-                          reason: e.target.value,
-                        }))
-                      }
-                    />
+                {loading && (
+                  <button type="submit" className="appointment__btn" disabled>
+                    Aguarde...
+                  </button>
+                )}
+              </form>
+            </div>
+          </div>,
+          document.body,
+        )}
+      {showAvailabilityModal &&
+        createPortal(
+          <div className="appointment__modalOverlay">
+            <div className="appointment__modal">
+              <div className="appointment__modalHeader">
+                <h3>Disponibilidade de Atendimento</h3>
+
+                <button
+                  className="appointment__closeBtn"
+                  onClick={closeAvailabilityModal}
+                >
+                   <IoClose />
+                </button>
+              </div>
+
+              <div className="appointment__form">
+                <div className="appointment__formSection">
+                  <h4>Dias disponíveis</h4>
+
+                  <div className="availability__days">
+                    {[
+                      { key: 0, label: "Domingo" },
+                      { key: 1, label: "Segunda" },
+                      { key: 2, label: "Terça" },
+                      { key: 3, label: "Quarta" },
+                      { key: 4, label: "Quinta" },
+                      { key: 5, label: "Sexta" },
+                      { key: 6, label: "Sábado" },
+                    ].map((day) => (
+                      <label key={day.key} className="availability__day">
+                        <input
+                          type="checkbox"
+                          checked={availabilityRules.workingDays[day.key]}
+                          onChange={(e) =>
+                            setAvailabilityRules((prev) => ({
+                              ...prev,
+                              workingDays: {
+                                ...prev.workingDays,
+                                [day.key]: e.target.checked,
+                              },
+                            }))
+                          }
+                        />
+
+                        {day.label}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="appointment__formSection">
+                  <h4>Horário de trabalho</h4>
+
+                  <div className="appointment__grid two">
+                    <div className="appointment__formGroup">
+                      <label>Início do expediente</label>
+
+                      <input
+                        type="time"
+                        value={availabilityRules.startTime}
+                        onChange={(e) =>
+                          setAvailabilityRules((prev) => ({
+                            ...prev,
+                            startTime: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+
+                    <div className="appointment__formGroup">
+                      <label>Fim do expediente</label>
+
+                      <input
+                        type="time"
+                        value={availabilityRules.endTime}
+                        onChange={(e) =>
+                          setAvailabilityRules((prev) => ({
+                            ...prev,
+                            endTime: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="appointment__formSection">
+                  <h4>Exceções</h4>
+
+                  <div className="appointment__grid two">
+                    <div className="appointment__formGroup">
+                      <label>Data indisponível</label>
+
+                      <input
+                        type="date"
+                        min={todayFormatted}
+                        value={exceptionForm.date}
+                        onChange={(e) =>
+                          setExceptionForm((prev) => ({
+                            ...prev,
+                            date: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+
+                    <div className="appointment__formGroup">
+                      <label>Motivo</label>
+
+                      <input
+                        type="text"
+                        placeholder="Viagem, doença, compromisso..."
+                        value={exceptionForm.reason}
+                        onChange={(e) =>
+                          setExceptionForm((prev) => ({
+                            ...prev,
+                            reason: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="appointment__btn"
+                    onClick={handleAddException}
+                  >
+                    Adicionar exceção
+                  </button>
+
+                  <div className="availability__exceptions">
+                    {availabilityRules.exceptions.length === 0 && (
+                      <p>Nenhuma exceção cadastrada.</p>
+                    )}
+
+                    {availabilityRules.exceptions.map((exception) => (
+                      <div
+                        key={exception.date}
+                        className="availability__exception"
+                      >
+                        <span>
+                          {exception.date.split("-").reverse().join("/")} -{" "}
+                          {exception.reason}
+                        </span>
+
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveException(exception.date)}
+                        >
+                          Remover
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
                 <button
                   type="button"
                   className="appointment__btn"
-                  onClick={handleAddException}
+                  onClick={closeAvailabilityModal}
                 >
-                  Adicionar exceção
+                  Salvar disponibilidade
                 </button>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
+      {showHistoryModal &&
+        createPortal(
+          <div className="appointment__modalOverlay">
+            <div className="appointment__modal">
+              <div className="appointment__modalHeader">
+                <h3>Histórico de Agendamentos</h3>
 
-                <div className="availability__exceptions">
-                  {availabilityRules.exceptions.length === 0 && (
-                    <p>Nenhuma exceção cadastrada.</p>
-                  )}
+                <button
+                  className="appointment__closeBtn"
+                  onClick={closeHistoryModal}
+                >
+                   <IoClose />
+                </button>
+              </div>
 
-                  {availabilityRules.exceptions.map((exception) => (
-                    <div
-                      key={exception.date}
-                      className="availability__exception"
-                    >
-                      <span>
-                        {exception.date.split("-").reverse().join("/")} -{" "}
-                        {exception.reason}
-                      </span>
+              <div className="appointment__historyFilters">
+                <div className="appointment__formGroup">
+                  <label>Data</label>
+                  <input
+                    type="date"
+                    value={historyFilters.date}
+                    onChange={(e) =>
+                      setHistoryFilters((prev) => ({
+                        ...prev,
+                        date: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+
+                <div className="appointment__formGroup">
+                  <label>Mês</label>
+                  <select
+                    value={historyFilters.month}
+                    onChange={(e) =>
+                      setHistoryFilters((prev) => ({
+                        ...prev,
+                        month: e.target.value,
+                      }))
+                    }
+                  >
+                    <option value="">Todos</option>
+                    <option value="01">Janeiro</option>
+                    <option value="02">Fevereiro</option>
+                    <option value="03">Março</option>
+                    <option value="04">Abril</option>
+                    <option value="05">Maio</option>
+                    <option value="06">Junho</option>
+                    <option value="07">Julho</option>
+                    <option value="08">Agosto</option>
+                    <option value="09">Setembro</option>
+                    <option value="10">Outubro</option>
+                    <option value="11">Novembro</option>
+                    <option value="12">Dezembro</option>
+                  </select>
+                </div>
+
+                <div className="appointment__formGroup">
+                  <label>Ano</label>
+                  <input
+                    type="number"
+                    placeholder="2026"
+                    value={historyFilters.year}
+                    onChange={(e) =>
+                      setHistoryFilters((prev) => ({
+                        ...prev,
+                        year: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="appointment__historyList">
+                {historyAppointments.length === 0 && (
+                  <p className="appointment__empty">
+                    Nenhum agendamento encontrado.
+                  </p>
+                )}
+
+                {historyAppointments.map((appointment) => (
+                  <div
+                    key={appointment._id}
+                    className={`appointment__historyItem ${appointment.status?.toLowerCase()}`}
+                  >
+                    <strong>{appointment.title}</strong>
+
+                    <span>
+                      {formatDateToCompare(appointment.date)
+                        .split("-")
+                        .reverse()
+                        .join("/")}{" "}
+                      às {appointment.startTime || "--:--"}
+                    </span>
+
+                    <small>
+                      Cliente: {getClientName(appointment)} • CPF/CNPJ:{" "}
+                      {formatCpfCnpj(getClientDocument(appointment)) || "-"} •
+                      Status: {translateStatus(appointment.status)}
+                    </small>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
+      {showOverdueModal &&
+        overdueAppointments.length > 0 &&
+        createPortal(
+          <div className="appointment__modalOverlay">
+            <div className="appointment__modal">
+              <div className="appointment__modalHeader">
+                <h3>Agendamentos pendentes de marcação</h3>
+
+                <button
+                  className="appointment__closeBtn"
+                  onClick={closeOverdueModal}
+                >
+                   <IoClose />
+                </button>
+              </div>
+
+              <div className="appointment__overdueAlert">
+                <p>
+                  Existem agendamentos cujo dia e horário já passaram, mas ainda
+                  não foram marcados como concluídos ou cancelados.
+                </p>
+              </div>
+
+              <div className="appointment__historyList">
+                {overdueAppointments.map((appointment) => (
+                  <div
+                    key={appointment._id}
+                    className={`appointment__historyItem ${appointment.status?.toLowerCase()}`}
+                  >
+                    <strong>{appointment.title}</strong>
+
+                    <span>
+                      {formatDateToCompare(appointment.date)
+                        .split("-")
+                        .reverse()
+                        .join("/")}{" "}
+                      das {appointment.startTime || "--:--"} às{" "}
+                      {appointment.endTime || "--:--"}
+                    </span>
+
+                    <small>
+                      Cliente: {getClientName(appointment)} • Status:{" "}
+                      {translateStatus(appointment.status)}
+                    </small>
+
+                    <div className="appointment__overdueActions">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleStatusUpdate(appointment._id, "FINISHED")
+                        }
+                      >
+                        Marcar como concluído
+                      </button>
 
                       <button
                         type="button"
-                        onClick={() => handleRemoveException(exception.date)}
+                        className="cancel"
+                        onClick={() =>
+                          handleStatusUpdate(appointment._id, "CANCELLED")
+                        }
                       >
-                        Remover
+                        Cancelar
                       </button>
                     </div>
-                  ))}
-                </div>
-              </div>
-
-              <button
-                type="button"
-                className="appointment__btn"
-                onClick={() => setShowAvailabilityModal(false)}
-              >
-                Salvar disponibilidade
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      {showHistoryModal && (
-        <div className="appointment__modalOverlay">
-          <div className="appointment__modal">
-            <div className="appointment__modalHeader">
-              <h3>Histórico de Agendamentos</h3>
-
-              <button
-                className="appointment__closeBtn"
-                onClick={() => setShowHistoryModal(false)}
-              >
-                ×
-              </button>
-            </div>
-
-            <div className="appointment__historyFilters">
-              <div className="appointment__formGroup">
-                <label>Data</label>
-                <input
-                  type="date"
-                  value={historyFilters.date}
-                  onChange={(e) =>
-                    setHistoryFilters((prev) => ({
-                      ...prev,
-                      date: e.target.value,
-                    }))
-                  }
-                />
-              </div>
-
-              <div className="appointment__formGroup">
-                <label>Mês</label>
-                <select
-                  value={historyFilters.month}
-                  onChange={(e) =>
-                    setHistoryFilters((prev) => ({
-                      ...prev,
-                      month: e.target.value,
-                    }))
-                  }
-                >
-                  <option value="">Todos</option>
-                  <option value="01">Janeiro</option>
-                  <option value="02">Fevereiro</option>
-                  <option value="03">Março</option>
-                  <option value="04">Abril</option>
-                  <option value="05">Maio</option>
-                  <option value="06">Junho</option>
-                  <option value="07">Julho</option>
-                  <option value="08">Agosto</option>
-                  <option value="09">Setembro</option>
-                  <option value="10">Outubro</option>
-                  <option value="11">Novembro</option>
-                  <option value="12">Dezembro</option>
-                </select>
-              </div>
-
-              <div className="appointment__formGroup">
-                <label>Ano</label>
-                <input
-                  type="number"
-                  placeholder="2026"
-                  value={historyFilters.year}
-                  onChange={(e) =>
-                    setHistoryFilters((prev) => ({
-                      ...prev,
-                      year: e.target.value,
-                    }))
-                  }
-                />
-              </div>
-            </div>
-
-            <div className="appointment__historyList">
-              {historyAppointments.length === 0 && (
-                <p className="appointment__empty">
-                  Nenhum agendamento encontrado.
-                </p>
-              )}
-
-              {historyAppointments.map((appointment) => (
-                <div
-                  key={appointment._id}
-                  className={`appointment__historyItem ${appointment.status?.toLowerCase()}`}
-                >
-                  <strong>{appointment.title}</strong>
-
-                  <span>
-                    {formatDateToCompare(appointment.date)
-                      .split("-")
-                      .reverse()
-                      .join("/")}{" "}
-                    às {appointment.startTime || "--:--"}
-                  </span>
-
-                  <small>
-                    Cliente: {getClientName(appointment)} • CPF/CNPJ:{" "}
-                    {formatCpfCnpj(getClientDocument(appointment)) || "-"} •
-                    Status: {translateStatus(appointment.status)}
-                  </small>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-      {showOverdueModal && overdueAppointments.length > 0 && (
-        <div className="appointment__modalOverlay">
-          <div className="appointment__modal">
-            <div className="appointment__modalHeader">
-              <h3>Agendamentos pendentes de marcação</h3>
-
-              <button
-                className="appointment__closeBtn"
-                onClick={() => setShowOverdueModal(false)}
-              >
-                ×
-              </button>
-            </div>
-
-            <div className="appointment__overdueAlert">
-              <p>
-                Existem agendamentos cujo dia e horário já passaram, mas ainda
-                não foram marcados como concluídos ou cancelados.
-              </p>
-            </div>
-
-            <div className="appointment__historyList">
-              {overdueAppointments.map((appointment) => (
-                <div
-                  key={appointment._id}
-                  className={`appointment__historyItem ${appointment.status?.toLowerCase()}`}
-                >
-                  <strong>{appointment.title}</strong>
-
-                  <span>
-                    {formatDateToCompare(appointment.date)
-                      .split("-")
-                      .reverse()
-                      .join("/")}{" "}
-                    das {appointment.startTime || "--:--"} às{" "}
-                    {appointment.endTime || "--:--"}
-                  </span>
-
-                  <small>
-                    Cliente: {getClientName(appointment)} • Status:{" "}
-                    {translateStatus(appointment.status)}
-                  </small>
-
-                  <div className="appointment__overdueActions">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        handleStatusUpdate(appointment._id, "FINISHED")
-                      }
-                    >
-                      Marcar como concluído
-                    </button>
-
-                    <button
-                      type="button"
-                      className="cancel"
-                      onClick={() =>
-                        handleStatusUpdate(appointment._id, "CANCELLED")
-                      }
-                    >
-                      Cancelar
-                    </button>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
     </div>
   );
 };
