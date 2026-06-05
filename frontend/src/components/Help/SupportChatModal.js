@@ -1,3 +1,4 @@
+//React
 import { createPortal } from "react-dom";
 
 // Components
@@ -10,6 +11,8 @@ import {
   translateStatus,
 } from "../../utils/supportUtils";
 
+//Icons
+import { IoClose } from "react-icons/io5";
 const SupportChatModal = ({
   loading,
   selectedTicket,
@@ -20,8 +23,12 @@ const SupportChatModal = ({
   closeChatModal,
 }) => {
   return createPortal(
-    <div className="help__modalOverlay">
-      <div className="help__modal help__chatModal">
+    <div className="help__modalOverlay" onClick={closeChatModal}>
+      <div
+        className="help__modal help__chatModal"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* MODAL HEADER */}
         <div className="help__modalHeader">
           <div>
             <h3>{selectedTicket.subject}</h3>
@@ -31,11 +38,17 @@ const SupportChatModal = ({
             </small>
           </div>
 
-          <button type="button" onClick={closeChatModal}>
-            ×
+          {/* CLOSE BUTTON */}
+          <button
+            type="button"
+            className="help__closeBtn"
+            onClick={closeChatModal}
+          >
+            <IoClose />
           </button>
         </div>
 
+        {/* CHAT MESSAGES */}
         <div className="help__chat">
           {selectedTicket.messages?.map((msg) => (
             <div
@@ -55,6 +68,7 @@ const SupportChatModal = ({
           ))}
         </div>
 
+        {/* CHAT FORM */}
         {selectedTicket.status !== "CLOSED" && (
           <form onSubmit={handleSendMessage} className="help__chatForm">
             <input

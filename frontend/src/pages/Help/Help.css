@@ -13,7 +13,11 @@
   align-items: center;
   gap: var(--space-xl);
   padding: var(--space-2xl);
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-primary-hover)
+  );
   color: var(--color-white);
   border-radius: var(--radius-2xl);
 }
@@ -70,7 +74,9 @@
   font-size: clamp(0.78rem, 0.9vw, 0.86rem);
   font-weight: var(--weight-bold);
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.15s ease;
+  transition:
+    background-color 0.2s ease,
+    transform 0.15s ease;
 }
 
 .help__searchBox button:hover {
@@ -101,7 +107,10 @@
   border-radius: var(--radius-xl);
   text-align: left;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    border-color 0.15s ease;
 }
 
 .help__card:hover {
@@ -286,7 +295,10 @@
   border-radius: var(--radius-lg);
   text-align: left;
   cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.15s ease;
 }
 
 .help__ticketItem:hover {
@@ -409,7 +421,9 @@
   font-size: clamp(0.88rem, 1vw, 0.95rem);
   font-weight: var(--weight-black);
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.15s ease;
+  transition:
+    background-color 0.2s ease,
+    transform 0.15s ease;
 }
 
 .help__support button:hover {
@@ -478,16 +492,37 @@
   font-size: clamp(0.78rem, 0.9vw, 0.86rem);
 }
 
-.help__modalHeader button {
-  min-width: 34px;
-  width: 34px;
-  height: 34px;
-  background: var(--color-surface-soft);
-  color: var(--color-text);
-  border: none;
-  border-radius: var(--radius-pill);
+.help__modalHeader .help__closeBtn {
+  min-width: 40px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   cursor: pointer;
-  font-size: clamp(1rem, 1.5vw, 1.2rem);
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.1s ease,
+    border-color 0.2s ease;
+}
+
+.help__modalHeader .help__closeBtn:hover {
+  background: #f8fafc;
+  color: var(--color-text);
+  border-color: var(--color-border-dark);
+}
+
+.help__modalHeader .help__closeBtn:active {
+  transform: scale(0.96);
+}
+
+.help__modalHeader .help__closeBtn svg {
+  font-size: 1.25rem;
 }
 
 /************ SUPPORT FORM ************/
@@ -539,7 +574,9 @@
   font-size: clamp(0.88rem, 1vw, 0.95rem);
   font-weight: var(--weight-black);
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.15s ease;
+  transition:
+    background-color 0.2s ease,
+    transform 0.15s ease;
 }
 
 .help__supportForm button:hover,

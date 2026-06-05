@@ -1,7 +1,11 @@
+//React
 import { createPortal } from "react-dom";
 
 // Components
 import Message from "../Message/Message";
+
+//Icons
+import { IoClose } from "react-icons/io5";
 
 const SupportModal = ({
   loading,
@@ -18,9 +22,12 @@ const SupportModal = ({
       <div className="help__modal">
         <div className="help__modalHeader">
           <h3>Novo chamado de suporte</h3>
-
-          <button type="button" onClick={closeSupportModal}>
-            ×
+          <button
+            type="button"
+            className="help__closeBtn"
+            onClick={closeSupportModal}
+          >
+            <IoClose />
           </button>
         </div>
 

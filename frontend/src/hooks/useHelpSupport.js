@@ -6,11 +6,7 @@ import {
   getMySupportTickets,
 } from "../slices/supportSlice";
 
-export const useHelpSupport = (dispatch, selectedTicket) => {
-  // Support modal state
-  const [showSupportModal, setShowSupportModal] = useState(false);
-
-  // Support ticket form state
+export const useHelpSupport = (dispatch, selectedTicket, closeSupportModal) => {
   const [supportData, setSupportData] = useState({
     subject: "",
     category: "OTHER",
@@ -18,26 +14,10 @@ export const useHelpSupport = (dispatch, selectedTicket) => {
     message: "",
   });
 
-  // Support ticket form errors
   const [supportErrors, setSupportErrors] = useState({});
-
-  // Chat message state
   const [chatMessage, setChatMessage] = useState("");
-
-  // Chat message error
   const [chatError, setChatError] = useState("");
 
-  // Open support modal
-  const openSupportModal = () => {
-    setShowSupportModal(true);
-  };
-
-  // Close support modal
-  const closeSupportModal = () => {
-    setShowSupportModal(false);
-  };
-
-  // Get validation message for support form fields
   const getSupportFieldError = (fieldName, value) => {
     const trimmedValue = String(value || "").trim();
 
@@ -63,7 +43,6 @@ export const useHelpSupport = (dispatch, selectedTicket) => {
     }
   };
 
-  // Validate a single support form field
   const validateSupportField = (fieldName, value) => {
     const fieldError = getSupportFieldError(fieldName, value);
 
@@ -75,7 +54,6 @@ export const useHelpSupport = (dispatch, selectedTicket) => {
     return fieldError;
   };
 
-  // Validate support form before submit
   const validateSupportForm = () => {
     const validationErrors = {
       subject: getSupportFieldError("subject", supportData.subject),
@@ -87,7 +65,6 @@ export const useHelpSupport = (dispatch, selectedTicket) => {
     return !Object.values(validationErrors).some((item) => item);
   };
 
-  // Validate chat message before submit
   const validateChatMessage = () => {
     const trimmedMessage = chatMessage.trim();
 
@@ -110,7 +87,6 @@ export const useHelpSupport = (dispatch, selectedTicket) => {
     return true;
   };
 
-  // Update support form field
   const handleSupportChange = (fieldName, value) => {
     setSupportData((prev) => ({
       ...prev,
@@ -122,7 +98,6 @@ export const useHelpSupport = (dispatch, selectedTicket) => {
     }
   };
 
-  // Reset support form
   const resetSupportForm = () => {
     setSupportData({
       subject: "",
@@ -134,7 +109,6 @@ export const useHelpSupport = (dispatch, selectedTicket) => {
     setSupportErrors({});
   };
 
-  // Create support ticket
   const handleCreateSupport = async (e) => {
     e.preventDefault();
 
@@ -148,7 +122,10 @@ export const useHelpSupport = (dispatch, selectedTicket) => {
       await dispatch(createSupportTicket(supportData)).unwrap();
 
       resetSupportForm();
-      closeSupportModal();
+
+      if (closeSupportModal) {
+        closeSupportModal();
+      }
 
       dispatch(getMySupportTickets());
     } catch (error) {
@@ -156,7 +133,6 @@ export const useHelpSupport = (dispatch, selectedTicket) => {
     }
   };
 
-  // Send support chat message
   const handleSendMessage = async (e) => {
     e.preventDefault();
 
@@ -184,14 +160,11 @@ export const useHelpSupport = (dispatch, selectedTicket) => {
   };
 
   return {
-    showSupportModal,
     supportData,
     supportErrors,
     chatMessage,
     chatError,
     setChatMessage,
-    openSupportModal,
-    closeSupportModal,
     handleSupportChange,
     handleCreateSupport,
     handleSendMessage,

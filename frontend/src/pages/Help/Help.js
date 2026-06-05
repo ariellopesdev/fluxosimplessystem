@@ -1,3 +1,4 @@
+//CSS
 import "./Help.css";
 
 // React
@@ -24,6 +25,7 @@ import SupportChatModal from "../../components/Help/SupportChatModal";
 
 // Hooks
 import { useHelpSupport } from "../../hooks/useHelpSupport";
+import { useModal } from "../../hooks/useModal";
 
 // Utils
 import { translatePriority, translateStatus } from "../../utils/supportUtils";
@@ -50,20 +52,31 @@ const Help = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [openTutorial, setOpenTutorial] = useState(null);
 
-  // Support ticket and chat actions
+  // Modal used to create a new support ticket
   const {
-    showSupportModal,
+    isOpen: showSupportModal,
+    openModal: openSupportModal,
+    closeModal: closeSupportModal,
+  } = useModal();
+
+  // Modal used to open the support chat
+  const {
+    isOpen: showChatModal,
+    openModal: openChatModal,
+    closeModal: closeChatModal,
+  } = useModal();
+
+  // Support form and chat logic
+  const {
     supportData,
     supportErrors,
     chatMessage,
     chatError,
     setChatMessage,
-    openSupportModal,
-    closeSupportModal,
     handleSupportChange,
     handleCreateSupport,
     handleSendMessage,
-  } = useHelpSupport(dispatch, selectedTicket);
+  } = useHelpSupport(dispatch, selectedTicket, closeSupportModal);
 
   // Load current user tickets
   useEffect(() => {
@@ -104,8 +117,15 @@ const Help = () => {
   );
 
   // Open selected ticket chat
-  const handleOpenTicket = (id) => {
-    dispatch(getSupportTicketById(id));
+  const handleOpenTicket = async (id) => {
+    await dispatch(getSupportTicketById(id));
+    openChatModal();
+  };
+
+  // Close chat modal and clear selected ticket from Redux
+  const handleCloseChatModal = () => {
+    closeChatModal();
+    dispatch(resetSelectedTicket());
   };
 
   return (
@@ -165,7 +185,7 @@ const Help = () => {
       )}
 
       {/* SUPPORT CHAT MODAL */}
-      {selectedTicket && (
+      {showChatModal && selectedTicket && (
         <SupportChatModal
           loading={loading}
           selectedTicket={selectedTicket}
@@ -173,7 +193,7 @@ const Help = () => {
           chatError={chatError}
           setChatMessage={setChatMessage}
           handleSendMessage={handleSendMessage}
-          closeChatModal={() => dispatch(resetSelectedTicket())}
+          closeChatModal={handleCloseChatModal}
         />
       )}
     </div>
