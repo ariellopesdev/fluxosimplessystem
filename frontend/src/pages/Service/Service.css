@@ -198,7 +198,7 @@
   font-size: clamp(0.86rem, 1vw, 0.95rem);
 }
 
-.services__table td span {
+.services__table td > span:not(.service__actionIcon) {
   display: block;
   color: var(--color-text-muted);
   font-size: clamp(0.76rem, 0.9vw, 0.84rem);
@@ -430,14 +430,19 @@
 }
 
 .service__actionIcon {
-  display: flex;
+  display: flex !important;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: clamp(1.05rem, 1.3vw, 1.25rem);
+  color: inherit;
+  font-size: clamp(1.05rem, 1.3vw, 1.25rem) !important;
   transition:
     transform 0.2s ease,
     opacity 0.2s ease;
+}
+
+.service__actionIcon svg {
+  font-size: inherit;
 }
 
 .service__actionIcon:hover {
