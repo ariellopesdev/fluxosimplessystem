@@ -4,31 +4,45 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: var(--space-xl);
 }
 
 .sales__header h2 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
   margin: 0;
+  color: var(--color-text);
+  font-size: clamp(1.3rem, 2vw, 1.8rem);
+  font-weight: var(--weight-bold);
 }
 
+.sales__header h2 svg {
+  font-size: clamp(1.15rem, 1.6vw, 1.4rem);
+}
+
+/************ BUTTONS ************/
+
 .sales__btn {
-  background: var(--primary);
-  color: var(--surface);
+  background: var(--color-primary);
+  color: var(--color-white);
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   padding: 10px 15px;
   cursor: pointer;
+  font-size: clamp(0.85rem, 1vw, 0.95rem);
+  font-weight: var(--weight-bold);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
   transition:
     background-color 0.2s ease,
     transform 0.1s ease,
-    opacity 0.2s ease;
-  font-weight: var(--weight-600);
-  letter-spacing: 0.3px;
-  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.18);
+    opacity 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .sales__btn:hover {
-  background: var(--primary-hover);
+  background: var(--color-primary-hover);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.28);
 }
 
 .sales__btn:active {
@@ -36,61 +50,78 @@
 }
 
 .sales__btn:disabled {
-  opacity: 0.7;
+  opacity: 0.65;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
 /************ CARDS ************/
 
 .sales__cards {
   display: flex;
-  gap: 15px;
-  margin-bottom: 20px;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-xl);
 }
 
 .card {
   flex: 1;
-  padding: 20px;
-  border-radius: 10px;
-  color: #fff;
-  font-weight: 600;
+  padding: var(--space-xl);
+  border-radius: var(--radius-lg);
+  color: var(--color-white);
+  font-size: clamp(0.9rem, 1vw, 1rem);
+  font-weight: var(--weight-bold);
 }
 
 .green {
-  background: #22c55e;
+  background: var(--color-success);
 }
 
 .blue {
-  background: #3b82f6;
+  background: var(--color-info);
 }
 
 .orange {
-  background: #f97316;
+  background: var(--color-warning);
 }
 
 .red {
-  background: #ef4444;
+  background: var(--color-danger);
 }
 
 /************ FILTER ************/
 
 .sales__filters {
   display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xl);
 }
 
 .sales__filters input {
   width: 260px;
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+  height: 42px;
+  padding: 0 var(--space-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border-dark);
+  border-radius: var(--radius-md);
+  font-size: clamp(0.86rem, 1vw, 0.95rem);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.sales__filters input:hover {
+  border-color: var(--color-primary);
 }
 
 .sales__filters input:focus {
-  border-color: var(--primary);
+  border-color: var(--color-primary);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+  box-shadow: 0 0 0 4px var(--color-primary-soft);
+}
+
+.sales__filters input::placeholder {
+  color: var(--color-text-light);
 }
 
 /************ TABLE ************/
@@ -98,29 +129,34 @@
 .sales__table {
   width: 100%;
   overflow-x: auto;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
 }
 
 .sales__table table {
   width: 100%;
   min-width: 1100px;
-  background: #fff;
-  border-radius: 10px;
-  overflow: hidden;
+  background: var(--color-surface);
   border-collapse: collapse;
 }
 
 .sales__table th,
 .sales__table td {
-  padding: 12px;
+  padding: var(--space-md);
   vertical-align: middle;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-size: clamp(0.78rem, 0.9vw, 0.88rem);
 }
 
 .sales__table th {
-  background: #f9fafb;
-  font-size: 0.82rem;
+  background: var(--color-surface-soft);
+  color: var(--color-text-muted);
+  font-size: clamp(0.72rem, 0.85vw, 0.8rem);
+  font-weight: var(--weight-bold);
   text-transform: uppercase;
   letter-spacing: 0.4px;
-  color: #6b7280;
 }
 
 .sales__table th:nth-child(1),
@@ -138,11 +174,15 @@
 }
 
 .sales__table tbody tr:nth-child(even) {
-  background: #fafafa;
+  background: var(--color-surface-soft);
 }
 
 .sales__table tbody tr:hover {
-  background: #f3f4f6;
+  background: var(--color-primary-soft);
+}
+
+.sales__table tbody tr:last-child td {
+  border-bottom: none;
 }
 
 .sales__itemsList {
@@ -154,53 +194,56 @@
 
 .sales__itemsList span {
   display: block;
-  font-size: 0.86rem;
-  color: #374151;
+  color: var(--color-text);
+  font-size: clamp(0.78rem, 0.95vw, 0.86rem);
   line-height: 1.35;
 }
 
 /************ STATUS ************/
 
 .status {
-  font-weight: 600;
+  font-size: clamp(0.76rem, 0.9vw, 0.84rem);
+  font-weight: var(--weight-bold);
 }
 
 .status.active {
-  color: #22c55e;
+  color: var(--color-success);
 }
 
 .status.pending {
-  color: #f97316;
+  color: var(--color-warning);
 }
 
 .status.inactive {
-  color: #ef4444;
+  color: var(--color-danger);
 }
 
-/************ BUTTONS ************/
+/************ SMALL BUTTONS ************/
 
 .sales__smallBtn,
 .sales__outlineBtn,
 .sales__removeBtn {
-  border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   cursor: pointer;
-  font-weight: 600;
+  font-size: clamp(0.74rem, 0.85vw, 0.82rem);
+  font-weight: var(--weight-bold);
   transition:
     background-color 0.2s ease,
     transform 0.1s ease,
-    opacity 0.2s ease;
+    opacity 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .sales__smallBtn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  background: #2563eb;
-  color: #fff;
+  gap: var(--space-xs);
+  background: var(--color-info);
+  color: var(--color-white);
+  border: none;
   padding: 7px 10px;
-  font-size: 12px;
 }
 
 .sales__smallBtn:hover {
@@ -208,26 +251,33 @@
 }
 
 .sales__outlineBtn {
-  background: #fff;
-  color: var(--primary);
-  border: 1px solid var(--primary);
+  background: var(--color-surface);
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
   padding: 10px 14px;
 }
 
 .sales__outlineBtn:hover {
-  background: rgba(16, 185, 129, 0.08);
+  background: var(--color-primary-soft);
 }
 
 .sales__removeBtn {
   align-self: end;
-  background: #ef4444;
-  color: #fff;
+  background: var(--color-danger);
+  color: var(--color-white);
+  border: none;
   padding: 9px 12px;
-  height: 38px;
+  height: 42px;
 }
 
 .sales__removeBtn:hover {
-  background: #dc2626;
+  background: #b91c1c;
+}
+
+.sales__smallBtn:active,
+.sales__outlineBtn:active,
+.sales__removeBtn:active {
+  transform: scale(0.98);
 }
 
 /************ MODAL ************/
@@ -235,14 +285,16 @@
 .sales__modalOverlay {
   position: fixed;
   inset: 0;
-  width: 100%;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.45);
+  width: 100vw;
+  height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 999;
-  padding: 20px;
+  padding: var(--space-xl);
+  background: rgba(0, 0, 0, 0.68);
+  backdrop-filter: blur(3px);
+  overflow-y: auto;
+  z-index: 99999;
 }
 
 .sales__modal {
@@ -250,9 +302,11 @@
   max-width: 620px;
   max-height: 95vh;
   overflow-y: auto;
-  background: #fff;
-  border-radius: 12px;
-  padding: 32px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-3xl);
+  box-shadow: var(--shadow-lg);
   animation: modalFade 0.2s ease;
 }
 
@@ -268,28 +322,49 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20px;
-  padding-bottom: 14px;
-  border-bottom: 1px solid #ececec;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-xl);
+  padding-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .sales__modalHeader h3 {
   margin: 0;
+  color: var(--color-text);
+  font-size: clamp(1.1rem, 1.6vw, 1.4rem);
+  font-weight: var(--weight-bold);
 }
 
 .sales__closeBtn {
-  background: transparent;
-  border: none;
-  font-size: 22px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   cursor: pointer;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  transition: background 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.1s ease,
+    border-color 0.2s ease;
+}
+
+.sales__closeBtn svg {
+  font-size: clamp(1.2rem, 1.5vw, 1.4rem);
 }
 
 .sales__closeBtn:hover {
-  background: #f3f4f6;
+  background: var(--color-surface-soft);
+  color: var(--color-text);
+  border-color: var(--color-border-dark);
+}
+
+.sales__closeBtn:active {
+  transform: scale(0.96);
 }
 
 /************ FORM ************/
@@ -297,21 +372,20 @@
 .form__sales {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--space-sm);
 }
 
 .form__group--sales {
   display: flex;
   flex-direction: column;
-  margin-bottom: 10px;
+  margin-bottom: var(--space-sm);
 }
 
 .form__group--sales label {
-  display: block;
   margin-bottom: 6px;
-  font-weight: 600;
-  color: #4b5563;
-  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  font-size: clamp(0.76rem, 0.9vw, 0.84rem);
+  font-weight: var(--weight-bold);
 }
 
 .form__sales input,
@@ -319,123 +393,135 @@
 .form__sales textarea {
   width: 100%;
   min-width: 0;
-  background: #fff;
-  padding: 0 12px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border-dark);
+  border-radius: var(--radius-md);
+  font-size: clamp(0.86rem, 1vw, 0.95rem);
   transition:
     border-color 0.2s ease,
-    box-shadow 0.2s ease;
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .form__sales input,
 .form__sales select {
-  height: 38px;
-  line-height: 38px;
+  height: 42px;
+  padding: 0 var(--space-md);
 }
 
 .form__sales textarea {
   min-height: 100px;
-  padding: 12px;
+  padding: var(--space-md);
   resize: none;
 }
 
 .form__sales input:hover,
 .form__sales select:hover,
 .form__sales textarea:hover {
-  border-color: var(--primary);
+  border-color: var(--color-primary);
 }
 
 .form__sales input:focus,
 .form__sales select:focus,
 .form__sales textarea:focus {
-  border-color: var(--primary);
+  border-color: var(--color-primary);
   outline: none;
-  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.12);
+  box-shadow: 0 0 0 4px var(--color-primary-soft);
 }
 
 .form__sales input:disabled {
-  background: #f9fafb;
-  color: #6b7280;
+  background: var(--color-surface-soft);
+  color: var(--color-text-muted);
   cursor: not-allowed;
 }
 
 /************ RECEIPT MODAL ************/
 
 .sales__receipt {
-  background: #fafafa;
-  border: 1px solid #ececec;
-  border-radius: 12px;
-  padding: 22px;
+  background: var(--color-surface-soft);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2xl);
 }
 
 .sales__receiptTop {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 18px;
-  padding-bottom: 12px;
-  border-bottom: 1px dashed #d1d5db;
-  color: #374151;
+  margin-bottom: var(--space-lg);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px dashed var(--color-border-dark);
+  color: var(--color-text);
+  font-size: clamp(0.86rem, 1vw, 0.95rem);
+}
+
+.sales__customerGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
 }
 
 .sales__productsBox {
-  margin-top: 14px;
-  padding: 18px;
-  background: #fff;
-  border: 1px solid #ececec;
-  border-radius: 10px;
+  margin-top: var(--space-lg);
+  padding: var(--space-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
 }
 
 .sales__productsBox h4 {
-  margin: 0 0 14px;
+  margin: 0 0 var(--space-md);
+  color: var(--color-text);
+  font-size: clamp(0.95rem, 1.2vw, 1.1rem);
 }
 
 .sales__productRow {
   display: grid;
   grid-template-columns: minmax(220px, 2fr) 90px 130px 130px auto;
-  gap: 12px;
+  gap: var(--space-md);
   align-items: end;
-  padding-bottom: 14px;
-  margin-bottom: 14px;
-  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: var(--space-md);
+  margin-bottom: var(--space-md);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .sales__paymentGrid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
-  margin-top: 18px;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
 }
 
 .sales__totals {
   display: grid;
   grid-template-columns: 160px 160px 1fr;
-  gap: 14px;
+  gap: var(--space-md);
   align-items: start;
-  margin-top: 18px;
+  margin-top: var(--space-lg);
 }
 
 .sales__summary {
-  background: #fff;
-  border: 1px solid #ececec;
-  border-radius: 10px;
-  padding: 14px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
 }
 
 .sales__summary p {
   display: flex;
   justify-content: space-between;
-  margin: 0 0 8px;
-  color: #4b5563;
+  margin: 0 0 var(--space-sm);
+  color: var(--color-text-muted);
+  font-size: clamp(0.84rem, 1vw, 0.92rem);
 }
 
 .sales__summaryTotal {
-  padding-top: 10px;
-  margin-top: 10px !important;
-  border-top: 1px dashed #d1d5db;
-  font-size: 1.05rem;
-  color: #111827 !important;
+  padding-top: var(--space-md);
+  margin-top: var(--space-md) !important;
+  border-top: 1px dashed var(--color-border-dark);
+  color: var(--color-text) !important;
+  font-size: clamp(0.98rem, 1.2vw, 1.08rem) !important;
 }
 
 /************ DETAILS MODAL ************/
@@ -443,37 +529,41 @@
 .sales__details {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: var(--space-md);
   text-align: left;
 }
 
 .sales__details p {
   margin: 0;
-  padding: 12px;
-  background: #fafafa;
-  border-radius: 8px;
-  color: #374151;
+  padding: var(--space-md);
+  background: var(--color-surface-soft);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  font-size: clamp(0.82rem, 1vw, 0.9rem);
 }
 
 .sales__details strong {
-  color: #111827;
+  color: var(--color-text);
 }
 
 .sales__detailsProducts {
   grid-column: 1 / -1;
-  margin-top: 8px;
-  padding: 14px;
-  background: #fafafa;
-  border-radius: 10px;
+  margin-top: var(--space-sm);
+  padding: var(--space-lg);
+  background: var(--color-surface-soft);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
 }
 
 .sales__detailsProduct {
   display: grid;
   grid-template-columns: 2fr 90px 150px 150px;
-  gap: 10px;
+  gap: var(--space-sm);
   padding: 10px 0;
-  border-bottom: 1px solid #e5e7eb;
-  color: #374151;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-size: clamp(0.8rem, 0.95vw, 0.88rem);
 }
 
 .sales__detailsProduct:last-child {
@@ -486,12 +576,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: var(--space-md);
 }
 
 .sales__actionIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  font-size: 20px;
+  font-size: clamp(1.05rem, 1.3vw, 1.25rem);
   transition:
     transform 0.2s ease,
     opacity 0.2s ease;
@@ -503,7 +596,7 @@
 }
 
 .sales__actionIcon.edit {
-  color: #3b82f6;
+  color: var(--color-info);
 }
 
 /************ ANIMATION ************/
@@ -520,21 +613,10 @@
   }
 }
 
-.sales__customerGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-}
-
-@media (max-width: 900px) {
-  .sales__customerGrid {
-    grid-template-columns: 1fr;
-  }
-}
-
 /************ RESPONSIVE ************/
 
 @media (max-width: 900px) {
+  .sales__customerGrid,
   .sales__productRow,
   .sales__paymentGrid,
   .sales__totals,
@@ -551,7 +633,7 @@
 @media (max-width: 768px) {
   .sales__header {
     flex-direction: column;
-    gap: 15px;
+    gap: var(--space-md);
     align-items: stretch;
   }
 
@@ -571,17 +653,23 @@
     width: 100%;
   }
 
+  .sales__modalOverlay {
+    align-items: flex-start;
+    padding: var(--space-md);
+  }
+
   .sales__modal {
-    padding: 20px;
+    max-height: calc(100dvh - 24px);
+    padding: var(--space-lg);
   }
 
   .sales__receipt {
-    padding: 16px;
+    padding: var(--space-lg);
   }
 
   .sales__receiptTop {
     flex-direction: column;
-    gap: 6px;
+    gap: var(--space-xs);
     align-items: flex-start;
   }
 }
