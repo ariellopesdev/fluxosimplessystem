@@ -4,7 +4,7 @@ const express = require("express");
 const path = require("path");
 const cors = require("cors");
 
-const port = process.env.PORT;
+const port = process.env.PORT || 5000;
 
 const app = express();
 
@@ -12,8 +12,27 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// solve CORS
-app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
+const allowedOrigins = [
+  process.env.FRONTEND_DEV_URL,
+  process.env.FRONTEND_PROD_URL,
+];
+
+app.use(
+  cors({
+    credentials: true,
+    origin: (origin, callback) => {
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Origem não permitida pelo CORS."));
+    },
+  }),
+);
 
 // upload directory
 app.use("/uploads", express.static(path.join(__dirname, "/uploads")));
