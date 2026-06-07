@@ -2,7 +2,8 @@
 import "./Financial.css";
 
 // React
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 
 // Redux
 import { useDispatch, useSelector } from "react-redux";
@@ -15,17 +16,21 @@ import {
   updateFinancial,
   resetMessage,
 } from "../../slices/financialSlice";
+
 import { getAllSales } from "../../slices/salesSlice";
 import { getProducts } from "../../slices/productSlice";
 import { getAllAppointments } from "../../slices/appointmentSlice";
 
 // Icons
-import { FaChartLine } from "react-icons/fa";
-import { MdDelete, MdEdit, MdVisibility } from "react-icons/md";
+import { FaChartLine, FaEdit, FaEye, FaTrash } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
 
 // Components
 import Message from "../../components/Message/Message";
+
+// Hooks
+import { useModal } from "../../hooks/useModal";
+import { useFilteredSearch } from "../../hooks/useFilteredSearch";
 
 const Financial = () => {
   const dispatch = useDispatch();
@@ -34,35 +39,50 @@ const Financial = () => {
     (state) => state.financial,
   );
 
-  const [showModal, setShowModal] = useState(false);
-  const [showDetails, setShowDetails] = useState(false);
-  const [detailsData, setDetailsData] = useState(null);
+  const { sales } = useSelector((state) => state.sales);
+  const { products } = useSelector((state) => state.product);
+  const { appointments } = useSelector((state) => state.appointment);
+
   const [editId, setEditId] = useState(null);
-  const [search, setSearch] = useState("");
-  const [showHistoryModal, setShowHistoryModal] = useState(false);
 
   const [historyFilters, setHistoryFilters] = useState({
     date: "",
     month: "",
     year: "",
   });
-  const { sales } = useSelector((state) => state.sales);
-  const { products } = useSelector((state) => state.product);
-  const { appointments } = useSelector((state) => state.appointment);
-  const [filters, setFilters] = useState({
-    type: "",
-    category: "",
-    paymentStatus: "",
-  });
+
+  const {
+    isOpen: showFinancialModal,
+    openModal: openFinancialModal,
+    closeModal: closeFinancialModal,
+  } = useModal();
+
+  const {
+    isOpen: showDetailsModal,
+    modalData: detailsData,
+    openModal: openDetailsModal,
+    closeModal: closeDetailsModal,
+  } = useModal();
+
+  const {
+    isOpen: showHistoryModal,
+    openModal: openHistoryModal,
+    closeModal: closeHistoryModal,
+  } = useModal();
+
+  const {
+    isOpen: showDeleteModal,
+    modalData: selectedDeleteFinancial,
+    openModal: openDeleteModal,
+    closeModal: closeDeleteModal,
+  } = useModal();
 
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     type: "INCOME",
     category: "SALE",
-
     amount: "",
-
     payment: {
       method: "PIX",
       status: "PENDING",
@@ -70,11 +90,8 @@ const Financial = () => {
       paidAt: "",
       dueDate: "",
     },
-
     notes: "",
-
     isRecurring: false,
-
     recurrence: {
       frequency: "NONE",
       nextDate: "",
@@ -93,7 +110,7 @@ const Financial = () => {
     if (error || message) {
       const timer = setTimeout(() => {
         dispatch(resetMessage());
-      }, 2000);
+      }, 2500);
 
       return () => clearTimeout(timer);
     }
@@ -105,9 +122,7 @@ const Financial = () => {
       description: "",
       type: "INCOME",
       category: "SALE",
-
       amount: "",
-
       payment: {
         method: "PIX",
         status: "PENDING",
@@ -115,11 +130,8 @@ const Financial = () => {
         paidAt: "",
         dueDate: "",
       },
-
       notes: "",
-
       isRecurring: false,
-
       recurrence: {
         frequency: "NONE",
         nextDate: "",
@@ -127,6 +139,11 @@ const Financial = () => {
     });
 
     setEditId(null);
+  };
+
+  const handleCloseFinancialModal = () => {
+    closeFinancialModal();
+    resetForm();
   };
 
   const formatCurrency = (value) => {
@@ -163,35 +180,6 @@ const Financial = () => {
     return categories[category] || "-";
   };
 
-  const appointmentsAsFinancials = Array.isArray(appointments)
-    ? appointments
-        .filter((appointment) => Number(appointment.total || 0) > 0)
-        .map((appointment) => ({
-          _id: `appointment-${appointment._id}`,
-          title: `Agendamento - ${appointment.title || "Serviço"}`,
-          description: "Receita gerada automaticamente por agendamento.",
-          type: "INCOME",
-          category: "UTILITY",
-          amount: Number(appointment.total || 0),
-          payment: {
-            method: appointment.payment?.method || "PIX",
-            status: appointment.payment?.status || "PENDING",
-            installments: appointment.payment?.installments || 1,
-            paidAt: appointment.payment?.paidAt || null,
-            dueDate: appointment.date || null,
-          },
-          notes: appointment.notes || "",
-          isRecurring: false,
-          recurrence: {
-            frequency: "NONE",
-            nextDate: null,
-          },
-          createdAt: appointment.createdAt,
-          updatedAt: appointment.updatedAt,
-          automatic: true,
-        }))
-    : [];
-
   const translatePaymentMethod = (method) => {
     const methods = {
       CASH: "Dinheiro",
@@ -215,97 +203,174 @@ const Financial = () => {
     return statuses[status] || "-";
   };
 
-  const financialList = Array.isArray(financials) ? financials : [];
+  const financialList = useMemo(() => {
+    return Array.isArray(financials) ? financials : [];
+  }, [financials]);
 
-  const salesAsFinancials = Array.isArray(sales)
-    ? sales.map((sale) => ({
-        _id: `sale-${sale._id}`,
-        title: `Venda ${sale.saleNumber || ""}`,
-        description: "Receita gerada automaticamente por venda.",
-        type: "INCOME",
-        category: "SALE",
-        amount: Number(sale.total || 0),
-        payment: sale.payment,
-        notes: sale.notes || "",
-        isRecurring: false,
-        recurrence: {
-          frequency: "NONE",
-          nextDate: null,
-        },
-        createdAt: sale.createdAt,
-        updatedAt: sale.updatedAt,
-        automatic: true,
-      }))
-    : [];
+  const salesAsFinancials = useMemo(() => {
+    return Array.isArray(sales)
+      ? sales.map((sale) => ({
+          _id: `sale-${sale._id}`,
+          title: `Venda ${sale.saleNumber || ""}`,
+          description: "Receita gerada automaticamente por venda.",
+          type: "INCOME",
+          category: "SALE",
+          amount: Number(sale.total || 0),
+          payment: sale.payment,
+          notes: sale.notes || "",
+          isRecurring: false,
+          recurrence: {
+            frequency: "NONE",
+            nextDate: null,
+          },
+          createdAt: sale.createdAt,
+          updatedAt: sale.updatedAt,
+          automatic: true,
+        }))
+      : [];
+  }, [sales]);
 
-  const productsAsFinancials = Array.isArray(products)
-    ? products.map((product) => ({
-        _id: `product-${product._id}`,
-        title: product.name,
-        description:
-          product.category === "ASSET"
-            ? "Bem da empresa cadastrado em produtos."
-            : "Produto cadastrado em estoque.",
-        type: product.category === "ASSET" ? "ASSET" : "EXPENSE",
-        category:
-          product.category === "ASSET" ? "COMPANY_ASSET" : "PRODUCT_PURCHASE",
-        amount: Number(product.totalPrice || 0),
-        payment: {
-          method: "PIX",
-          status: "PAID",
-          installments: 1,
-        },
-        notes: "",
-        isRecurring: false,
-        recurrence: {
-          frequency: "NONE",
-          nextDate: null,
-        },
-        createdAt: product.createdAt,
-        updatedAt: product.updatedAt,
-        automatic: true,
-      }))
-    : [];
+  const productsAsFinancials = useMemo(() => {
+    return Array.isArray(products)
+      ? products.map((product) => ({
+          _id: `product-${product._id}`,
+          title: product.name,
+          description:
+            product.category === "ASSET"
+              ? "Bem da empresa cadastrado em produtos."
+              : "Produto cadastrado em estoque.",
+          type: product.category === "ASSET" ? "ASSET" : "EXPENSE",
+          category:
+            product.category === "ASSET" ? "COMPANY_ASSET" : "PRODUCT_PURCHASE",
+          amount: Number(product.totalPrice || 0),
+          payment: {
+            method: "PIX",
+            status: "PAID",
+            installments: 1,
+          },
+          notes: "",
+          isRecurring: false,
+          recurrence: {
+            frequency: "NONE",
+            nextDate: null,
+          },
+          createdAt: product.createdAt,
+          updatedAt: product.updatedAt,
+          automatic: true,
+        }))
+      : [];
+  }, [products]);
 
-  const allFinancials = [
-    ...financialList,
-    ...salesAsFinancials,
-    ...productsAsFinancials,
-    ...appointmentsAsFinancials,
-  ];
+  const appointmentsAsFinancials = useMemo(() => {
+    return Array.isArray(appointments)
+      ? appointments
+          .filter((appointment) => Number(appointment.total || 0) > 0)
+          .map((appointment) => ({
+            _id: `appointment-${appointment._id}`,
+            title: `Agendamento - ${appointment.title || "Serviço"}`,
+            description: "Receita gerada automaticamente por agendamento.",
+            type: "INCOME",
+            category: "UTILITY",
+            amount: Number(appointment.total || 0),
+            payment: {
+              method: appointment.payment?.method || "PIX",
+              status: appointment.payment?.status || "PENDING",
+              installments: appointment.payment?.installments || 1,
+              paidAt: appointment.payment?.paidAt || null,
+              dueDate: appointment.date || null,
+            },
+            notes: appointment.notes || "",
+            isRecurring: false,
+            recurrence: {
+              frequency: "NONE",
+              nextDate: null,
+            },
+            createdAt: appointment.createdAt,
+            updatedAt: appointment.updatedAt,
+            automatic: true,
+          }))
+      : [];
+  }, [appointments]);
 
-  const filteredFinancials = allFinancials.filter((financial) => {
-    const searchText = search.toLowerCase();
+  const allFinancials = useMemo(() => {
+    return [
+      ...financialList,
+      ...salesAsFinancials,
+      ...productsAsFinancials,
+      ...appointmentsAsFinancials,
+    ];
+  }, [
+    financialList,
+    salesAsFinancials,
+    productsAsFinancials,
+    appointmentsAsFinancials,
+  ]);
 
-    const matchesSearch =
-      !searchText ||
-      financial.title?.toLowerCase().includes(searchText) ||
-      financial.description?.toLowerCase().includes(searchText) ||
-      financial.notes?.toLowerCase().includes(searchText);
+  const {
+    search,
+    setSearch,
+    filters,
+    updateFilter,
+    clearFilters,
+    filteredItems: filteredFinancials,
+  } = useFilteredSearch(
+    allFinancials,
+    [
+      "title",
+      "description",
+      "notes",
+      "type",
+      "category",
+      "payment.method",
+      "payment.status",
+      (financial) => translateType(financial.type),
+      (financial) => translateCategory(financial.category),
+      (financial) => translatePaymentMethod(financial.payment?.method),
+      (financial) => translatePaymentStatus(financial.payment?.status),
+    ],
+    {
+      type: "",
+      category: "",
+      paymentStatus: "",
+    },
+    {
+      type: (financial, value) => financial.type === value,
+      category: (financial, value) => financial.category === value,
+      paymentStatus: (financial, value) =>
+        (financial.payment?.status || "PENDING") === value,
+    },
+  );
 
-    const matchesType = filters.type ? financial.type === filters.type : true;
+  const incomeTotal = allFinancials
+    .filter((item) => item.type === "INCOME")
+    .reduce((acc, item) => acc + Number(item.amount || 0), 0);
 
-    const matchesCategory = filters.category
-      ? financial.category === filters.category
-      : true;
+  const expenseTotal = allFinancials
+    .filter((item) => item.type === "EXPENSE")
+    .reduce((acc, item) => acc + Number(item.amount || 0), 0);
 
-    const matchesPaymentStatus = filters.paymentStatus
-      ? (financial.payment?.status || "PENDING") === filters.paymentStatus
-      : true;
+  const assetTotal = allFinancials
+    .filter((item) => item.type === "ASSET")
+    .reduce((acc, item) => acc + Number(item.amount || 0), 0);
 
-    return (
-      matchesSearch && matchesType && matchesCategory && matchesPaymentStatus
-    );
-  });
+  const balanceTotal = allFinancials.reduce((acc, item) => {
+    if (item.type === "INCOME") {
+      return acc + Number(item.amount || 0);
+    }
+
+    if (item.type === "EXPENSE") {
+      return acc - Number(item.amount || 0);
+    }
+
+    return acc;
+  }, 0);
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     const payload = {
       ...formData,
-
       amount: Number(formData.amount),
-
       payment: {
         ...formData.payment,
         installments:
@@ -326,8 +391,7 @@ const Financial = () => {
       dispatch(createFinancial(payload));
     }
 
-    setShowModal(false);
-    resetForm();
+    handleCloseFinancialModal();
   };
 
   const handleEdit = (financial) => {
@@ -338,9 +402,7 @@ const Financial = () => {
       description: financial.description || "",
       type: financial.type || "INCOME",
       category: financial.category || "OTHER",
-
       amount: financial.amount || "",
-
       payment: {
         method: financial.payment?.method || "PIX",
         status: financial.payment?.status || "PENDING",
@@ -352,11 +414,8 @@ const Financial = () => {
           ? financial.payment.dueDate.split("T")[0]
           : "",
       },
-
       notes: financial.notes || "",
-
       isRecurring: financial.isRecurring || false,
-
       recurrence: {
         frequency: financial.recurrence?.frequency || "NONE",
         nextDate: financial.recurrence?.nextDate
@@ -365,11 +424,14 @@ const Financial = () => {
       },
     });
 
-    setShowModal(true);
+    openFinancialModal();
   };
 
-  const handleDelete = (id) => {
-    dispatch(deleteFinancial(id));
+  const handleConfirmDelete = () => {
+    if (!selectedDeleteFinancial?._id) return;
+
+    dispatch(deleteFinancial(selectedDeleteFinancial._id));
+    closeDeleteModal();
   };
 
   const formatDateToCompare = (date) => {
@@ -435,17 +497,19 @@ const Financial = () => {
 
         <div className="financial__headerActions">
           <button
+            type="button"
             className="financial__secondaryBtn"
-            onClick={() => setShowHistoryModal(true)}
+            onClick={openHistoryModal}
           >
             Histórico
           </button>
 
           <button
+            type="button"
             className="financial__btn"
             onClick={() => {
               resetForm();
-              setShowModal(true);
+              openFinancialModal();
             }}
           >
             + Novo registro
@@ -453,61 +517,28 @@ const Financial = () => {
         </div>
       </div>
 
+      {error && <Message msg={error} type="error" />}
+      {message && <Message msg={message} type="success" />}
+
       <div className="financial__cards">
         <div className="financial__card income">
           <span>Receitas</span>
-
-          <strong>
-            {formatCurrency(
-              allFinancials
-                .filter((item) => item.type === "INCOME")
-                .reduce((acc, item) => acc + Number(item.amount || 0), 0),
-            )}
-          </strong>
+          <strong>{formatCurrency(incomeTotal)}</strong>
         </div>
 
         <div className="financial__card expense">
           <span>Despesas</span>
-
-          <strong>
-            {formatCurrency(
-              allFinancials
-                .filter((item) => item.type === "EXPENSE")
-                .reduce((acc, item) => acc + Number(item.amount || 0), 0),
-            )}
-          </strong>
+          <strong>{formatCurrency(expenseTotal)}</strong>
         </div>
 
         <div className="financial__card asset">
           <span>Patrimônio</span>
-
-          <strong>
-            {formatCurrency(
-              allFinancials
-                .filter((item) => item.type === "ASSET")
-                .reduce((acc, item) => acc + Number(item.amount || 0), 0),
-            )}
-          </strong>
+          <strong>{formatCurrency(assetTotal)}</strong>
         </div>
 
         <div className="financial__card balance">
           <span>Saldo</span>
-
-          <strong>
-            {formatCurrency(
-              allFinancials.reduce((acc, item) => {
-                if (item.type === "INCOME") {
-                  return acc + Number(item.amount || 0);
-                }
-
-                if (item.type === "EXPENSE") {
-                  return acc - Number(item.amount || 0);
-                }
-
-                return acc;
-              }, 0),
-            )}
-          </strong>
+          <strong>{formatCurrency(balanceTotal)}</strong>
         </div>
       </div>
 
@@ -521,12 +552,7 @@ const Financial = () => {
 
         <select
           value={filters.type}
-          onChange={(e) =>
-            setFilters((prev) => ({
-              ...prev,
-              type: e.target.value,
-            }))
-          }
+          onChange={(e) => updateFilter("type", e.target.value)}
         >
           <option value="">Todos os tipos</option>
           <option value="INCOME">Receita</option>
@@ -536,12 +562,7 @@ const Financial = () => {
 
         <select
           value={filters.category}
-          onChange={(e) =>
-            setFilters((prev) => ({
-              ...prev,
-              category: e.target.value,
-            }))
-          }
+          onChange={(e) => updateFilter("category", e.target.value)}
         >
           <option value="">Todas as categorias</option>
           <option value="SALE">Venda</option>
@@ -558,29 +579,18 @@ const Financial = () => {
 
         <select
           value={filters.paymentStatus}
-          onChange={(e) =>
-            setFilters((prev) => ({
-              ...prev,
-              paymentStatus: e.target.value,
-            }))
-          }
+          onChange={(e) => updateFilter("paymentStatus", e.target.value)}
         >
           <option value="">Todos os status</option>
           <option value="PENDING">Pendente</option>
           <option value="PAID">Pago</option>
           <option value="CANCELLED">Cancelado</option>
         </select>
+
         <button
           type="button"
           className="financial__clearBtn"
-          onClick={() => {
-            setSearch("");
-            setFilters({
-              type: "",
-              category: "",
-              paymentStatus: "",
-            });
-          }}
+          onClick={clearFilters}
         >
           Limpar filtros
         </button>
@@ -603,17 +613,13 @@ const Financial = () => {
           </thead>
 
           <tbody>
-            {filteredFinancials?.length > 0 ? (
+            {filteredFinancials.length > 0 ? (
               filteredFinancials.map((financial) => (
                 <tr key={financial._id}>
                   <td>{financial.title}</td>
-
                   <td>{translateType(financial.type)}</td>
-
                   <td>{translateCategory(financial.category)}</td>
-
                   <td>{formatCurrency(financial.amount)}</td>
-
                   <td>{translatePaymentMethod(financial.payment?.method)}</td>
 
                   <td>
@@ -634,13 +640,11 @@ const Financial = () => {
 
                   <td>
                     <button
+                      type="button"
                       className="financial__smallBtn"
-                      onClick={() => {
-                        setDetailsData(financial);
-                        setShowDetails(true);
-                      }}
+                      onClick={() => openDetailsModal(financial)}
                     >
-                      <MdVisibility />
+                      <FaEye />
                       Ver dados
                     </button>
                   </td>
@@ -648,15 +652,19 @@ const Financial = () => {
                   <td>
                     {!financial.automatic ? (
                       <div className="table__edit--close">
-                        <MdEdit
+                        <span
                           className="financial__actionIcon edit"
                           onClick={() => handleEdit(financial)}
-                        />
+                        >
+                          <FaEdit />
+                        </span>
 
-                        <MdDelete
+                        <span
                           className="financial__actionIcon delete"
-                          onClick={() => handleDelete(financial._id)}
-                        />
+                          onClick={() => openDeleteModal(financial)}
+                        >
+                          <FaTrash />
+                        </span>
                       </div>
                     ) : (
                       <span className="financial__automatic">Automático</span>
@@ -673,579 +681,631 @@ const Financial = () => {
         </table>
       </div>
 
-      {showModal && (
-        <div className="financial__modalOverlay">
-          <div className="financial__modal">
-            <div className="financial__modalHeader">
-              <h3>{editId ? "Editar registro" : "Novo registro financeiro"}</h3>
+      {showFinancialModal &&
+        createPortal(
+          <div
+            className="financial__modalOverlay"
+            onClick={handleCloseFinancialModal}
+          >
+            <div
+              className="financial__modal"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="financial__modalHeader">
+                <h3>
+                  {editId ? "Editar registro" : "Novo registro financeiro"}
+                </h3>
 
-              <button
-                className="financial__closeBtn"
-                onClick={() => {
-                  setShowModal(false);
-                  resetForm();
-                }}
-              >
-                <IoClose />
-              </button>
-            </div>
+                <button
+                  type="button"
+                  className="financial__closeBtn"
+                  onClick={handleCloseFinancialModal}
+                >
+                  <IoClose />
+                </button>
+              </div>
 
-            <form onSubmit={handleSubmit} className="financial__form">
-              <div className="financial__section">
-                <h4>Dados principais</h4>
-
-                <div className="form__group--financial">
-                  <label>Título</label>
-
-                  <input
-                    type="text"
-                    value={formData.title}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        title: e.target.value,
-                      }))
-                    }
-                  />
-                </div>
-
-                <div className="form__group--financial">
-                  <label>Descrição</label>
-
-                  <textarea
-                    value={formData.description}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        description: e.target.value,
-                      }))
-                    }
-                  />
-                </div>
-
-                <div className="financial__grid">
-                  <div className="form__group--financial">
-                    <label>Tipo</label>
-
-                    <select
-                      value={formData.type}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          type: e.target.value,
-                        }))
-                      }
-                    >
-                      <option value="INCOME">Receita</option>
-                      <option value="EXPENSE">Despesa</option>
-                      <option value="ASSET">Patrimônio</option>
-                    </select>
-                  </div>
+              <form onSubmit={handleSubmit} className="financial__form">
+                <div className="financial__section">
+                  <h4>Dados principais</h4>
 
                   <div className="form__group--financial">
-                    <label>Categoria</label>
-
-                    <select
-                      value={formData.category}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          category: e.target.value,
-                        }))
-                      }
-                    >
-                      <option value="SALE">Venda</option>
-                      <option value="PRODUCT_PURCHASE">
-                        Compra de produto
-                      </option>
-                      <option value="PRODUCT_ASSET">Ativo de produto</option>
-                      <option value="COMPANY_ASSET">
-                        Patrimônio da empresa
-                      </option>
-                      <option value="MAINTENANCE">Manutenção</option>
-                      <option value="TAX">Imposto</option>
-                      <option value="SALARY">Salário</option>
-                      <option value="RENT">Aluguel</option>
-                      <option value="UTILITY">Serviços</option>
-                      <option value="OTHER">Outros</option>
-                    </select>
-                  </div>
-
-                  <div className="form__group--financial">
-                    <label>Valor</label>
-
+                    <label>Título</label>
                     <input
-                      type="number"
-                      min="0"
-                      value={formData.amount}
+                      type="text"
+                      value={formData.title}
                       onChange={(e) =>
                         setFormData((prev) => ({
                           ...prev,
-                          amount: e.target.value,
+                          title: e.target.value,
                         }))
                       }
                     />
                   </div>
-                </div>
-              </div>
 
-              <div className="financial__section">
-                <h4>Pagamento</h4>
-
-                <div className="financial__grid">
                   <div className="form__group--financial">
-                    <label>Forma de pagamento</label>
-
-                    <select
-                      value={formData.payment.method}
+                    <label>Descrição</label>
+                    <textarea
+                      value={formData.description}
                       onChange={(e) =>
                         setFormData((prev) => ({
                           ...prev,
-                          payment: {
-                            ...prev.payment,
-                            method: e.target.value,
-                          },
+                          description: e.target.value,
                         }))
                       }
-                    >
-                      <option value="CASH">Dinheiro</option>
-                      <option value="PIX">Pix</option>
-                      <option value="CREDIT_CARD">Cartão de crédito</option>
-                      <option value="DEBIT_CARD">Cartão de débito</option>
-                      <option value="BANK_SLIP">Boleto</option>
-                      <option value="TRANSFER">Transferência</option>
-                    </select>
+                    />
                   </div>
 
-                  <div className="form__group--financial">
-                    <label>Status do pagamento</label>
-
-                    <select
-                      value={formData.payment.status}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          payment: {
-                            ...prev.payment,
-                            status: e.target.value,
-                          },
-                        }))
-                      }
-                    >
-                      <option value="PENDING">Pendente</option>
-                      <option value="PAID">Pago</option>
-                      <option value="CANCELLED">Cancelado</option>
-                    </select>
-                  </div>
-
-                  {formData.payment.method === "CREDIT_CARD" && (
+                  <div className="financial__grid">
                     <div className="form__group--financial">
-                      <label>Parcelas</label>
+                      <label>Tipo</label>
+                      <select
+                        value={formData.type}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            type: e.target.value,
+                          }))
+                        }
+                      >
+                        <option value="INCOME">Receita</option>
+                        <option value="EXPENSE">Despesa</option>
+                        <option value="ASSET">Patrimônio</option>
+                      </select>
+                    </div>
 
+                    <div className="form__group--financial">
+                      <label>Categoria</label>
+                      <select
+                        value={formData.category}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            category: e.target.value,
+                          }))
+                        }
+                      >
+                        <option value="SALE">Venda</option>
+                        <option value="PRODUCT_PURCHASE">
+                          Compra de produto
+                        </option>
+                        <option value="PRODUCT_ASSET">Ativo de produto</option>
+                        <option value="COMPANY_ASSET">
+                          Patrimônio da empresa
+                        </option>
+                        <option value="MAINTENANCE">Manutenção</option>
+                        <option value="TAX">Imposto</option>
+                        <option value="SALARY">Salário</option>
+                        <option value="RENT">Aluguel</option>
+                        <option value="UTILITY">Serviços</option>
+                        <option value="OTHER">Outros</option>
+                      </select>
+                    </div>
+
+                    <div className="form__group--financial">
+                      <label>Valor</label>
                       <input
                         type="number"
-                        min="1"
-                        max="12"
-                        value={formData.payment.installments}
+                        min="0"
+                        value={formData.amount}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            amount: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="financial__section">
+                  <h4>Pagamento</h4>
+
+                  <div className="financial__grid">
+                    <div className="form__group--financial">
+                      <label>Forma de pagamento</label>
+                      <select
+                        value={formData.payment.method}
                         onChange={(e) =>
                           setFormData((prev) => ({
                             ...prev,
                             payment: {
                               ...prev.payment,
-                              installments: e.target.value,
+                              method: e.target.value,
                             },
                           }))
                         }
-                      />
+                      >
+                        <option value="CASH">Dinheiro</option>
+                        <option value="PIX">Pix</option>
+                        <option value="CREDIT_CARD">Cartão de crédito</option>
+                        <option value="DEBIT_CARD">Cartão de débito</option>
+                        <option value="BANK_SLIP">Boleto</option>
+                        <option value="TRANSFER">Transferência</option>
+                      </select>
                     </div>
-                  )}
 
-                  <div className="form__group--financial">
-                    <label>Pago em</label>
-
-                    <input
-                      type="date"
-                      value={formData.payment.paidAt}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          payment: {
-                            ...prev.payment,
-                            paidAt: e.target.value,
-                          },
-                        }))
-                      }
-                    />
-                  </div>
-
-                  <div className="form__group--financial">
-                    <label>Vencimento</label>
-
-                    <input
-                      type="date"
-                      value={formData.payment.dueDate}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          payment: {
-                            ...prev.payment,
-                            dueDate: e.target.value,
-                          },
-                        }))
-                      }
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="financial__section">
-                <h4>Recorrência</h4>
-
-                <div className="financial__grid">
-                  <div className="form__group--financial checkbox">
-                    <label>
-                      <input
-                        type="checkbox"
-                        checked={formData.isRecurring}
+                    <div className="form__group--financial">
+                      <label>Status do pagamento</label>
+                      <select
+                        value={formData.payment.status}
                         onChange={(e) =>
                           setFormData((prev) => ({
                             ...prev,
-                            isRecurring: e.target.checked,
+                            payment: {
+                              ...prev.payment,
+                              status: e.target.value,
+                            },
                           }))
                         }
-                      />
-                      Registro recorrente
-                    </label>
-                  </div>
+                      >
+                        <option value="PENDING">Pendente</option>
+                        <option value="PAID">Pago</option>
+                        <option value="CANCELLED">Cancelado</option>
+                      </select>
+                    </div>
 
-                  {formData.isRecurring && (
-                    <>
+                    {formData.payment.method === "CREDIT_CARD" && (
                       <div className="form__group--financial">
-                        <label>Frequência</label>
-
-                        <select
-                          value={formData.recurrence.frequency}
-                          onChange={(e) =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              recurrence: {
-                                ...prev.recurrence,
-                                frequency: e.target.value,
-                              },
-                            }))
-                          }
-                        >
-                          <option value="NONE">Nenhuma</option>
-                          <option value="DAILY">Diária</option>
-                          <option value="WEEKLY">Semanal</option>
-                          <option value="MONTHLY">Mensal</option>
-                          <option value="YEARLY">Anual</option>
-                        </select>
-                      </div>
-
-                      <div className="form__group--financial">
-                        <label>Próxima recorrência</label>
-
+                        <label>Parcelas</label>
                         <input
-                          type="date"
-                          value={formData.recurrence.nextDate}
+                          type="number"
+                          min="1"
+                          max="12"
+                          value={formData.payment.installments}
                           onChange={(e) =>
                             setFormData((prev) => ({
                               ...prev,
-                              recurrence: {
-                                ...prev.recurrence,
-                                nextDate: e.target.value,
+                              payment: {
+                                ...prev.payment,
+                                installments: e.target.value,
                               },
                             }))
                           }
                         />
                       </div>
-                    </>
-                  )}
+                    )}
+
+                    <div className="form__group--financial">
+                      <label>Pago em</label>
+                      <input
+                        type="date"
+                        value={formData.payment.paidAt}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            payment: {
+                              ...prev.payment,
+                              paidAt: e.target.value,
+                            },
+                          }))
+                        }
+                      />
+                    </div>
+
+                    <div className="form__group--financial">
+                      <label>Vencimento</label>
+                      <input
+                        type="date"
+                        value={formData.payment.dueDate}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            payment: {
+                              ...prev.payment,
+                              dueDate: e.target.value,
+                            },
+                          }))
+                        }
+                      />
+                    </div>
+                  </div>
                 </div>
+
+                <div className="financial__section">
+                  <h4>Recorrência</h4>
+
+                  <div className="financial__grid">
+                    <div className="form__group--financial checkbox">
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={formData.isRecurring}
+                          onChange={(e) =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              isRecurring: e.target.checked,
+                            }))
+                          }
+                        />
+                        Registro recorrente
+                      </label>
+                    </div>
+
+                    {formData.isRecurring && (
+                      <>
+                        <div className="form__group--financial">
+                          <label>Frequência</label>
+                          <select
+                            value={formData.recurrence.frequency}
+                            onChange={(e) =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                recurrence: {
+                                  ...prev.recurrence,
+                                  frequency: e.target.value,
+                                },
+                              }))
+                            }
+                          >
+                            <option value="NONE">Nenhuma</option>
+                            <option value="DAILY">Diária</option>
+                            <option value="WEEKLY">Semanal</option>
+                            <option value="MONTHLY">Mensal</option>
+                            <option value="YEARLY">Anual</option>
+                          </select>
+                        </div>
+
+                        <div className="form__group--financial">
+                          <label>Próxima recorrência</label>
+                          <input
+                            type="date"
+                            value={formData.recurrence.nextDate}
+                            onChange={(e) =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                recurrence: {
+                                  ...prev.recurrence,
+                                  nextDate: e.target.value,
+                                },
+                              }))
+                            }
+                          />
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                <div className="financial__section">
+                  <h4>Observações</h4>
+
+                  <div className="form__group--financial">
+                    <label>Observações</label>
+                    <textarea
+                      value={formData.notes}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          notes: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                </div>
+
+                {!loading && (
+                  <button className="financial__btn" type="submit">
+                    {editId ? "Salvar alterações" : "Cadastrar"}
+                  </button>
+                )}
+
+                {loading && (
+                  <button className="financial__btn" disabled>
+                    Aguarde...
+                  </button>
+                )}
+              </form>
+            </div>
+          </div>,
+          document.body,
+        )}
+
+      {showDetailsModal &&
+        detailsData &&
+        createPortal(
+          <div className="financial__modalOverlay" onClick={closeDetailsModal}>
+            <div
+              className="financial__modal details"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="financial__modalHeader">
+                <h3>Dados do registro</h3>
+
+                <button
+                  type="button"
+                  className="financial__closeBtn"
+                  onClick={closeDetailsModal}
+                >
+                  <IoClose />
+                </button>
               </div>
 
-              <div className="financial__section">
-                <h4>Observações</h4>
+              <div className="financial__details">
+                <div className="financial__detailsSection">
+                  <h4>Dados principais</h4>
+
+                  <p>
+                    <strong>ID:</strong> {detailsData._id}
+                  </p>
+
+                  <p>
+                    <strong>Título:</strong> {detailsData.title}
+                  </p>
+
+                  <p>
+                    <strong>Descrição:</strong> {detailsData.description || "-"}
+                  </p>
+
+                  <p>
+                    <strong>Tipo:</strong> {translateType(detailsData.type)}
+                  </p>
+
+                  <p>
+                    <strong>Categoria:</strong>{" "}
+                    {translateCategory(detailsData.category)}
+                  </p>
+
+                  <p>
+                    <strong>Valor:</strong> {formatCurrency(detailsData.amount)}
+                  </p>
+                </div>
+
+                <div className="financial__detailsSection">
+                  <h4>Pagamento</h4>
+
+                  <p>
+                    <strong>Forma de pagamento:</strong>{" "}
+                    {translatePaymentMethod(detailsData.payment?.method)}
+                  </p>
+
+                  <p>
+                    <strong>Status:</strong>{" "}
+                    {translatePaymentStatus(detailsData.payment?.status)}
+                  </p>
+
+                  <p>
+                    <strong>Parcelas:</strong>{" "}
+                    {detailsData.payment?.installments || 1}x
+                  </p>
+
+                  <p>
+                    <strong>Pago em:</strong>{" "}
+                    {detailsData.payment?.paidAt
+                      ? new Date(detailsData.payment.paidAt).toLocaleDateString(
+                          "pt-BR",
+                        )
+                      : "-"}
+                  </p>
+
+                  <p>
+                    <strong>Vencimento:</strong>{" "}
+                    {detailsData.payment?.dueDate
+                      ? new Date(
+                          detailsData.payment.dueDate,
+                        ).toLocaleDateString("pt-BR")
+                      : "-"}
+                  </p>
+                </div>
+
+                <div className="financial__detailsSection">
+                  <h4>Recorrência</h4>
+
+                  <p>
+                    <strong>Recorrente:</strong>{" "}
+                    {detailsData.isRecurring ? "Sim" : "Não"}
+                  </p>
+
+                  <p>
+                    <strong>Frequência:</strong>{" "}
+                    {detailsData.recurrence?.frequency || "-"}
+                  </p>
+
+                  <p>
+                    <strong>Próxima recorrência:</strong>{" "}
+                    {detailsData.recurrence?.nextDate
+                      ? new Date(
+                          detailsData.recurrence.nextDate,
+                        ).toLocaleDateString("pt-BR")
+                      : "-"}
+                  </p>
+                </div>
+
+                <div className="financial__detailsSection">
+                  <h4>Observações e datas</h4>
+
+                  <p>
+                    <strong>Observações:</strong> {detailsData.notes || "-"}
+                  </p>
+
+                  <p>
+                    <strong>Criado em:</strong>{" "}
+                    {detailsData.createdAt
+                      ? new Date(detailsData.createdAt).toLocaleString("pt-BR")
+                      : "-"}
+                  </p>
+
+                  <p>
+                    <strong>Atualizado em:</strong>{" "}
+                    {detailsData.updatedAt
+                      ? new Date(detailsData.updatedAt).toLocaleString("pt-BR")
+                      : "-"}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
+
+      {showHistoryModal &&
+        createPortal(
+          <div className="financial__modalOverlay" onClick={closeHistoryModal}>
+            <div
+              className="financial__modal"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="financial__modalHeader">
+                <h3>Histórico Financeiro</h3>
+
+                <button
+                  type="button"
+                  className="financial__closeBtn"
+                  onClick={closeHistoryModal}
+                >
+                  <IoClose />
+                </button>
+              </div>
+
+              <div className="financial__historyFilters">
+                <div className="form__group--financial">
+                  <label>Data</label>
+
+                  <input
+                    type="date"
+                    value={historyFilters.date}
+                    onChange={(e) =>
+                      setHistoryFilters((prev) => ({
+                        ...prev,
+                        date: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
 
                 <div className="form__group--financial">
-                  <label>Observações</label>
+                  <label>Mês</label>
 
-                  <textarea
-                    value={formData.notes}
+                  <select
+                    value={historyFilters.month}
                     onChange={(e) =>
-                      setFormData((prev) => ({
+                      setHistoryFilters((prev) => ({
                         ...prev,
-                        notes: e.target.value,
+                        month: e.target.value,
+                      }))
+                    }
+                  >
+                    <option value="">Todos</option>
+                    <option value="01">Janeiro</option>
+                    <option value="02">Fevereiro</option>
+                    <option value="03">Março</option>
+                    <option value="04">Abril</option>
+                    <option value="05">Maio</option>
+                    <option value="06">Junho</option>
+                    <option value="07">Julho</option>
+                    <option value="08">Agosto</option>
+                    <option value="09">Setembro</option>
+                    <option value="10">Outubro</option>
+                    <option value="11">Novembro</option>
+                    <option value="12">Dezembro</option>
+                  </select>
+                </div>
+
+                <div className="form__group--financial">
+                  <label>Ano</label>
+
+                  <input
+                    type="number"
+                    placeholder="2026"
+                    value={historyFilters.year}
+                    onChange={(e) =>
+                      setHistoryFilters((prev) => ({
+                        ...prev,
+                        year: e.target.value,
                       }))
                     }
                   />
                 </div>
               </div>
 
-              {!loading && (
-                <button className="financial__btn" type="submit">
-                  {editId ? "Salvar alterações" : "Cadastrar"}
-                </button>
-              )}
+              <div className="financial__historyList">
+                {historyFinancials.length === 0 && (
+                  <p className="financial__empty">
+                    Nenhuma movimentação encontrada.
+                  </p>
+                )}
 
-              {loading && (
-                <button className="financial__btn" disabled>
-                  Aguarde...
-                </button>
-              )}
-            </form>
-          </div>
-        </div>
-      )}
+                {historyFinancials.map((financial) => (
+                  <div
+                    key={financial._id}
+                    className={`financial__historyItem ${financial.type?.toLowerCase()}`}
+                  >
+                    <div>
+                      <strong>{financial.title}</strong>
 
-      {showDetails && detailsData && (
-        <div className="financial__modalOverlay">
-          <div className="financial__modal details">
-            <div className="financial__modalHeader">
-              <h3>Dados do registro</h3>
+                      <span>
+                        {formatDateToCompare(getFinancialDate(financial))
+                          .split("-")
+                          .reverse()
+                          .join("/")}
+                      </span>
+                    </div>
 
-              <button
-                className="financial__closeBtn"
-                onClick={() => {
-                  setShowDetails(false);
-                  setDetailsData(null);
-                }}
-              >
-                <IoClose />
-              </button>
-            </div>
+                    <small>
+                      {translateType(financial.type)} •{" "}
+                      {translateCategory(financial.category)} •{" "}
+                      {translatePaymentStatus(
+                        financial.payment?.status || "PENDING",
+                      )}
+                    </small>
 
-            <div className="financial__details">
-              <div className="financial__detailsSection">
-                <h4>Dados principais</h4>
-
-                <p>
-                  <strong>ID:</strong> {detailsData._id}
-                </p>
-
-                <p>
-                  <strong>Título:</strong> {detailsData.title}
-                </p>
-
-                <p>
-                  <strong>Descrição:</strong> {detailsData.description || "-"}
-                </p>
-
-                <p>
-                  <strong>Tipo:</strong> {translateType(detailsData.type)}
-                </p>
-
-                <p>
-                  <strong>Categoria:</strong>{" "}
-                  {translateCategory(detailsData.category)}
-                </p>
-
-                <p>
-                  <strong>Valor:</strong> {formatCurrency(detailsData.amount)}
-                </p>
-              </div>
-
-              <div className="financial__detailsSection">
-                <h4>Pagamento</h4>
-
-                <p>
-                  <strong>Forma de pagamento:</strong>{" "}
-                  {translatePaymentMethod(detailsData.payment?.method)}
-                </p>
-
-                <p>
-                  <strong>Status:</strong>{" "}
-                  {translatePaymentStatus(detailsData.payment?.status)}
-                </p>
-
-                <p>
-                  <strong>Parcelas:</strong>{" "}
-                  {detailsData.payment?.installments || 1}x
-                </p>
-
-                <p>
-                  <strong>Pago em:</strong>{" "}
-                  {detailsData.payment?.paidAt
-                    ? new Date(detailsData.payment.paidAt).toLocaleDateString(
-                        "pt-BR",
-                      )
-                    : "-"}
-                </p>
-
-                <p>
-                  <strong>Vencimento:</strong>{" "}
-                  {detailsData.payment?.dueDate
-                    ? new Date(detailsData.payment.dueDate).toLocaleDateString(
-                        "pt-BR",
-                      )
-                    : "-"}
-                </p>
-              </div>
-
-              <div className="financial__detailsSection">
-                <h4>Recorrência</h4>
-
-                <p>
-                  <strong>Recorrente:</strong>{" "}
-                  {detailsData.isRecurring ? "Sim" : "Não"}
-                </p>
-
-                <p>
-                  <strong>Frequência:</strong>{" "}
-                  {detailsData.recurrence?.frequency || "-"}
-                </p>
-
-                <p>
-                  <strong>Próxima recorrência:</strong>{" "}
-                  {detailsData.recurrence?.nextDate
-                    ? new Date(
-                        detailsData.recurrence.nextDate,
-                      ).toLocaleDateString("pt-BR")
-                    : "-"}
-                </p>
-              </div>
-
-              <div className="financial__detailsSection">
-                <h4>Observações e datas</h4>
-
-                <p>
-                  <strong>Observações:</strong> {detailsData.notes || "-"}
-                </p>
-
-                <p>
-                  <strong>Criado em:</strong>{" "}
-                  {detailsData.createdAt
-                    ? new Date(detailsData.createdAt).toLocaleString("pt-BR")
-                    : "-"}
-                </p>
-
-                <p>
-                  <strong>Atualizado em:</strong>{" "}
-                  {detailsData.updatedAt
-                    ? new Date(detailsData.updatedAt).toLocaleString("pt-BR")
-                    : "-"}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-      {showHistoryModal && (
-        <div className="financial__modalOverlay">
-          <div className="financial__modal">
-            <div className="financial__modalHeader">
-              <h3>Histórico Financeiro</h3>
-
-              <button
-                className="financial__closeBtn"
-                onClick={() => setShowHistoryModal(false)}
-              >
-                <IoClose />
-              </button>
-            </div>
-
-            <div className="financial__historyFilters">
-              <div className="form__group--financial">
-                <label>Data</label>
-
-                <input
-                  type="date"
-                  value={historyFilters.date}
-                  onChange={(e) =>
-                    setHistoryFilters((prev) => ({
-                      ...prev,
-                      date: e.target.value,
-                    }))
-                  }
-                />
-              </div>
-
-              <div className="form__group--financial">
-                <label>Mês</label>
-
-                <select
-                  value={historyFilters.month}
-                  onChange={(e) =>
-                    setHistoryFilters((prev) => ({
-                      ...prev,
-                      month: e.target.value,
-                    }))
-                  }
-                >
-                  <option value="">Todos</option>
-                  <option value="01">Janeiro</option>
-                  <option value="02">Fevereiro</option>
-                  <option value="03">Março</option>
-                  <option value="04">Abril</option>
-                  <option value="05">Maio</option>
-                  <option value="06">Junho</option>
-                  <option value="07">Julho</option>
-                  <option value="08">Agosto</option>
-                  <option value="09">Setembro</option>
-                  <option value="10">Outubro</option>
-                  <option value="11">Novembro</option>
-                  <option value="12">Dezembro</option>
-                </select>
-              </div>
-
-              <div className="form__group--financial">
-                <label>Ano</label>
-
-                <input
-                  type="number"
-                  placeholder="2026"
-                  value={historyFilters.year}
-                  onChange={(e) =>
-                    setHistoryFilters((prev) => ({
-                      ...prev,
-                      year: e.target.value,
-                    }))
-                  }
-                />
-              </div>
-            </div>
-
-            <div className="financial__historyList">
-              {historyFinancials.length === 0 && (
-                <p className="financial__empty">
-                  Nenhuma movimentação encontrada.
-                </p>
-              )}
-
-              {historyFinancials.map((financial) => (
-                <div
-                  key={financial._id}
-                  className={`financial__historyItem ${financial.type?.toLowerCase()}`}
-                >
-                  <div>
-                    <strong>{financial.title}</strong>
-
-                    <span>
-                      {formatDateToCompare(getFinancialDate(financial))
-                        .split("-")
-                        .reverse()
-                        .join("/")}
-                    </span>
+                    <p>{formatCurrency(financial.amount)}</p>
                   </div>
-
-                  <small>
-                    {translateType(financial.type)} •{" "}
-                    {translateCategory(financial.category)} •{" "}
-                    {translatePaymentStatus(
-                      financial.payment?.status || "PENDING",
-                    )}
-                  </small>
-
-                  <p>{formatCurrency(financial.amount)}</p>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        </div>
-      )}
-      {error && <Message msg={error} type="error" />}
-      {message && <Message msg={message} type="success" />}
+          </div>,
+          document.body,
+        )}
+
+      {showDeleteModal &&
+        selectedDeleteFinancial &&
+        createPortal(
+          <div className="financial__modalOverlay" onClick={closeDeleteModal}>
+            <div
+              className="financial__deleteModal"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="financial__modalHeader">
+                <h3>Excluir registro</h3>
+
+                <button
+                  type="button"
+                  className="financial__closeBtn"
+                  onClick={closeDeleteModal}
+                >
+                  <IoClose />
+                </button>
+              </div>
+
+              <div className="financial__deleteContent">
+                <p>Deseja realmente excluir o registro:</p>
+                <strong>{selectedDeleteFinancial.title}</strong>
+                <span>Esta ação não poderá ser desfeita.</span>
+              </div>
+
+              <div className="financial__deleteActions">
+                <button
+                  type="button"
+                  className="financial__btn financial__btnSecondary"
+                  onClick={closeDeleteModal}
+                >
+                  Cancelar
+                </button>
+
+                <button
+                  type="button"
+                  className="financial__btn financial__btnDanger"
+                  onClick={handleConfirmDelete}
+                >
+                  Excluir
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 };
