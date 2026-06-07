@@ -1,14 +1,12 @@
 // CSS
 import "./Product.css";
 
-// Components
-import Message from "../../components/Message/Message";
-
-// Hooks
-import { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+// React
+import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 
 // Redux
+import { useSelector, useDispatch } from "react-redux";
 import {
   getProducts,
   resetMessage,
@@ -18,10 +16,19 @@ import {
   getProductById,
 } from "../../slices/productSlice";
 
-//Storage
+// Components
+import Message from "../../components/Message/Message";
+
+// Hooks
+import { useModal } from "../../hooks/useModal";
+import { useSearch } from "../../hooks/useSearch";
+
+// Storage
 import { uploads } from "../../utils/config";
 
-import { FaEdit, FaTrash } from "react-icons/fa";
+// Icons
+import { FaEdit, FaTrash, FaBoxOpen } from "react-icons/fa";
+import { IoClose } from "react-icons/io5";
 
 const Product = () => {
   const dispatch = useDispatch();
@@ -30,25 +37,74 @@ const Product = () => {
     (state) => state.product,
   );
 
-  const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [name, setName] = useState("");
   const [stock, setStock] = useState("");
   const [unityPrice, setUnityPrice] = useState("");
   const [productImage, setProductImage] = useState("");
-  const [search, setSearch] = useState("");
   const [errors, setErrors] = useState({});
   const [category, setCategory] = useState("");
 
-  const validateField = (name, value) => {
+  const {
+    isOpen: showProductModal,
+    openModal: openProductModal,
+    closeModal: closeProductModal,
+  } = useModal();
+
+  const {
+    isOpen: showDeleteModal,
+    modalData: selectedDeleteProduct,
+    openModal: openDeleteModal,
+    closeModal: closeDeleteModal,
+  } = useModal();
+
+  const productsList = useMemo(() => {
+    return Array.isArray(products) ? products : [];
+  }, [products]);
+
+  const {
+    search,
+    setSearch,
+    filteredItems: filteredProducts,
+  } = useSearch(productsList, [
+    "name",
+    "category",
+    "company.name",
+    (product) =>
+      product.category === "ASSET"
+        ? "bem da empresa asset"
+        : product.category === "SELLABLE"
+          ? "vendável vendavel produto vendável sellable"
+          : "operacional operational",
+    (product) => (Number(product.stock) > 0 ? "ativo estoque" : "sem estoque"),
+  ]);
+
+  const resetForm = () => {
+    setEditId(null);
+    setName("");
+    setStock("");
+    setUnityPrice("");
+    setProductImage("");
+    setCategory("");
+    setErrors({});
+  };
+
+  const handleCloseProductModal = () => {
+    closeProductModal();
+    resetForm();
+    dispatch(resetMessage());
+  };
+
+  const validateField = (fieldName, value) => {
     let error = "";
 
-    switch (name) {
+    switch (fieldName) {
       case "name":
         if (value.trim().length < 3) {
           error = "O nome do produto precisa ter no mínimo 3 caracteres.";
         }
         break;
+
       case "stock":
         if (value === "") {
           error = "Estoque é obrigatório.";
@@ -56,67 +112,68 @@ const Product = () => {
           error = "O estoque não pode ser negativo.";
         }
         break;
+
       case "unityPrice":
         if (value === "") {
-          error = "O preço do produto unitário é obrigatório.";
+          error = "O preço unitário é obrigatório.";
         } else if (Number(value) <= 0) {
-          error = "O preço precisa ser um valor maior que zero.";
+          error = "O preço precisa ser maior que zero.";
         }
         break;
+
       case "category":
         if (!value) {
           error = "A categoria é obrigatória.";
         }
         break;
+
       default:
         break;
     }
 
     setErrors((prev) => ({
       ...prev,
-      [name]: error,
+      [fieldName]: error,
     }));
+
+    return error;
   };
 
-  // Load products
+  const validateForm = () => {
+    const validationErrors = {
+      name: validateField("name", name),
+      stock: validateField("stock", stock),
+      unityPrice: validateField("unityPrice", unityPrice),
+      category: validateField("category", category),
+    };
+
+    return !Object.values(validationErrors).some((item) => item);
+  };
+
   useEffect(() => {
     dispatch(getProducts());
   }, [dispatch]);
 
-  // Reset messages ao abrir página
   useEffect(() => {
     dispatch(resetMessage());
   }, [dispatch]);
 
-  // Auto remove messages
   useEffect(() => {
     if (message || error) {
       const timer = setTimeout(() => {
         dispatch(resetMessage());
-      }, 2000);
+      }, 2500);
 
       return () => clearTimeout(timer);
     }
   }, [message, error, dispatch]);
 
-  // Submit create/update
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    validateField("name", name);
-    validateField("stock", stock);
-    validateField("unityPrice", unityPrice);
-    validateField("category", category);
+    const isValid = validateForm();
 
-    if (
-      !name ||
-      name.length < 3 ||
-      stock === "" ||
-      Number(stock) < 0 ||
-      unityPrice === "" ||
-      Number(unityPrice) <= 0 ||
-      !category
-    ) {
+    if (!isValid) {
       return;
     }
 
@@ -133,7 +190,6 @@ const Product = () => {
 
     let result;
 
-    // UPDATE
     if (editId) {
       result = await dispatch(
         updateProduct({
@@ -141,10 +197,7 @@ const Product = () => {
           productData,
         }),
       );
-    }
-
-    // CREATE
-    else {
+    } else {
       result = await dispatch(createProduct(productData));
     }
 
@@ -153,18 +206,10 @@ const Product = () => {
       updateProduct.fulfilled.match(result);
 
     if (success) {
-      setName("");
-      setStock("");
-      setUnityPrice("");
-      setProductImage("");
-      setCategory("");
-
-      setEditId(null);
-      setShowModal(false);
+      handleCloseProductModal();
     }
   };
 
-  // EDIT
   const handleEdit = async (id) => {
     const result = await dispatch(getProductById(id));
 
@@ -172,210 +217,99 @@ const Product = () => {
       const product = result.payload;
 
       setEditId(product._id);
-
       setName(product.name || "");
       setStock(product.stock || "");
       setUnityPrice(product.unityPrice || "");
       setCategory(product.category || "");
 
-      setShowModal(true);
+      openProductModal();
     }
   };
 
-  // DELETE
-  const handleDelete = async (id) => {
-    await dispatch(deleteProduct(id));
+  const handleConfirmDelete = async () => {
+    if (!selectedDeleteProduct?._id) return;
+
+    await dispatch(deleteProduct(selectedDeleteProduct._id));
+    closeDeleteModal();
   };
 
-  // FILTER
-  const filteredProducts = products.filter((product) =>
-    product.name?.toLowerCase().includes(search.toLowerCase()),
+  const getCategoryLabel = (productCategory) => {
+    const categories = {
+      ASSET: "Bem da empresa",
+      SELLABLE: "Vendável",
+      OPERATIONAL: "Operacional",
+    };
+
+    return categories[productCategory] || "-";
+  };
+
+  const totalStock = productsList.reduce(
+    (acc, product) => acc + Number(product.stock || 0),
+    0,
   );
+
+  const stockValue = productsList.reduce(
+    (acc, product) => acc + Number(product.totalPrice || 0),
+    0,
+  );
+
+  const latestProduct = [...productsList].sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+  )[0];
+
+  const latestEntry = latestProduct
+    ? (() => {
+        const latestDate = new Date(latestProduct.createdAt);
+        const today = new Date();
+
+        const isToday =
+          latestDate.getDate() === today.getDate() &&
+          latestDate.getMonth() === today.getMonth() &&
+          latestDate.getFullYear() === today.getFullYear();
+
+        return isToday ? "Hoje" : latestDate.toLocaleDateString("pt-BR");
+      })()
+    : "Nenhum produto";
 
   return (
     <div className="product">
       <main className="product__main">
         <div className="product__header">
-          <h2>Produtos</h2>
+          <h2>
+            <FaBoxOpen />
+            Produtos
+          </h2>
+
           <button
+            type="button"
             className="product__btn"
             onClick={() => {
-              setShowModal(true);
-              setEditId(null);
-              setName("");
-              setStock("");
-              setUnityPrice("");
-              setProductImage("");
+              resetForm();
               dispatch(resetMessage());
+              openProductModal();
             }}
           >
             + Novo Produto
           </button>
         </div>
 
-        {/* MODAL */}
-        {showModal && (
-          <div className="product__modalOverlay">
-            <div className="product__modal">
-              <div className="product__modalHeader">
-                <h3>{editId ? "Editar Produto" : "Novo Produto"}</h3>
+        {error && <Message msg={error} type="error" />}
+        {message && <Message msg={message} type="success" />}
 
-                <button
-                  className="product__closeBtn"
-                  onClick={() => {
-                    setShowModal(false);
-                    setEditId(null);
-
-                    setName("");
-                    setStock("");
-                    setUnityPrice("");
-                    setProductImage("");
-
-                    dispatch(resetMessage());
-                  }}
-                >
-                  ✕
-                </button>
-              </div>
-
-              <form onSubmit={handleSubmit} className="form__product">
-                <div className="form__group--product">
-                  <label>Categoria</label>
-                  <select
-                    value={category}
-                    onChange={(e) => {
-                      setCategory(e.target.value);
-                      validateField("category", e.target.value);
-                    }}
-                  >
-                    <option value="">Selecione uma categoria</option>
-                    <option value="ASSET">Bem da Empresa</option>
-                    <option value="SELLABLE">Produto vendável</option>
-                    <option value="OPERATIONAL">Produto operacional</option>
-                  </select>
-                  {errors.category && (
-                    <Message msg={errors.category} type="error" />
-                  )}
-                </div>
-                <div className="form__group--product">
-                  <label>Nome do produto</label>
-                  <input
-                    type="text"
-                    placeholder="Digite o nome do produto"
-                    value={name}
-                    onChange={(e) => {
-                      setName(e.target.value);
-                      validateField("name", e.target.value);
-                    }}
-                  />
-                  {errors.name && <Message msg={errors.name} type="error" />}
-                </div>
-                <div className="form__group--product">
-                  <label>Estoque</label>
-                  <input
-                    type="number"
-                    placeholder="Digite a quantidade do produto"
-                    value={stock}
-                    onChange={(e) => {
-                      setStock(e.target.value);
-                      validateField("stock", e.target.value);
-                    }}
-                  />
-                  {errors.stock && <Message msg={errors.stock} type="error" />}
-                </div>
-                <div className="form__group--product">
-                  <label>Preço unitário</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    placeholder="Digite o preço unitário"
-                    value={unityPrice}
-                    onChange={(e) => {
-                      setUnityPrice(e.target.value);
-                      validateField("unityPrice", e.target.value);
-                    }}
-                  />
-                  {errors.unityPrice && (
-                    <Message msg={errors.unityPrice} type="error" />
-                  )}
-                </div>
-                <div className="form__group--product">
-                  <label>Imagem do produto</label>
-                  <input
-                    type="file"
-                    onChange={(e) => setProductImage(e.target.files[0])}
-                  />
-                </div>
-                {!loading && (
-                  <input
-                    type="submit"
-                    value={editId ? "Salvar Alterações" : "Cadastrar Produto"}
-                    className="product__btn"
-                  />
-                )}
-
-                {loading && (
-                  <input
-                    type="submit"
-                    value="Aguarde..."
-                    className="product__btn"
-                    disabled
-                  />
-                )}
-
-                {error && <Message msg={error} type="error" />}
-              </form>
-            </div>
-          </div>
-        )}
-
-        {/* CARDS */}
         <div className="product__cards">
-          <div className="card green">{products.length} Produtos</div>
-
-          <div className="card blue">
-            Estoque total:{" "}
-            {products.reduce((acc, p) => acc + (p.stock || 0), 0)}
-          </div>
-
-          <div className="card orange">
-            Última entrada:{" "}
-            {products.length > 0
-              ? (() => {
-                  const latestProduct = [...products].sort(
-                    (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
-                  )[0];
-
-                  const latestDate = new Date(latestProduct.createdAt);
-                  const today = new Date();
-
-                  const isToday =
-                    latestDate.getDate() === today.getDate() &&
-                    latestDate.getMonth() === today.getMonth() &&
-                    latestDate.getFullYear() === today.getFullYear();
-
-                  return isToday
-                    ? "Hoje"
-                    : latestDate.toLocaleDateString("pt-BR");
-                })()
-              : "Nenhum produto"}
-          </div>
-
+          <div className="card green">{productsList.length} Produtos</div>
+          <div className="card blue">Estoque total: {totalStock}</div>
+          <div className="card orange">Última entrada: {latestEntry}</div>
           <div className="card red">
             R${" "}
-            {products
-              .reduce((acc, product) => {
-                return acc + Number(product.totalPrice || 0);
-              }, 0)
-              .toLocaleString("pt-BR", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}{" "}
+            {stockValue.toLocaleString("pt-BR", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}{" "}
             em estoque
           </div>
         </div>
 
-        {/* FILTERS */}
         <div className="product__filters">
           <input
             type="text"
@@ -385,7 +319,6 @@ const Product = () => {
           />
         </div>
 
-        {/* TABLE */}
         <div className="product__table">
           <table>
             <thead>
@@ -419,18 +352,14 @@ const Product = () => {
                       </div>
                     )}
                   </td>
-                  <td>
-                    {product.category === "ASSET"
-                      ? "Bem da empresa"
-                      : product.category === "SELLABLE"
-                        ? "Vendável"
-                        : "Operacional"}
-                  </td>
+
+                  <td>{getCategoryLabel(product.category)}</td>
                   <td>{product.name}</td>
                   <td>{product.stock}</td>
-                  <td>R$ {Number(product.unityPrice).toFixed(2)}</td>
-                  <td>R$ {Number(product.totalPrice).toFixed(2)}</td>
-                  <td>{product.company?.name}</td>
+                  <td>R$ {Number(product.unityPrice || 0).toFixed(2)}</td>
+                  <td>R$ {Number(product.totalPrice || 0).toFixed(2)}</td>
+                  <td>{product.company?.name || "-"}</td>
+
                   <td>
                     <span
                       className={
@@ -442,9 +371,13 @@ const Product = () => {
                       {Number(product.stock) > 0 ? "Ativo" : "Sem estoque"}
                     </span>
                   </td>
+
                   <td>
-                    {new Date(product.createdAt).toLocaleDateString("pt-BR")}
+                    {product.createdAt
+                      ? new Date(product.createdAt).toLocaleDateString("pt-BR")
+                      : "-"}
                   </td>
+
                   <td>
                     <div className="table__edit--close">
                       <span
@@ -453,9 +386,10 @@ const Product = () => {
                       >
                         <FaEdit />
                       </span>
+
                       <span
                         className="product__actionIcon delete"
-                        onClick={() => handleDelete(product._id)}
+                        onClick={() => openDeleteModal(product)}
                       >
                         <FaTrash />
                       </span>
@@ -466,10 +400,189 @@ const Product = () => {
             </tbody>
           </table>
 
-          {message && <Message msg={message} type="success" />}
+          {!loading && filteredProducts.length === 0 && (
+            <p className="product__empty">Nenhum produto encontrado.</p>
+          )}
 
-          {loading && <p>Carregando produtos...</p>}
+          {loading && <p className="product__empty">Carregando produtos...</p>}
         </div>
+
+        {showProductModal &&
+          createPortal(
+            <div
+              className="product__modalOverlay"
+              onClick={handleCloseProductModal}
+            >
+              <div
+                className="product__modal"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="product__modalHeader">
+                  <h3>{editId ? "Editar Produto" : "Novo Produto"}</h3>
+
+                  <button
+                    type="button"
+                    className="product__closeBtn"
+                    onClick={handleCloseProductModal}
+                  >
+                    <IoClose />
+                  </button>
+                </div>
+
+                <form onSubmit={handleSubmit} className="form__product">
+                  <div className="form__group--product">
+                    <label>Categoria</label>
+                    <select
+                      value={category}
+                      onChange={(e) => {
+                        setCategory(e.target.value);
+                        validateField("category", e.target.value);
+                      }}
+                      className={errors.category ? "input__error" : ""}
+                    >
+                      <option value="">Selecione uma categoria</option>
+                      <option value="ASSET">Bem da Empresa</option>
+                      <option value="SELLABLE">Produto vendável</option>
+                      <option value="OPERATIONAL">Produto operacional</option>
+                    </select>
+
+                    {errors.category && (
+                      <span className="field__error">{errors.category}</span>
+                    )}
+                  </div>
+
+                  <div className="form__group--product">
+                    <label>Nome do produto</label>
+                    <input
+                      type="text"
+                      placeholder="Digite o nome do produto"
+                      value={name}
+                      onChange={(e) => {
+                        setName(e.target.value);
+                        validateField("name", e.target.value);
+                      }}
+                      className={errors.name ? "input__error" : ""}
+                    />
+
+                    {errors.name && (
+                      <span className="field__error">{errors.name}</span>
+                    )}
+                  </div>
+
+                  <div className="form__group--product">
+                    <label>Estoque</label>
+                    <input
+                      type="number"
+                      placeholder="Digite a quantidade do produto"
+                      value={stock}
+                      onChange={(e) => {
+                        setStock(e.target.value);
+                        validateField("stock", e.target.value);
+                      }}
+                      className={errors.stock ? "input__error" : ""}
+                    />
+
+                    {errors.stock && (
+                      <span className="field__error">{errors.stock}</span>
+                    )}
+                  </div>
+
+                  <div className="form__group--product">
+                    <label>Preço unitário</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      placeholder="Digite o preço unitário"
+                      value={unityPrice}
+                      onChange={(e) => {
+                        setUnityPrice(e.target.value);
+                        validateField("unityPrice", e.target.value);
+                      }}
+                      className={errors.unityPrice ? "input__error" : ""}
+                    />
+
+                    {errors.unityPrice && (
+                      <span className="field__error">{errors.unityPrice}</span>
+                    )}
+                  </div>
+
+                  <div className="form__group--product">
+                    <label>Imagem do produto</label>
+                    <input
+                      type="file"
+                      onChange={(e) => setProductImage(e.target.files[0])}
+                    />
+                  </div>
+
+                  {!loading && (
+                    <input
+                      type="submit"
+                      value={editId ? "Salvar Alterações" : "Cadastrar Produto"}
+                      className="product__btn"
+                    />
+                  )}
+
+                  {loading && (
+                    <input
+                      type="submit"
+                      value="Aguarde..."
+                      className="product__btn"
+                      disabled
+                    />
+                  )}
+                </form>
+              </div>
+            </div>,
+            document.body,
+          )}
+
+        {showDeleteModal &&
+          selectedDeleteProduct &&
+          createPortal(
+            <div className="product__modalOverlay" onClick={closeDeleteModal}>
+              <div
+                className="product__deleteModal"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="product__modalHeader">
+                  <h3>Excluir Produto</h3>
+
+                  <button
+                    type="button"
+                    className="product__closeBtn"
+                    onClick={closeDeleteModal}
+                  >
+                    <IoClose />
+                  </button>
+                </div>
+
+                <div className="product__deleteContent">
+                  <p>Deseja realmente excluir o produto:</p>
+                  <strong>{selectedDeleteProduct.name}</strong>
+                  <span>Esta ação não poderá ser desfeita.</span>
+                </div>
+
+                <div className="product__deleteActions">
+                  <button
+                    type="button"
+                    className="product__btn product__btnSecondary"
+                    onClick={closeDeleteModal}
+                  >
+                    Cancelar
+                  </button>
+
+                  <button
+                    type="button"
+                    className="product__btn product__btnDanger"
+                    onClick={handleConfirmDelete}
+                  >
+                    Excluir
+                  </button>
+                </div>
+              </div>
+            </div>,
+            document.body,
+          )}
       </main>
     </div>
   );
