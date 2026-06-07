@@ -392,7 +392,7 @@ const Dashboard = () => {
 
         <div className="dashboardPage__charts">
           <div className="dashboardPage__chart">
-            <h3>Produtos em destaque</h3>
+            <h3>Ranking de produtos</h3>
 
             {topProducts.length === 0 && (
               <p className="dashboardPage__empty">Nenhum produto vendido.</p>
@@ -414,7 +414,7 @@ const Dashboard = () => {
           </div>
 
           <div className="dashboardPage__chart">
-            <h3>Clientes em destaque</h3>
+            <h3>Ranking de clientes</h3>
 
             {topClients.length === 0 && (
               <p className="dashboardPage__empty">Nenhum cliente encontrado.</p>
