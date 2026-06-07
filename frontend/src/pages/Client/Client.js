@@ -1,7 +1,9 @@
+//CSS
 import "./Client.css";
 
 //React
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 
 //Redux
 import { useDispatch, useSelector } from "react-redux";
@@ -18,9 +20,14 @@ import { getAllAppointments } from "../../slices/appointmentSlice";
 //Icons
 import { MdDelete, MdEdit } from "react-icons/md";
 import { IoClose } from "react-icons/io5";
+import { FaUsers } from "react-icons/fa";
 
 //Components
 import Message from "../../components/Message/Message";
+
+//Hooks
+import { useModal } from "../../hooks/useModal";
+import { useSearch } from "../../hooks/useSearch";
 
 const Clients = () => {
   const dispatch = useDispatch();
@@ -28,13 +35,42 @@ const Clients = () => {
   const { clients, error, message } = useSelector((state) => state.client);
   const { sales } = useSelector((state) => state.sales);
   const { appointments } = useSelector((state) => state.appointment);
-  const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState(null);
-  const [selectedAddress, setSelectedAddress] = useState(null);
   const [errors, setErrors] = useState({});
-  const [selectedPhones, setSelectedPhones] = useState(null);
-  const [search, setSearch] = useState("");
-  const [selectedPurchaseHistory, setSelectedPurchaseHistory] = useState(null);
+
+  const {
+    isOpen: showClientModal,
+    openModal: openClientModal,
+    closeModal: closeClientModal,
+  } = useModal();
+
+  const {
+    isOpen: showAddressModal,
+    modalData: selectedAddress,
+    openModal: openAddressModal,
+    closeModal: closeAddressModal,
+  } = useModal();
+
+  const {
+    isOpen: showPhonesModal,
+    modalData: selectedPhones,
+    openModal: openPhonesModal,
+    closeModal: closePhonesModal,
+  } = useModal();
+
+  const {
+    isOpen: showHistoryModal,
+    modalData: selectedPurchaseHistory,
+    openModal: openHistoryModal,
+    closeModal: closeHistoryModal,
+  } = useModal();
+
+  const {
+    isOpen: showDeleteModal,
+    modalData: selectedDeleteClient,
+    openModal: openDeleteModal,
+    closeModal: closeDeleteModal,
+  } = useModal();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -292,39 +328,47 @@ const Clients = () => {
     }
   };
 
-  const activeClients = clients.filter(
+  const clientsList = useMemo(() => {
+    return Array.isArray(clients) ? clients : [];
+  }, [clients]);
+
+  const activeClients = clientsList.filter(
     (client) => client.financial === "ACTIVE",
   ).length;
 
-  const cancelledClients = clients.filter(
+  const cancelledClients = clientsList.filter(
     (client) => client.financial === "CANCELLED",
   ).length;
 
-  const companyClients = clients.filter(
+  const companyClients = clientsList.filter(
     (client) => client.type === "COMPANY",
   ).length;
 
-  const filteredClients = clients.filter((client) => {
-    const searchText = search.toLowerCase();
-
-    return (
-      client.name?.toLowerCase().includes(searchText) ||
-      client.email?.toLowerCase().includes(searchText) ||
-      client.cpfCnpj?.toLowerCase().includes(searchText) ||
-      client.type?.toLowerCase().includes(searchText) ||
-      client.financial?.toLowerCase().includes(searchText) ||
-      client.phones?.primary?.toLowerCase().includes(searchText) ||
-      client.phones?.secondary?.toLowerCase().includes(searchText) ||
-      client.phones?.emergency?.toLowerCase().includes(searchText) ||
-      client.address?.street?.toLowerCase().includes(searchText) ||
-      client.address?.number?.toLowerCase().includes(searchText) ||
-      client.address?.complement?.toLowerCase().includes(searchText) ||
-      client.address?.neighborhood?.toLowerCase().includes(searchText) ||
-      client.address?.city?.toLowerCase().includes(searchText) ||
-      client.address?.state?.toLowerCase().includes(searchText) ||
-      client.address?.zipCode?.toLowerCase().includes(searchText)
-    );
-  });
+  const {
+    search,
+    setSearch,
+    filteredItems: filteredClients,
+    hasSearch,
+  } = useSearch(clientsList, [
+    "name",
+    "email",
+    "cpfCnpj",
+    "type",
+    "financial",
+    "phones.primary",
+    "phones.secondary",
+    "phones.emergency",
+    "address.street",
+    "address.number",
+    "address.complement",
+    "address.neighborhood",
+    "address.city",
+    "address.state",
+    "address.zipCode",
+    (client) =>
+      client.type === "PERSON" ? "pessoa física pessoa fisica" : "empresa",
+    (client) => (client.financial === "ACTIVE" ? "ativo" : "cancelado"),
+  ]);
 
   useEffect(() => {
     dispatch(getAllClients());
@@ -333,14 +377,14 @@ const Clients = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (message) {
+    if (message || error) {
       const timer = setTimeout(() => {
         dispatch(resetMessage());
-      }, 2000);
+      }, 2500);
 
       return () => clearTimeout(timer);
     }
-  }, [message, dispatch]);
+  }, [message, error, dispatch]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -433,8 +477,7 @@ const Clients = () => {
       dispatch(createClient(payload));
     }
 
-    setShowModal(false);
-    resetForm();
+    handleCloseClientModal();
   };
 
   const handleEdit = (client) => {
@@ -462,7 +505,7 @@ const Clients = () => {
       notes: client.notes || "",
     });
 
-    setShowModal(true);
+    openClientModal();
   };
 
   const handleDelete = (id) => {
@@ -489,24 +532,41 @@ const Clients = () => {
     });
   };
 
+  const handleCloseClientModal = () => {
+    closeClientModal();
+    resetForm();
+  };
+
+  const handleConfirmDelete = () => {
+    if (!selectedDeleteClient?._id) return;
+
+    dispatch(deleteClient(selectedDeleteClient._id));
+    closeDeleteModal();
+  };
+
   return (
     <div className="clients">
       {/* HEADER */}
       <div className="clients__header">
-        <h2>Clientes</h2>
+        <h2>
+          <FaUsers />
+          Clientes
+        </h2>
 
         <button
           className="clients__btn"
           onClick={() => {
             resetForm();
-            setShowModal(true);
+            openClientModal();
           }}
         >
           + Novo Cliente
         </button>
       </div>
+      {error && <Message msg={error} type="error" />}
+      {message && <Message msg={message} type="success" />}
       <div className="clients__cards">
-        <div className="clientCard green">{clients.length} Clientes</div>
+        <div className="clientCard green">{clientsList.length} Clientes</div>
         <div className="clientCard blue">{activeClients} Ativos</div>
         <div className="clientCard orange">{companyClients} Empresas</div>
         <div className="clientCard red">{cancelledClients} Cancelados</div>
@@ -544,7 +604,7 @@ const Clients = () => {
                   <td>
                     <button
                       className="addressBtn"
-                      onClick={() => setSelectedPhones(client.phones)}
+                      onClick={() => openPhonesModal(client.phones)}
                     >
                       Ver telefones
                     </button>
@@ -569,7 +629,7 @@ const Clients = () => {
                   <td>
                     <button
                       className="addressBtn"
-                      onClick={() => setSelectedAddress(client.address)}
+                      onClick={() => openAddressModal(client.address)}
                     >
                       Ver endereço
                     </button>
@@ -577,7 +637,7 @@ const Clients = () => {
                   <td>
                     <button
                       className="addressBtn"
-                      onClick={() => setSelectedPurchaseHistory(client)}
+                      onClick={() => openHistoryModal(client)}
                     >
                       Ver histórico
                     </button>
@@ -591,7 +651,7 @@ const Clients = () => {
 
                       <MdDelete
                         className="client__actionIcon delete"
-                        onClick={() => handleDelete(client._id)}
+                        onClick={() => openDeleteModal(client)}
                       />
                     </div>
                   </td>
@@ -602,620 +662,691 @@ const Clients = () => {
       </div>
 
       {/* MODAL CLIENTE */}
-      {showModal && (
-        <div className="clients__modalOverlay">
-          <div className="clients__modal">
-            <div className="clients__modalHeader">
-              <h3>{editId ? "Editar Cliente" : "Novo Cliente"}</h3>
+      {showClientModal &&
+        createPortal(
+          <div className="clients__modalOverlay">
+            <div className="clients__modal">
+              <div className="clients__modalHeader">
+                <h3>{editId ? "Editar Cliente" : "Novo Cliente"}</h3>
 
-              <button
-                className="clients__closeBtn"
-                onClick={() => setShowModal(false)}
-              >
-                <IoClose />
-              </button>
+                <button
+                  className="clients__closeBtn"
+                  onClick={handleCloseClientModal}
+                >
+                  <IoClose />
+                </button>
+              </div>
+
+              <form onSubmit={handleSubmit} className="form__client">
+                {/* IDENTIFICAÇÃO */}
+                <div className="form__section">
+                  <h4>Dados do Cliente</h4>
+
+                  <div className="form__group--client">
+                    <label>Nome</label>
+                    <input
+                      name="name"
+                      placeholder="Digite o nome completo"
+                      value={formData.name}
+                      onChange={handleChange}
+                      className={errors.name ? "input__error" : ""}
+                      required
+                    />
+                    {errors.name && (
+                      <span className="field__error">{errors.name}</span>
+                    )}
+                  </div>
+
+                  <div className="form__group--client">
+                    <label>Email</label>
+                    <input
+                      name="email"
+                      placeholder="Digite o e-mail do cliente"
+                      value={formData.email}
+                      onChange={handleChange}
+                      className={errors.email ? "input__error" : ""}
+                    />
+                    {errors.email && (
+                      <span className="field__error">{errors.email}</span>
+                    )}
+                  </div>
+
+                  <div className="form__group--client">
+                    <label>CPF / CNPJ</label>
+                    <input
+                      name="cpfCnpj"
+                      placeholder="Digite CPF ou CNPJ"
+                      value={formData.cpfCnpj}
+                      onChange={handleChange}
+                      className={errors.cpfCnpj ? "input__error" : ""}
+                    />
+                    {errors.cpfCnpj && (
+                      <span className="field__error">{errors.cpfCnpj}</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* TELEFONES */}
+                <div className="form__section">
+                  <h4>Telefones</h4>
+
+                  <div className="form__group--client">
+                    <label>Telefone Principal</label>
+                    <input
+                      name="primaryPhone"
+                      placeholder="(00) 00000-0000"
+                      value={formData.primaryPhone}
+                      onChange={handleChange}
+                      className={errors.primaryPhone ? "input__error" : ""}
+                    />
+                    {errors.primaryPhone && (
+                      <span className="field__error">
+                        {errors.primaryPhone}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="form__group--client">
+                    <label>Telefone Secundário</label>
+                    <input
+                      name="secondaryPhone"
+                      placeholder="(00) 00000-0000"
+                      value={formData.secondaryPhone}
+                      onChange={handleChange}
+                      className={errors.secondaryPhone ? "input__error" : ""}
+                    />
+                    {errors.secondaryPhone && (
+                      <span className="field__error">
+                        {errors.secondaryPhone}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="form__group--client">
+                    <label>Telefone de Emergência</label>
+                    <input
+                      name="emergencyPhone"
+                      placeholder="(00) 00000-0000"
+                      value={formData.emergencyPhone}
+                      onChange={handleChange}
+                      className={errors.emergencyPhone ? "input__error" : ""}
+                    />
+                    {errors.emergencyPhone && (
+                      <span className="field__error">
+                        {errors.emergencyPhone}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="form__section">
+                  <h4>Endereço</h4>
+
+                  <div className="form__section-grid">
+                    <div className="form__group--client form__full">
+                      <label>Rua</label>
+                      <input
+                        name="street"
+                        placeholder="Digite o nome da rua"
+                        value={formData.street}
+                        onChange={handleChange}
+                      />
+                    </div>
+
+                    <div className="form__group--client">
+                      <label>Número</label>
+                      <input
+                        name="number"
+                        placeholder="Número"
+                        value={formData.number}
+                        onChange={handleChange}
+                      />
+                    </div>
+
+                    <div className="form__group--client">
+                      <label>Complemento</label>
+                      <input
+                        name="complement"
+                        placeholder="Complemento"
+                        value={formData.complement}
+                        onChange={handleChange}
+                      />
+                    </div>
+
+                    <div className="form__group--client">
+                      <label>Bairro</label>
+                      <input
+                        name="neighborhood"
+                        placeholder="Digite o bairro"
+                        value={formData.neighborhood}
+                        onChange={handleChange}
+                      />
+                    </div>
+
+                    <div className="form__group--client">
+                      <label>Cidade</label>
+                      <input
+                        name="city"
+                        placeholder="Digite a cidade"
+                        value={formData.city}
+                        onChange={handleChange}
+                      />
+                    </div>
+
+                    <div className="form__group--client">
+                      <label>Estado</label>
+
+                      <select
+                        name="state"
+                        value={formData.state}
+                        onChange={handleChange}
+                      >
+                        <option value="AC">AC</option>
+                        <option value="AL">AL</option>
+                        <option value="AP">AP</option>
+                        <option value="AM">AM</option>
+                        <option value="BA">BA</option>
+                        <option value="CE">CE</option>
+                        <option value="DF">DF</option>
+                        <option value="ES">ES</option>
+                        <option value="GO">GO</option>
+                        <option value="MA">MA</option>
+                        <option value="MT">MT</option>
+                        <option value="MS">MS</option>
+                        <option value="MG">MG</option>
+                        <option value="PA">PA</option>
+                        <option value="PB">PB</option>
+                        <option value="PR">PR</option>
+                        <option value="PE">PE</option>
+                        <option value="PI">PI</option>
+                        <option value="RJ">RJ</option>
+                        <option value="RN">RN</option>
+                        <option value="RS">RS</option>
+                        <option value="RO">RO</option>
+                        <option value="RR">RR</option>
+                        <option value="SC">SC</option>
+                        <option value="SP">SP</option>
+                        <option value="SE">SE</option>
+                        <option value="TO">TO</option>
+                      </select>
+                    </div>
+
+                    <div className="form__group--client">
+                      <label>CEP</label>
+                      <input
+                        name="zipCode"
+                        placeholder="00000-000"
+                        value={formData.zipCode}
+                        onChange={handleChange}
+                        className={errors.zipCode ? "input__error" : ""}
+                      />
+                      {errors.zipCode && (
+                        <span className="field__error">{errors.zipCode}</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* TIPOS */}
+                <div className="form__group--client">
+                  <label>Tipo de Cliente</label>
+                  <select
+                    name="type"
+                    value={formData.type}
+                    onChange={handleChange}
+                  >
+                    <option value="PERSON">Pessoa Física</option>
+                    <option value="COMPANY">Empresa</option>
+                  </select>
+                </div>
+
+                <div className="form__group--client">
+                  <label>Status Financeiro</label>
+                  <select
+                    name="financial"
+                    value={formData.financial}
+                    onChange={handleChange}
+                  >
+                    <option value="ACTIVE">Ativo</option>
+                    <option value="CANCELLED">Cancelado</option>
+                  </select>
+                </div>
+
+                {/* OBSERVAÇÕES */}
+                <div className="form__group--client">
+                  <label>Observações</label>
+                  <textarea
+                    name="notes"
+                    placeholder="Adicione observações importantes sobre o cliente"
+                    value={formData.notes}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <button type="submit" className="clients__btn">
+                  {editId ? "Atualizar Cliente" : "Cadastrar Cliente"}
+                </button>
+              </form>
             </div>
+          </div>,
+          document.body,
+        )}
 
-            <form onSubmit={handleSubmit} className="form__client">
-              {/* IDENTIFICAÇÃO */}
-              <div className="form__section">
-                <h4>Dados do Cliente</h4>
+      {/* MODAL ENDEREÇO */}
+      {showAddressModal &&
+        selectedAddress &&
+        createPortal(
+          <div className="clients__modalOverlay">
+            <div className="clients__modal clientViewModal">
+              <div className="clients__modalHeader">
+                <h3>Endereço do Cliente</h3>
 
-                <div className="form__group--client">
-                  <label>Nome</label>
-                  <input
-                    name="name"
-                    placeholder="Digite o nome completo"
-                    value={formData.name}
-                    onChange={handleChange}
-                    className={errors.name ? "input__error" : ""}
-                    required
-                  />
-                  {errors.name && (
-                    <span className="field__error">{errors.name}</span>
-                  )}
-                </div>
-
-                <div className="form__group--client">
-                  <label>Email</label>
-                  <input
-                    name="email"
-                    placeholder="Digite o e-mail do cliente"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className={errors.email ? "input__error" : ""}
-                  />
-                  {errors.email && (
-                    <span className="field__error">{errors.email}</span>
-                  )}
-                </div>
-
-                <div className="form__group--client">
-                  <label>CPF / CNPJ</label>
-                  <input
-                    name="cpfCnpj"
-                    placeholder="Digite CPF ou CNPJ"
-                    value={formData.cpfCnpj}
-                    onChange={handleChange}
-                    className={errors.cpfCnpj ? "input__error" : ""}
-                  />
-                  {errors.cpfCnpj && (
-                    <span className="field__error">{errors.cpfCnpj}</span>
-                  )}
-                </div>
+                <button
+                  className="clients__closeBtn"
+                  onClick={closeAddressModal}
+                >
+                  <IoClose />
+                </button>
               </div>
 
-              {/* TELEFONES */}
-              <div className="form__section">
-                <h4>Telefones</h4>
-
-                <div className="form__group--client">
-                  <label>Telefone Principal</label>
-                  <input
-                    name="primaryPhone"
-                    placeholder="(00) 00000-0000"
-                    value={formData.primaryPhone}
-                    onChange={handleChange}
-                    className={errors.primaryPhone ? "input__error" : ""}
-                  />
-                  {errors.primaryPhone && (
-                    <span className="field__error">{errors.primaryPhone}</span>
-                  )}
-                </div>
-
-                <div className="form__group--client">
-                  <label>Telefone Secundário</label>
-                  <input
-                    name="secondaryPhone"
-                    placeholder="(00) 00000-0000"
-                    value={formData.secondaryPhone}
-                    onChange={handleChange}
-                    className={errors.secondaryPhone ? "input__error" : ""}
-                  />
-                  {errors.secondaryPhone && (
-                    <span className="field__error">
-                      {errors.secondaryPhone}
-                    </span>
-                  )}
-                </div>
-
-                <div className="form__group--client">
-                  <label>Telefone de Emergência</label>
-                  <input
-                    name="emergencyPhone"
-                    placeholder="(00) 00000-0000"
-                    value={formData.emergencyPhone}
-                    onChange={handleChange}
-                    className={errors.emergencyPhone ? "input__error" : ""}
-                  />
-                  {errors.emergencyPhone && (
-                    <span className="field__error">
-                      {errors.emergencyPhone}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              <div className="form__section">
-                <h4>Endereço</h4>
-
-                <div className="form__section-grid">
+              <div className="form__section clientViewSection">
+                <div className="form__section-grid clientViewGrid">
                   <div className="form__group--client form__full">
                     <label>Rua</label>
-                    <input
-                      name="street"
-                      placeholder="Digite o nome da rua"
-                      value={formData.street}
-                      onChange={handleChange}
-                    />
+                    <input value={selectedAddress.street || "-"} disabled />
                   </div>
 
                   <div className="form__group--client">
                     <label>Número</label>
-                    <input
-                      name="number"
-                      placeholder="Número"
-                      value={formData.number}
-                      onChange={handleChange}
-                    />
+                    <input value={selectedAddress.number || "-"} disabled />
                   </div>
 
                   <div className="form__group--client">
                     <label>Complemento</label>
-                    <input
-                      name="complement"
-                      placeholder="Complemento"
-                      value={formData.complement}
-                      onChange={handleChange}
-                    />
+                    <input value={selectedAddress.complement || "-"} disabled />
                   </div>
 
                   <div className="form__group--client">
                     <label>Bairro</label>
                     <input
-                      name="neighborhood"
-                      placeholder="Digite o bairro"
-                      value={formData.neighborhood}
-                      onChange={handleChange}
+                      value={selectedAddress.neighborhood || "-"}
+                      disabled
                     />
                   </div>
 
                   <div className="form__group--client">
                     <label>Cidade</label>
-                    <input
-                      name="city"
-                      placeholder="Digite a cidade"
-                      value={formData.city}
-                      onChange={handleChange}
-                    />
+                    <input value={selectedAddress.city || "-"} disabled />
                   </div>
 
                   <div className="form__group--client">
                     <label>Estado</label>
-
-                    <select
-                      name="state"
-                      value={formData.state}
-                      onChange={handleChange}
-                    >
-                      <option value="AC">AC</option>
-                      <option value="AL">AL</option>
-                      <option value="AP">AP</option>
-                      <option value="AM">AM</option>
-                      <option value="BA">BA</option>
-                      <option value="CE">CE</option>
-                      <option value="DF">DF</option>
-                      <option value="ES">ES</option>
-                      <option value="GO">GO</option>
-                      <option value="MA">MA</option>
-                      <option value="MT">MT</option>
-                      <option value="MS">MS</option>
-                      <option value="MG">MG</option>
-                      <option value="PA">PA</option>
-                      <option value="PB">PB</option>
-                      <option value="PR">PR</option>
-                      <option value="PE">PE</option>
-                      <option value="PI">PI</option>
-                      <option value="RJ">RJ</option>
-                      <option value="RN">RN</option>
-                      <option value="RS">RS</option>
-                      <option value="RO">RO</option>
-                      <option value="RR">RR</option>
-                      <option value="SC">SC</option>
-                      <option value="SP">SP</option>
-                      <option value="SE">SE</option>
-                      <option value="TO">TO</option>
-                    </select>
+                    <input value={selectedAddress.state || "-"} disabled />
                   </div>
 
                   <div className="form__group--client">
                     <label>CEP</label>
                     <input
-                      name="zipCode"
-                      placeholder="00000-000"
-                      value={formData.zipCode}
-                      onChange={handleChange}
-                      className={errors.zipCode ? "input__error" : ""}
+                      value={
+                        selectedAddress.zipCode
+                          ? formatCEP(selectedAddress.zipCode)
+                          : "-"
+                      }
+                      disabled
                     />
-                    {errors.zipCode && (
-                      <span className="field__error">{errors.zipCode}</span>
-                    )}
                   </div>
                 </div>
               </div>
-
-              {/* TIPOS */}
-              <div className="form__group--client">
-                <label>Tipo de Cliente</label>
-                <select
-                  name="type"
-                  value={formData.type}
-                  onChange={handleChange}
-                >
-                  <option value="PERSON">Pessoa Física</option>
-                  <option value="COMPANY">Empresa</option>
-                </select>
-              </div>
-
-              <div className="form__group--client">
-                <label>Status Financeiro</label>
-                <select
-                  name="financial"
-                  value={formData.financial}
-                  onChange={handleChange}
-                >
-                  <option value="ACTIVE">Ativo</option>
-                  <option value="CANCELLED">Cancelado</option>
-                </select>
-              </div>
-
-              {/* OBSERVAÇÕES */}
-              <div className="form__group--client">
-                <label>Observações</label>
-                <textarea
-                  name="notes"
-                  placeholder="Adicione observações importantes sobre o cliente"
-                  value={formData.notes}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <button type="submit" className="clients__btn">
-                {editId ? "Atualizar Cliente" : "Cadastrar Cliente"}
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL ENDEREÇO */}
-      {selectedAddress && (
-        <div className="clients__modalOverlay">
-          <div className="clients__modal clientViewModal">
-            <div className="clients__modalHeader">
-              <h3>Endereço do Cliente</h3>
-
-              <button
-                className="clients__closeBtn"
-                onClick={() => setSelectedAddress(null)}
-              >
-                <IoClose />
-              </button>
             </div>
-
-            <div className="form__section clientViewSection">
-              <div className="form__section-grid clientViewGrid">
-                <div className="form__group--client form__full">
-                  <label>Rua</label>
-                  <input value={selectedAddress.street || "-"} disabled />
-                </div>
-
-                <div className="form__group--client">
-                  <label>Número</label>
-                  <input value={selectedAddress.number || "-"} disabled />
-                </div>
-
-                <div className="form__group--client">
-                  <label>Complemento</label>
-                  <input value={selectedAddress.complement || "-"} disabled />
-                </div>
-
-                <div className="form__group--client">
-                  <label>Bairro</label>
-                  <input value={selectedAddress.neighborhood || "-"} disabled />
-                </div>
-
-                <div className="form__group--client">
-                  <label>Cidade</label>
-                  <input value={selectedAddress.city || "-"} disabled />
-                </div>
-
-                <div className="form__group--client">
-                  <label>Estado</label>
-                  <input value={selectedAddress.state || "-"} disabled />
-                </div>
-
-                <div className="form__group--client">
-                  <label>CEP</label>
-                  <input
-                    value={
-                      selectedAddress.zipCode
-                        ? formatCEP(selectedAddress.zipCode)
-                        : "-"
-                    }
-                    disabled
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
 
       {/* MODAL TELEFONES */}
-      {selectedPhones && (
-        <div className="clients__modalOverlay">
-          <div className="clients__modal clientViewModal">
-            <div className="clients__modalHeader">
-              <h3>Telefones do Cliente</h3>
+      {showPhonesModal &&
+        selectedPhones &&
+        createPortal(
+          <div className="clients__modalOverlay">
+            <div className="clients__modal clientViewModal">
+              <div className="clients__modalHeader">
+                <h3>Telefones do Cliente</h3>
 
-              <button
-                className="clients__closeBtn"
-                onClick={() => setSelectedPhones(null)}
-              >
-                <IoClose />
-              </button>
+                <button
+                  className="clients__closeBtn"
+                  onClick={closePhonesModal}
+                >
+                  <IoClose />
+                </button>
+              </div>
+
+              <div className="form__section clientViewSection">
+                <div className="clientViewColumn">
+                  <div className="form__group--client">
+                    <label>Telefone Principal</label>
+                    <input
+                      value={
+                        selectedPhones.primary
+                          ? formatPhone(selectedPhones.primary)
+                          : "-"
+                      }
+                      disabled
+                    />
+                  </div>
+
+                  <div className="form__group--client">
+                    <label>Telefone Secundário</label>
+                    <input
+                      value={
+                        selectedPhones.secondary
+                          ? formatPhone(selectedPhones.secondary)
+                          : "-"
+                      }
+                      disabled
+                    />
+                  </div>
+
+                  <div className="form__group--client">
+                    <label>Telefone de Emergência</label>
+                    <input
+                      value={
+                        selectedPhones.emergency
+                          ? formatPhone(selectedPhones.emergency)
+                          : "-"
+                      }
+                      disabled
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
+          </div>,
+          document.body,
+        )}
 
-            <div className="form__section clientViewSection">
-              <div className="clientViewColumn">
-                <div className="form__group--client">
-                  <label>Telefone Principal</label>
-                  <input
-                    value={
-                      selectedPhones.primary
-                        ? formatPhone(selectedPhones.primary)
-                        : "-"
-                    }
-                    disabled
-                  />
+      {showHistoryModal &&
+        selectedPurchaseHistory &&
+        createPortal(
+          <div className="clients__modalOverlay">
+            <div className="clients__modal purchaseHistoryModal">
+              <div className="clients__modalHeader">
+                <h3>Histórico do Cliente</h3>
+
+                <button
+                  className="clients__closeBtn"
+                  onClick={closeHistoryModal}
+                >
+                  <IoClose />
+                </button>
+              </div>
+
+              <div className="purchase__summary">
+                <div>
+                  <strong>Cliente</strong>
+                  <p>{selectedPurchaseHistory.name}</p>
                 </div>
 
-                <div className="form__group--client">
-                  <label>Telefone Secundário</label>
-                  <input
-                    value={
-                      selectedPhones.secondary
-                        ? formatPhone(selectedPhones.secondary)
-                        : "-"
-                    }
-                    disabled
-                  />
+                <div>
+                  <strong>Total de compras</strong>
+                  <p>{getClientSales(selectedPurchaseHistory)?.length || 0}</p>
+                </div>
+                <div>
+                  <strong>Serviços solicitados</strong>
+                  <p>
+                    {getClientServices(selectedPurchaseHistory)?.length || 0}
+                  </p>
                 </div>
 
-                <div className="form__group--client">
-                  <label>Telefone de Emergência</label>
-                  <input
-                    value={
-                      selectedPhones.emergency
-                        ? formatPhone(selectedPhones.emergency)
-                        : "-"
-                    }
-                    disabled
-                  />
+                <div>
+                  <strong>Itens comprados</strong>
+                  <p>
+                    {getClientSales(selectedPurchaseHistory)?.reduce(
+                      (acc, sale) => {
+                        const totalItems = sale.products?.reduce(
+                          (sum, item) => sum + Number(item.quantity || 0),
+                          0,
+                        );
+
+                        return acc + Number(totalItems || 0);
+                      },
+                      0,
+                    )}
+                  </p>
+                </div>
+
+                <div>
+                  <strong>Valor gasto</strong>
+                  <p>
+                    R${" "}
+                    {getClientSales(selectedPurchaseHistory)
+                      ?.reduce((acc, sale) => acc + Number(sale.total || 0), 0)
+                      .toLocaleString("pt-BR", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                  </p>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
-      {selectedPurchaseHistory && (
-        <div className="clients__modalOverlay">
-          <div className="clients__modal purchaseHistoryModal">
-            <div className="clients__modalHeader">
-              <h3>Histórico do Cliente</h3>
 
-              <button
-                className="clients__closeBtn"
-                onClick={() => setSelectedPurchaseHistory(null)}
-              >
-                <IoClose />
-              </button>
-            </div>
+              <div className="purchase__history">
+                {getClientSales(selectedPurchaseHistory)?.length > 0 ? (
+                  getClientSales(selectedPurchaseHistory).map((sale) => (
+                    <div className="purchase__couponWrapper" key={sale._id}>
+                      <div className="purchase__coupon">
+                        <div className="purchase__couponHeader">
+                          <div>
+                            <strong>{sale.saleNumber}</strong>
+                            <span>
+                              {sale.createdAt
+                                ? new Date(sale.createdAt).toLocaleString(
+                                    "pt-BR",
+                                  )
+                                : "-"}
+                            </span>
+                          </div>
 
-            <div className="purchase__summary">
-              <div>
-                <strong>Cliente</strong>
-                <p>{selectedPurchaseHistory.name}</p>
-              </div>
-
-              <div>
-                <strong>Total de compras</strong>
-                <p>{getClientSales(selectedPurchaseHistory)?.length || 0}</p>
-              </div>
-              <div>
-                <strong>Serviços solicitados</strong>
-                <p>{getClientServices(selectedPurchaseHistory)?.length || 0}</p>
-              </div>
-
-              <div>
-                <strong>Itens comprados</strong>
-                <p>
-                  {getClientSales(selectedPurchaseHistory)?.reduce(
-                    (acc, sale) => {
-                      const totalItems = sale.products?.reduce(
-                        (sum, item) => sum + Number(item.quantity || 0),
-                        0,
-                      );
-
-                      return acc + Number(totalItems || 0);
-                    },
-                    0,
-                  )}
-                </p>
-              </div>
-
-              <div>
-                <strong>Valor gasto</strong>
-                <p>
-                  R${" "}
-                  {getClientSales(selectedPurchaseHistory)
-                    ?.reduce((acc, sale) => acc + Number(sale.total || 0), 0)
-                    .toLocaleString("pt-BR", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                </p>
-              </div>
-            </div>
-
-            <div className="purchase__history">
-              {getClientSales(selectedPurchaseHistory)?.length > 0 ? (
-                getClientSales(selectedPurchaseHistory).map((sale) => (
-                  <div className="purchase__couponWrapper" key={sale._id}>
-                    <div className="purchase__coupon">
-                      <div className="purchase__couponHeader">
-                        <div>
-                          <strong>{sale.saleNumber}</strong>
-                          <span>
-                            {sale.createdAt
-                              ? new Date(sale.createdAt).toLocaleString("pt-BR")
-                              : "-"}
+                          <span
+                            className={`status ${
+                              sale.payment?.status === "PAID"
+                                ? "active"
+                                : "pending"
+                            }`}
+                          >
+                            {sale.payment?.status === "PAID"
+                              ? "Pago"
+                              : sale.payment?.status === "PENDING"
+                                ? "Pendente"
+                                : sale.payment?.status === "CANCELLED"
+                                  ? "Cancelado"
+                                  : "Reembolsado"}
                           </span>
                         </div>
 
-                        <span
-                          className={`status ${
-                            sale.payment?.status === "PAID"
-                              ? "active"
-                              : "pending"
-                          }`}
-                        >
-                          {sale.payment?.status === "PAID"
-                            ? "Pago"
-                            : sale.payment?.status === "PENDING"
-                              ? "Pendente"
-                              : sale.payment?.status === "CANCELLED"
-                                ? "Cancelado"
-                                : "Reembolsado"}
-                        </span>
-                      </div>
-
-                      <div className="purchase__productsTable">
-                        <div className="purchase__productsHeader">
-                          <span>Produto</span>
-                          <span>Qtd</span>
-                          <span>Unitário</span>
-                          <span>Total</span>
-                        </div>
-
-                        {sale.products?.map((item, index) => (
-                          <div key={index} className="purchase__productsRow">
-                            <span>{item.name}</span>
-                            <span>{item.quantity}</span>
-                            <span>
-                              R${" "}
-                              {Number(item.unityPrice || 0).toLocaleString(
-                                "pt-BR",
-                                {
-                                  minimumFractionDigits: 2,
-                                  maximumFractionDigits: 2,
-                                },
-                              )}
-                            </span>
-                            <span>
-                              R${" "}
-                              {Number(item.totalPrice || 0).toLocaleString(
-                                "pt-BR",
-                                {
-                                  minimumFractionDigits: 2,
-                                  maximumFractionDigits: 2,
-                                },
-                              )}
-                            </span>
+                        <div className="purchase__productsTable">
+                          <div className="purchase__productsHeader">
+                            <span>Produto</span>
+                            <span>Qtd</span>
+                            <span>Unitário</span>
+                            <span>Total</span>
                           </div>
-                        ))}
-                      </div>
 
-                      <div className="purchase__couponFooter">
-                        <div>
-                          <strong>Pagamento</strong>
-                          <p>
-                            {sale.payment?.method === "CASH"
-                              ? "Dinheiro"
-                              : sale.payment?.method === "PIX"
-                                ? "Pix"
-                                : sale.payment?.method === "CREDIT_CARD"
-                                  ? "Cartão de crédito"
-                                  : sale.payment?.method === "DEBIT_CARD"
-                                    ? "Cartão de débito"
-                                    : sale.payment?.method === "BANK_SLIP"
-                                      ? "Boleto"
-                                      : "Transferência"}{" "}
-                            /{" "}
-                            {sale.payment?.installments
-                              ? `${sale.payment.installments}x`
-                              : "1x"}
-                          </p>
+                          {sale.products?.map((item, index) => (
+                            <div key={index} className="purchase__productsRow">
+                              <span>{item.name}</span>
+                              <span>{item.quantity}</span>
+                              <span>
+                                R${" "}
+                                {Number(item.unityPrice || 0).toLocaleString(
+                                  "pt-BR",
+                                  {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                  },
+                                )}
+                              </span>
+                              <span>
+                                R${" "}
+                                {Number(item.totalPrice || 0).toLocaleString(
+                                  "pt-BR",
+                                  {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                  },
+                                )}
+                              </span>
+                            </div>
+                          ))}
                         </div>
 
+                        <div className="purchase__couponFooter">
+                          <div>
+                            <strong>Pagamento</strong>
+                            <p>
+                              {sale.payment?.method === "CASH"
+                                ? "Dinheiro"
+                                : sale.payment?.method === "PIX"
+                                  ? "Pix"
+                                  : sale.payment?.method === "CREDIT_CARD"
+                                    ? "Cartão de crédito"
+                                    : sale.payment?.method === "DEBIT_CARD"
+                                      ? "Cartão de débito"
+                                      : sale.payment?.method === "BANK_SLIP"
+                                        ? "Boleto"
+                                        : "Transferência"}{" "}
+                              /{" "}
+                              {sale.payment?.installments
+                                ? `${sale.payment.installments}x`
+                                : "1x"}
+                            </p>
+                          </div>
+
+                          <div>
+                            <strong>Total</strong>
+                            <p>
+                              R${" "}
+                              {Number(sale.total || 0).toLocaleString("pt-BR", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="purchase__empty">
+                    Nenhuma compra encontrada para este cliente.
+                  </p>
+                )}
+                <div className="purchase__servicesTitle">
+                  <h4>Serviços e agendamentos</h4>
+                </div>
+
+                {getClientServices(selectedPurchaseHistory)?.length > 0 ? (
+                  getClientServices(selectedPurchaseHistory).map(
+                    (appointment) => (
+                      <div
+                        className="purchase__serviceCard"
+                        key={appointment._id}
+                      >
                         <div>
-                          <strong>Total</strong>
-                          <p>
-                            R${" "}
-                            {Number(sale.total || 0).toLocaleString("pt-BR", {
+                          <strong>{appointment.title || "Serviço"}</strong>
+
+                          <span>
+                            {appointment.date
+                              ? new Date(appointment.date).toLocaleDateString(
+                                  "pt-BR",
+                                )
+                              : "-"}{" "}
+                            das {appointment.startTime || "--:--"} às{" "}
+                            {appointment.endTime || "--:--"}
+                          </span>
+                        </div>
+
+                        <small>
+                          Status:{" "}
+                          {appointment.status === "FINISHED"
+                            ? "Concluído"
+                            : appointment.status === "CANCELLED"
+                              ? "Cancelado"
+                              : appointment.status === "CONFIRMED"
+                                ? "Confirmado"
+                                : "Pendente"}
+                        </small>
+
+                        <p>
+                          Total: R${" "}
+                          {Number(appointment.total || 0).toLocaleString(
+                            "pt-BR",
+                            {
                               minimumFractionDigits: 2,
                               maximumFractionDigits: 2,
-                            })}
-                          </p>
-                        </div>
+                            },
+                          )}
+                        </p>
                       </div>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p className="purchase__empty">
-                  Nenhuma compra encontrada para este cliente.
-                </p>
-              )}
-              <div className="purchase__servicesTitle">
-                <h4>Serviços e agendamentos</h4>
+                    ),
+                  )
+                ) : (
+                  <p className="purchase__empty">
+                    Nenhum serviço encontrado para este cliente.
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
+
+      {showDeleteModal &&
+        selectedDeleteClient &&
+        createPortal(
+          <div className="clients__modalOverlay" onClick={closeDeleteModal}>
+            <div
+              className="clients__deleteModal"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="clients__modalHeader">
+                <h3>Excluir Cliente</h3>
+
+                <button
+                  type="button"
+                  className="clients__closeBtn"
+                  onClick={closeDeleteModal}
+                >
+                  <IoClose />
+                </button>
               </div>
 
-              {getClientServices(selectedPurchaseHistory)?.length > 0 ? (
-                getClientServices(selectedPurchaseHistory).map(
-                  (appointment) => (
-                    <div
-                      className="purchase__serviceCard"
-                      key={appointment._id}
-                    >
-                      <div>
-                        <strong>{appointment.title || "Serviço"}</strong>
+              <div className="clients__deleteContent">
+                <p>Deseja realmente excluir o cliente:</p>
 
-                        <span>
-                          {appointment.date
-                            ? new Date(appointment.date).toLocaleDateString(
-                                "pt-BR",
-                              )
-                            : "-"}{" "}
-                          das {appointment.startTime || "--:--"} às{" "}
-                          {appointment.endTime || "--:--"}
-                        </span>
-                      </div>
+                <strong>{selectedDeleteClient.name}</strong>
 
-                      <small>
-                        Status:{" "}
-                        {appointment.status === "FINISHED"
-                          ? "Concluído"
-                          : appointment.status === "CANCELLED"
-                            ? "Cancelado"
-                            : appointment.status === "CONFIRMED"
-                              ? "Confirmado"
-                              : "Pendente"}
-                      </small>
+                <span>Esta ação não poderá ser desfeita.</span>
+              </div>
 
-                      <p>
-                        Total: R${" "}
-                        {Number(appointment.total || 0).toLocaleString(
-                          "pt-BR",
-                          {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          },
-                        )}
-                      </p>
-                    </div>
-                  ),
-                )
-              ) : (
-                <p className="purchase__empty">
-                  Nenhum serviço encontrado para este cliente.
-                </p>
-              )}
+              <div className="clients__deleteActions">
+                <button
+                  type="button"
+                  className="clients__btn clients__btnSecondary"
+                  onClick={closeDeleteModal}
+                >
+                  Cancelar
+                </button>
+
+                <button
+                  type="button"
+                  className="clients__btn clients__btnDanger"
+                  onClick={handleConfirmDelete}
+                >
+                  Excluir
+                </button>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
     </div>
   );
 };
