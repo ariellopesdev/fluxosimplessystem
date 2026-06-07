@@ -4,34 +4,45 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: var(--space-xl);
 }
 
 .services__header h2 {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-sm);
   margin: 0;
+  color: var(--color-text);
+  font-size: clamp(1.3rem, 2vw, 1.8rem);
+  font-weight: var(--weight-bold);
+}
+
+.services__header h2 svg {
+  font-size: clamp(1.15rem, 1.6vw, 1.4rem);
 }
 
 /************ BUTTONS ************/
 
 .services__btn {
-  background: var(--primary);
-  color: var(--surface);
+  background: var(--color-primary);
+  color: var(--color-white);
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   padding: 10px 15px;
   cursor: pointer;
-  font-weight: 600;
+  font-size: clamp(0.85rem, 1vw, 0.95rem);
+  font-weight: var(--weight-bold);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
   transition:
     background-color 0.2s ease,
     transform 0.1s ease,
-    opacity 0.2s ease;
+    opacity 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .services__btn:hover {
-  background: var(--primary-hover);
+  background: var(--color-primary-hover);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.28);
 }
 
 .services__btn:active {
@@ -39,47 +50,100 @@
 }
 
 .services__btn:disabled {
-  opacity: 0.7;
+  opacity: 0.65;
   cursor: not-allowed;
+  box-shadow: none;
+}
+
+.services__btnSecondary {
+  background: var(--color-surface-soft);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  box-shadow: none;
+}
+
+.services__btnSecondary:hover {
+  background: var(--color-border);
+  box-shadow: none;
+}
+
+.services__btnDanger {
+  background: var(--color-danger);
+  box-shadow: none;
+}
+
+.services__btnDanger:hover {
+  background: #b91c1c;
+  box-shadow: none;
 }
 
 /************ CARDS ************/
 
 .services__cards {
   display: flex;
-  gap: 15px;
-  margin-bottom: 20px;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-xl);
 }
 
 .serviceCard {
   flex: 1;
-  padding: 20px;
-  border-radius: 10px;
-  color: #fff;
-  font-weight: 600;
+  padding: var(--space-xl);
+  border-radius: var(--radius-lg);
+  color: var(--color-white);
+  font-size: clamp(0.9rem, 1vw, 1rem);
+  font-weight: var(--weight-bold);
+}
+
+.green {
+  background: var(--color-success);
+}
+
+.blue {
+  background: var(--color-info);
+}
+
+.orange {
+  background: var(--color-warning);
+}
+
+.red {
+  background: var(--color-danger);
 }
 
 /************ FILTERS ************/
 
 .services__filters {
   display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xl);
 }
 
 .services__filters input {
-  width: 240px;
-  height: 38px;
-  padding: 0 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  background: #fff;
+  width: 260px;
+  height: 42px;
+  padding: 0 var(--space-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border-dark);
+  border-radius: var(--radius-md);
+  font-size: clamp(0.86rem, 1vw, 0.95rem);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.services__filters input:hover {
+  border-color: var(--color-primary);
 }
 
 .services__filters input:focus {
-  border-color: var(--primary);
+  border-color: var(--color-primary);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+  box-shadow: 0 0 0 4px var(--color-primary-soft);
+}
+
+.services__filters input::placeholder {
+  color: var(--color-text-light);
 }
 
 /************ TABLE ************/
@@ -87,29 +151,34 @@
 .services__table {
   width: 100%;
   overflow-x: auto;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
 }
 
 .services__table table {
   width: 100%;
   min-width: 1050px;
-  background: #fff;
-  border-radius: 10px;
-  overflow: hidden;
+  background: var(--color-surface);
   border-collapse: collapse;
 }
 
 .services__table th,
 .services__table td {
-  padding: 12px;
+  padding: var(--space-md);
   vertical-align: middle;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-size: clamp(0.78rem, 0.9vw, 0.88rem);
 }
 
 .services__table th {
-  background: #f9fafb;
-  font-size: 0.82rem;
+  background: var(--color-surface-soft);
+  color: var(--color-text-muted);
+  font-size: clamp(0.72rem, 0.85vw, 0.8rem);
+  font-weight: var(--weight-bold);
   text-transform: uppercase;
   letter-spacing: 0.4px;
-  color: #6b7280;
 }
 
 .services__table th:nth-child(1),
@@ -124,36 +193,50 @@
 
 .services__table td strong {
   display: block;
-  color: #111827;
-  margin-bottom: 4px;
+  margin-bottom: var(--space-xs);
+  color: var(--color-text);
+  font-size: clamp(0.86rem, 1vw, 0.95rem);
 }
 
 .services__table td span {
   display: block;
-  color: #6b7280;
-  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  font-size: clamp(0.76rem, 0.9vw, 0.84rem);
 }
 
 .services__table tbody tr:nth-child(even) {
-  background: #fafafa;
+  background: var(--color-surface-soft);
 }
 
 .services__table tbody tr:hover {
-  background: #f3f4f6;
+  background: var(--color-primary-soft);
+}
+
+.services__table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.services__empty {
+  margin: 0;
+  padding: var(--space-xl);
+  color: var(--color-text-muted);
+  background: var(--color-surface-soft);
+  font-size: clamp(0.84rem, 1vw, 0.95rem);
 }
 
 /************ STATUS ************/
 
 .status {
-  font-weight: 600;
+  font-size: clamp(0.76rem, 0.9vw, 0.84rem);
+  font-weight: var(--weight-bold);
 }
 
 .status.active {
-  color: #22c55e;
+  color: var(--color-success);
 }
 
 .status.inactive {
-  color: #ef4444;
+  color: var(--color-danger);
 }
 
 /************ MODAL ************/
@@ -161,52 +244,92 @@
 .services__modalOverlay {
   position: fixed;
   inset: 0;
-  width: 100%;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.45);
+  width: 100vw;
+  height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 999;
-  padding: 20px;
+  padding: var(--space-xl);
+  background: rgba(0, 0, 0, 0.68);
+  backdrop-filter: blur(3px);
+  overflow-y: auto;
+  z-index: 99999;
+}
+
+.services__modal,
+.services__deleteModal {
+  width: 100%;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  animation: modalFade 0.2s ease;
 }
 
 .services__modal {
-  width: 100%;
   max-width: 860px;
   max-height: 95vh;
   overflow-y: auto;
-  background: #fff;
-  border-radius: 12px;
-  padding: 32px;
-  animation: modalFade 0.2s ease;
+  padding: var(--space-3xl);
+}
+
+.services__deleteModal {
+  max-width: 420px;
+  overflow: hidden;
 }
 
 .services__modalHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20px;
-  padding-bottom: 14px;
-  border-bottom: 1px solid #ececec;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-xl);
+  padding-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.services__deleteModal .services__modalHeader {
+  margin-bottom: 0;
+  padding: var(--space-xl);
 }
 
 .services__modalHeader h3 {
   margin: 0;
+  color: var(--color-text);
+  font-size: clamp(1.1rem, 1.6vw, 1.4rem);
+  font-weight: var(--weight-bold);
 }
 
 .services__closeBtn {
-  background: transparent;
-  border: none;
-  font-size: 22px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   cursor: pointer;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.1s ease,
+    border-color 0.2s ease;
+}
+
+.services__closeBtn svg {
+  font-size: clamp(1.2rem, 1.5vw, 1.4rem);
 }
 
 .services__closeBtn:hover {
-  background: #f3f4f6;
+  background: var(--color-surface-soft);
+  color: var(--color-text);
+  border-color: var(--color-border-dark);
+}
+
+.services__closeBtn:active {
+  transform: scale(0.96);
 }
 
 /************ FORM ************/
@@ -214,27 +337,28 @@
 .services__form {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--space-sm);
 }
 
 .services__section {
-  margin-bottom: 18px;
-  padding: 18px;
-  border: 1px solid #ececec;
-  border-radius: 10px;
-  background: #fafafa;
+  margin-bottom: var(--space-lg);
+  padding: var(--space-lg);
+  background: var(--color-surface-soft);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
 }
 
 .services__section h4 {
-  margin: 0 0 14px;
-  font-size: 1rem;
-  font-weight: 600;
+  margin: 0 0 var(--space-md);
+  color: var(--color-text);
+  font-size: clamp(0.95rem, 1.3vw, 1.1rem);
+  font-weight: var(--weight-bold);
 }
 
 .services__grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
+  gap: var(--space-md);
 }
 
 .services__grid.two {
@@ -244,15 +368,14 @@
 .form__group--service {
   display: flex;
   flex-direction: column;
-  margin-bottom: 10px;
+  margin-bottom: var(--space-sm);
 }
 
 .form__group--service label {
-  display: block;
   margin-bottom: 6px;
-  font-weight: 600;
-  color: #4b5563;
-  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  font-size: clamp(0.76rem, 0.9vw, 0.84rem);
+  font-weight: var(--weight-bold);
 }
 
 .form__group--service input,
@@ -260,39 +383,41 @@
 .form__group--service textarea {
   width: 100%;
   min-width: 0;
-  background: #fff;
-  padding: 0 12px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border-dark);
+  border-radius: var(--radius-md);
+  font-size: clamp(0.86rem, 1vw, 0.95rem);
   transition:
     border-color 0.2s ease,
-    box-shadow 0.2s ease;
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .form__group--service input,
 .form__group--service select {
-  height: 38px;
-  line-height: 38px;
+  height: 42px;
+  padding: 0 var(--space-md);
 }
 
 .form__group--service textarea {
   min-height: 90px;
-  padding: 12px;
+  padding: var(--space-md);
   resize: none;
 }
 
 .form__group--service input:hover,
 .form__group--service select:hover,
 .form__group--service textarea:hover {
-  border-color: var(--primary);
+  border-color: var(--color-primary);
 }
 
 .form__group--service input:focus,
 .form__group--service select:focus,
 .form__group--service textarea:focus {
-  border-color: var(--primary);
+  border-color: var(--color-primary);
   outline: none;
-  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.12);
+  box-shadow: 0 0 0 4px var(--color-primary-soft);
 }
 
 /************ ACTION ICONS ************/
@@ -301,12 +426,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: var(--space-md);
 }
 
 .service__actionIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  font-size: 20px;
+  font-size: clamp(1.05rem, 1.3vw, 1.25rem);
   transition:
     transform 0.2s ease,
     opacity 0.2s ease;
@@ -318,11 +446,44 @@
 }
 
 .service__actionIcon.edit {
-  color: #3b82f6;
+  color: var(--color-info);
 }
 
 .service__actionIcon.delete {
-  color: #ef4444;
+  color: var(--color-danger);
+}
+
+/************ DELETE MODAL ************/
+
+.services__deleteContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-xl);
+}
+
+.services__deleteContent p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: clamp(0.88rem, 1vw, 0.95rem);
+}
+
+.services__deleteContent strong {
+  color: var(--color-text);
+  font-size: clamp(1rem, 1.1vw, 1.1rem);
+}
+
+.services__deleteContent span {
+  color: var(--color-danger);
+  font-size: clamp(0.8rem, 0.9vw, 0.88rem);
+}
+
+.services__deleteActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-md);
+  padding: var(--space-xl);
+  border-top: 1px solid var(--color-border);
 }
 
 /************ ANIMATION ************/
@@ -356,7 +517,7 @@
 @media (max-width: 768px) {
   .services__header {
     flex-direction: column;
-    gap: 15px;
+    gap: var(--space-md);
     align-items: stretch;
   }
 
@@ -376,7 +537,19 @@
     width: 100%;
   }
 
+  .services__modalOverlay {
+    align-items: flex-start;
+    padding: var(--space-md);
+  }
+
   .services__modal {
-    padding: 20px;
+    max-height: calc(100dvh - 24px);
+    padding: var(--space-lg);
+  }
+}
+
+@media (max-width: 480px) {
+  .services__deleteActions {
+    flex-direction: column;
   }
 }

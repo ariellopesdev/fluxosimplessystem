@@ -18,7 +18,7 @@ import { getAllSales } from "../../slices/salesSlice";
 import { getAllAppointments } from "../../slices/appointmentSlice";
 
 //Icons
-import { MdDelete, MdEdit } from "react-icons/md";
+import { FaEdit, FaTrash } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
 import { FaUsers } from "react-icons/fa";
 
@@ -644,15 +644,19 @@ const Clients = () => {
                   </td>
                   <td>
                     <div className="table__edit--close">
-                      <MdEdit
+                      <span
                         className="client__actionIcon edit"
                         onClick={() => handleEdit(client)}
-                      />
+                      >
+                        <FaEdit />
+                      </span>
 
-                      <MdDelete
+                      <span
                         className="client__actionIcon delete"
                         onClick={() => openDeleteModal(client)}
-                      />
+                      >
+                        <FaTrash />
+                      </span>
                     </div>
                   </td>
                 </tr>
