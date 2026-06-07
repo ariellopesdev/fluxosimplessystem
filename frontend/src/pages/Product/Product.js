@@ -21,7 +21,7 @@ import Message from "../../components/Message/Message";
 
 // Hooks
 import { useModal } from "../../hooks/useModal";
-import { useSearch } from "../../hooks/useSearch";
+import { useFilteredSearch } from "../../hooks/useFilteredSearch";
 
 // Storage
 import { uploads } from "../../utils/config";
@@ -66,19 +66,27 @@ const Product = () => {
   const {
     search,
     setSearch,
+    filters,
+    updateFilter,
+    clearFilters,
     filteredItems: filteredProducts,
-  } = useSearch(productsList, [
-    "name",
-    "category",
-    "company.name",
-    (product) =>
-      product.category === "ASSET"
-        ? "bem da empresa asset"
-        : product.category === "SELLABLE"
-          ? "vendável vendavel produto vendável sellable"
-          : "operacional operational",
-    (product) => (Number(product.stock) > 0 ? "ativo estoque" : "sem estoque"),
-  ]);
+  } = useFilteredSearch(
+    productsList,
+    [
+      "name",
+      "category",
+      "company.name",
+      (product) => getCategoryLabel(product.category),
+      (product) =>
+        Number(product.stock) > 0 ? "ativo estoque" : "sem estoque",
+    ],
+    {
+      category: "",
+    },
+    {
+      category: (product, value) => product.category === value,
+    },
+  );
 
   const resetForm = () => {
     setEditId(null);
@@ -318,6 +326,24 @@ const Product = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
+
+          <select
+            value={filters.category}
+            onChange={(e) => updateFilter("category", e.target.value)}
+          >
+            <option value="">Todas as categorias</option>
+            <option value="ASSET">Bem da empresa</option>
+            <option value="SELLABLE">Vendável</option>
+            <option value="OPERATIONAL">Operacional</option>
+          </select>
+
+          <button
+            type="button"
+            className="product__clearBtn"
+            onClick={clearFilters}
+          >
+            Limpar filtros
+          </button>
         </div>
 
         <div className="product__table">
