@@ -3,6 +3,7 @@ import "./Reports.css";
 
 // React
 import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 
 // Redux
 import { useDispatch, useSelector } from "react-redux";
@@ -19,6 +20,11 @@ import Message from "../../components/Message/Message";
 
 //Icons
 import { FiBarChart2 } from "react-icons/fi";
+import { FaEye, FaTrash } from "react-icons/fa";
+import { IoClose } from "react-icons/io5";
+
+//Hooks
+import { useModal } from "../../hooks/useModal";
 
 const Reports = () => {
   const dispatch = useDispatch();
@@ -35,7 +41,19 @@ const Reports = () => {
   });
 
   const [selectedReport, setSelectedReport] = useState(null);
-  const [showReportModal, setShowReportModal] = useState(false);
+
+  const {
+    isOpen: showReportModal,
+    openModal: openReportModal,
+    closeModal: closeReportModal,
+  } = useModal();
+
+  const {
+    isOpen: showDeleteModal,
+    modalData: selectedDeleteReport,
+    openModal: openDeleteModal,
+    closeModal: closeDeleteModal,
+  } = useModal();
 
   const reportsList = Array.isArray(reports) ? reports : [];
   const currentReport = selectedReport || report || reportsList[0] || null;
@@ -124,16 +142,20 @@ const Reports = () => {
 
   const handleSelectReport = (item) => {
     setSelectedReport(item);
-    setShowReportModal(true);
+    openReportModal();
   };
 
-  const handleDeleteReport = async (id) => {
-    await dispatch(deleteReport(id));
+  const handleConfirmDelete = async () => {
+    if (!selectedDeleteReport?._id) return;
 
-    if (selectedReport?._id === id) {
+    await dispatch(deleteReport(selectedDeleteReport._id));
+
+    if (selectedReport?._id === selectedDeleteReport._id) {
       setSelectedReport(null);
       dispatch(resetReport());
     }
+
+    closeDeleteModal();
   };
 
   const buildRows = (headers, rows) => {
@@ -1036,13 +1058,15 @@ const Reports = () => {
                     <td>
                       <div className="reports__tableActions">
                         <button onClick={() => handleSelectReport(item)}>
+                          <FaEye />
                           Ver
                         </button>
-
                         <button
+                          type="button"
                           className="delete"
-                          onClick={() => handleDeleteReport(item._id)}
+                          onClick={() => openDeleteModal(item)}
                         >
+                          <FaTrash />
                           Excluir
                         </button>
                       </div>
@@ -1055,49 +1079,108 @@ const Reports = () => {
         </>
       )}
 
-      {showReportModal && selectedReport && (
-        <div className="reports__modalOverlay">
-          <div className="reports__modal">
-            <div className="reports__modalHeader">
-              <h3>{selectedReport.title}</h3>
+      {showReportModal &&
+        selectedReport &&
+        createPortal(
+          <div className="reports__modalOverlay" onClick={closeReportModal}>
+            <div
+              className="reports__modal"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="reports__modalHeader">
+                <h3>{selectedReport.title}</h3>
 
-              <button onClick={() => setShowReportModal(false)}>×</button>
-            </div>
+                <button
+                  type="button"
+                  className="reports__closeBtn"
+                  onClick={closeReportModal}
+                >
+                  <IoClose />
+                </button>
+              </div>
 
-            <div className="reports__modalContent">
-              <p>
-                <strong>Tipo:</strong> {translateType(selectedReport.type)}
-              </p>
+              <div className="reports__modalContent">
+                <p>
+                  <strong>Tipo:</strong> {translateType(selectedReport.type)}
+                </p>
+                <p>
+                  <strong>Período:</strong>{" "}
+                  {formatDate(selectedReport.period?.startDate)} até{" "}
+                  {formatDate(selectedReport.period?.endDate)}
+                </p>
+                <p>
+                  <strong>Receita:</strong>{" "}
+                  {formatCurrency(selectedReport.summary?.totalRevenue)}
+                </p>
+                <p>
+                  <strong>Despesas:</strong>{" "}
+                  {formatCurrency(selectedReport.summary?.totalExpenses)}
+                </p>
+                <p>
+                  <strong>Lucro:</strong>{" "}
+                  {formatCurrency(selectedReport.summary?.totalProfit)}
+                </p>
 
-              <p>
-                <strong>Período:</strong>{" "}
-                {formatDate(selectedReport.period?.startDate)} até{" "}
-                {formatDate(selectedReport.period?.endDate)}
-              </p>
-
-              <p>
-                <strong>Receita:</strong>{" "}
-                {formatCurrency(selectedReport.summary?.totalRevenue)}
-              </p>
-
-              <p>
-                <strong>Despesas:</strong>{" "}
-                {formatCurrency(selectedReport.summary?.totalExpenses)}
-              </p>
-
-              <p>
-                <strong>Lucro:</strong>{" "}
-                {formatCurrency(selectedReport.summary?.totalProfit)}
-              </p>
-
-              <div className="reports__modalActions">
-                <button onClick={handleViewPdf}>Visualizar PDF</button>
-                <button onClick={handleExportPdf}>Exportar PDF</button>
+                <div className="reports__modalActions">
+                  <button onClick={handleViewPdf}>Visualizar PDF</button>
+                  <button onClick={handleExportPdf}>Exportar PDF</button>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
+      {showDeleteModal &&
+        selectedDeleteReport &&
+        createPortal(
+          <div className="reports__modalOverlay" onClick={closeDeleteModal}>
+            <div
+              className="reports__deleteModal"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="reports__modalHeader">
+                <h3>Excluir relatório</h3>
+
+                <button
+                  type="button"
+                  className="reports__closeBtn"
+                  onClick={closeDeleteModal}
+                >
+                  <IoClose />
+                </button>
+              </div>
+
+              <div className="reports__deleteContent">
+                <p>Deseja realmente excluir o relatório:</p>
+
+                <strong>
+                  Relatório {translateType(selectedDeleteReport.type)}
+                </strong>
+
+                <span>Esta ação não poderá ser desfeita.</span>
+              </div>
+
+              <div className="reports__deleteActions">
+                <button
+                  type="button"
+                  className="reports__btn reports__btnSecondary"
+                  onClick={closeDeleteModal}
+                >
+                  Cancelar
+                </button>
+
+                <button
+                  type="button"
+                  className="reports__btn reports__btnDanger"
+                  onClick={handleConfirmDelete}
+                >
+                  Excluir
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 };
