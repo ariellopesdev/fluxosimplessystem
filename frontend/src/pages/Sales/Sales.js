@@ -19,6 +19,7 @@ import { getProducts } from "../../slices/productSlice";
 // Icons
 import { MdEdit, MdVisibility } from "react-icons/md";
 import { IoClose } from "react-icons/io5";
+import { FaShoppingCart } from "react-icons/fa";
 
 // Components
 import Message from "../../components/Message/Message";
@@ -417,7 +418,10 @@ const Sales = () => {
   return (
     <div className="sales">
       <div className="sales__header">
-        <h2>Vendas</h2>
+        <h2>
+          <FaShoppingCart />
+          Vendas
+        </h2>
 
         <button
           className="sales__btn"

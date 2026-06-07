@@ -1,3 +1,4 @@
+//CSS
 import "./Dashboard.css";
 
 // React
@@ -10,6 +11,7 @@ import { getDashboard, resetMessage } from "../../slices/dashboardSlice";
 // Components
 import Message from "../../components/Message/Message";
 
+//Graphics
 import {
   ResponsiveContainer,
   LineChart,
@@ -25,6 +27,9 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
+
+//Icons
+import { FiHome } from "react-icons/fi";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -134,7 +139,10 @@ const Dashboard = () => {
       <div className="dashboardPage__container">
         <div className="dashboardPage__header">
           <div>
-            <h2>Dashboard</h2>
+            <h2>
+              <FiHome />
+              Dashboard
+            </h2>
             <p>
               Acompanhe indicadores, alertas e atividades recentes do sistema.
             </p>

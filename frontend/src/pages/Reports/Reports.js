@@ -1,3 +1,4 @@
+//CSS
 import "./Reports.css";
 
 // React
@@ -15,6 +16,9 @@ import {
 
 // Components
 import Message from "../../components/Message/Message";
+
+//Icons
+import { FiBarChart2 } from "react-icons/fi";
 
 const Reports = () => {
   const dispatch = useDispatch();
@@ -679,7 +683,10 @@ const Reports = () => {
     <div className="reports">
       <div className="reports__header">
         <div>
-          <h2>Relatórios</h2>
+          <h2>
+            <FiBarChart2 />
+            Relatórios
+          </h2>
           <p>Visualize, gere e exporte relatórios do Fluxo Simples.</p>
         </div>
 

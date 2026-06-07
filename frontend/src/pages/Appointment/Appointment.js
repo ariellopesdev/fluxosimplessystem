@@ -24,7 +24,7 @@ import Message from "../../components/Message/Message";
 import { useModal } from "../../hooks/useModal";
 
 //Icons
-import { FaCalendarAlt } from "react-icons/fa";
+import { FiCalendar } from "react-icons/fi";
 import { IoClose } from "react-icons/io5";
 
 const Appointment = ({ setPage }) => {
@@ -1032,7 +1032,7 @@ Parcelas: ${
     <div className="appointment">
       <div className="appointment__header">
         <h2>
-          <FaCalendarAlt />
+          <FiCalendar />
           Agendamentos
         </h2>
 
@@ -1280,7 +1280,7 @@ Parcelas: ${
                   className="appointment__closeBtn"
                   onClick={closeAppointmentModal}
                 >
-                   <IoClose />
+                  <IoClose />
                 </button>
               </div>
 
@@ -1691,7 +1691,7 @@ Parcelas: ${
                   className="appointment__closeBtn"
                   onClick={closeAvailabilityModal}
                 >
-                   <IoClose />
+                  <IoClose />
                 </button>
               </div>
 
@@ -1860,7 +1860,7 @@ Parcelas: ${
                   className="appointment__closeBtn"
                   onClick={closeHistoryModal}
                 >
-                   <IoClose />
+                  <IoClose />
                 </button>
               </div>
 
@@ -1968,7 +1968,7 @@ Parcelas: ${
                   className="appointment__closeBtn"
                   onClick={closeOverdueModal}
                 >
-                   <IoClose />
+                  <IoClose />
                 </button>
               </div>
 

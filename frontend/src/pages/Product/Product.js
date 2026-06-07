@@ -27,8 +27,9 @@ import { useSearch } from "../../hooks/useSearch";
 import { uploads } from "../../utils/config";
 
 // Icons
-import { FaEdit, FaTrash, FaBoxOpen } from "react-icons/fa";
+import { FaEdit, FaTrash } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
+import { FiPackage } from "react-icons/fi";
 
 const Product = () => {
   const dispatch = useDispatch();
@@ -276,7 +277,7 @@ const Product = () => {
       <main className="product__main">
         <div className="product__header">
           <h2>
-            <FaBoxOpen />
+            <FiPackage />
             Produtos
           </h2>
 

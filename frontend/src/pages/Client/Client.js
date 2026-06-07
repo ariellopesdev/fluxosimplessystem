@@ -20,7 +20,7 @@ import { getAllAppointments } from "../../slices/appointmentSlice";
 //Icons
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
-import { FaUsers } from "react-icons/fa";
+import { FiUser } from "react-icons/fi";
 
 //Components
 import Message from "../../components/Message/Message";
@@ -549,7 +549,7 @@ const Clients = () => {
       {/* HEADER */}
       <div className="clients__header">
         <h2>
-          <FaUsers />
+          <FiUser />
           Clientes
         </h2>
 
