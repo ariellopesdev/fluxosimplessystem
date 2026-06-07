@@ -37,7 +37,6 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
-          <Route path="/painel" element={<Painel />} />
           <Route
             path="/painel"
             element={auth ? <Painel /> : <Navigate to="/" />}

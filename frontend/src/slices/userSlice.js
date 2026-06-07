@@ -13,9 +13,17 @@ const initialState = {
 export const profile = createAsyncThunk(
   "user/profile",
   async (user, thunkAPI) => {
-    const token = thunkAPI.getState().auth.user.token;
+    const token = thunkAPI.getState().auth.user?.token;
+
+    if (!token) {
+      return thunkAPI.rejectWithValue("Token não encontrado.");
+    }
 
     const data = await userService.profile(user, token);
+
+    if (data?.errors) {
+      return thunkAPI.rejectWithValue(data.errors[0]);
+    }
 
     return data;
   },
@@ -87,6 +95,12 @@ export const userSlice = createSlice({
         state.success = true;
         state.error = null;
         state.user = action.payload;
+      })
+      .addCase(profile.rejected, (state, action) => {
+        state.loading = false;
+        state.success = false;
+        state.error = action.payload;
+        state.user = null;
       })
       .addCase(updateProfile.pending, (state) => {
         state.loading = true;

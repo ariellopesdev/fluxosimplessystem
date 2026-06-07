@@ -5,17 +5,25 @@ const register = async (data) => {
   const config = requestConfig("POST", data);
 
   try {
-    const res = await fetch(api + "/users/register", config)
-      .then((res) => res.json())
-      .catch((err) => err);
+    const res = await fetch(api + "/users/register", config);
 
-    if (res) {
-      localStorage.setItem("user", JSON.stringify(res));
+    const json = await res.json();
+
+    if (!res.ok) {
+      return json;
     }
 
-    return res;
+    if (json) {
+      localStorage.setItem("user", JSON.stringify(json));
+    }
+
+    return json;
   } catch (error) {
-    console.log(error);
+    return {
+      errors: [
+        "Não foi possível conectar ao servidor. Verifique se o backend está rodando.",
+      ],
+    };
   }
 };
 
@@ -29,17 +37,25 @@ const login = async (data) => {
   const config = requestConfig("POST", data);
 
   try {
-    const res = await fetch(api + "/users/login", config)
-      .then((res) => res.json())
-      .catch((err) => err);
+    const res = await fetch(api + "/users/login", config);
 
-    if (res._id) {
-      localStorage.setItem("user", JSON.stringify(res));
+    const json = await res.json();
+
+    if (!res.ok) {
+      return json;
     }
 
-    return res;
+    if (json) {
+      localStorage.setItem("user", JSON.stringify(json));
+    }
+
+    return json;
   } catch (error) {
-    console.log(error);
+    return {
+      errors: [
+        "Não foi possível conectar ao servidor. Verifique se o backend está rodando.",
+      ],
+    };
   }
 };
 
