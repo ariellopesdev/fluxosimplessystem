@@ -47,16 +47,11 @@ const Home = () => {
     typeof error === "string" &&
     error.toLowerCase().includes("muitas tentativas");
 
-  //Clean auth states on mount
-  useEffect(() => {
-    dispatch(reset());
-  }, [dispatch]);
-
   //Redirect after sucessful login
   useEffect(() => {
-    if (user) {
+    if (user?.token) {
       resetForm();
-      navigate("/painel");
+      navigate("/painel", { replace: true });
     }
   }, [user, navigate, resetForm]);
 
@@ -87,6 +82,7 @@ const Home = () => {
       captchaToken: formData.captchaToken,
     };
 
+    dispatch(reset());
     dispatch(login(userData));
   };
 
