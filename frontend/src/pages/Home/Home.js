@@ -57,6 +57,8 @@ const Home = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    console.log("CLICOU NO LOGIN");
+
     const isValid = validateForm(shouldShowCaptcha);
 
     if (!isValid) return;
