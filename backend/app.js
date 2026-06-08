@@ -13,7 +13,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 const allowedOrigins = [
-  process.env.FRONTEND_DEV_URL,
+  process.env.FRONTEND_URL,
   process.env.FRONTEND_PROD_URL,
 ];
 
