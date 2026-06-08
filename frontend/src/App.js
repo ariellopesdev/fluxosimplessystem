@@ -23,12 +23,14 @@ import Appointment from "./pages/Appointment/Appointment";
 import Reports from "./pages/Reports/Reports";
 import Settings from "./pages/Settings/Settings";
 import Help from "./pages/Help/Help";
+import HomeLoading from "./components/Loading/HomeLoading";
+import PainelSkeleton from "./components/Loading/PainelSkeleton";
 
 function App() {
   const { auth, loading } = useAuth();
 
   if (loading) {
-    return <p>Carregando...</p>;
+    return <HomeLoading />;
   }
   return (
     <div className="App">

@@ -5,26 +5,35 @@ import "./Painel.css";
 import Navbar from "../../components/Navbar/Navbar";
 import Aside from "../../components/Aside/Aside";
 import Main from "../../components/Main/Main";
+import PainelSkeleton from "../../components/Loading/PainelSkeleton";
 
 //Hooks
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const Painel = () => {
-  //Current active page
   const [page, setPage] = useState("dashboard");
-
-  //Mobile sidebar state
   const [isAsideOpen, setIsAsideOpen] = useState(false);
+  const [isLoadingPainel, setIsLoadingPainel] = useState(true);
 
-  //Toggle mobile sidebar
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoadingPainel(false);
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   const toggleAside = () => {
     setIsAsideOpen((prev) => !prev);
   };
 
-  //Close mobile sidebar
   const closeAside = () => {
     setIsAsideOpen(false);
   };
+
+  if (isLoadingPainel) {
+    return <PainelSkeleton />;
+  }
 
   return (
     <div id="painel">
