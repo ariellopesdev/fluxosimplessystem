@@ -57,8 +57,6 @@ const Home = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log("CLICOU NO LOGIN");
-
     const isValid = validateForm(shouldShowCaptcha);
 
     if (!isValid) return;
@@ -80,7 +78,6 @@ const Home = () => {
         navigate("/painel", { replace: true });
       }
     } catch (error) {
-      console.log("Erro no login:", error);
       increaseFailedAttempts();
     }
   };

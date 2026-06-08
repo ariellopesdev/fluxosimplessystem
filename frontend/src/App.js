@@ -34,54 +34,60 @@ function App() {
     <div className="App">
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route path="/" element={<Home replace />} />
+          <Route path="/forgot-password" element={<ForgotPassword replace />} />
+          <Route
+            path="/reset-password/:token"
+            element={<ResetPassword replace />}
+          />
           <Route
             path="/painel"
-            element={auth ? <Painel /> : <Navigate to="/" />}
+            element={auth ? <Painel /> : <Navigate to="/" replace />}
           />
           <Route
             path="/register"
-            element={auth ? <Register /> : <Navigate to="/" />}
+            element={auth ? <Register /> : <Navigate to="/" replace />}
           />
           <Route
             path="/dashboard"
-            element={auth ? <Dashboard /> : <Navigate to="/" />}
+            element={auth ? <Dashboard /> : <Navigate to="/" replace />}
           />
           <Route
             path="/client"
-            element={auth ? <Client /> : <Navigate to="/" />}
+            element={auth ? <Client /> : <Navigate to="/" replace />}
           />
           <Route
             path="/sales"
-            element={auth ? <Sales /> : <Navigate to="/" />}
+            element={auth ? <Sales /> : <Navigate to="/" replace />}
           />
           <Route
             path="/product"
-            element={auth ? <Product /> : <Navigate to="/" />}
+            element={auth ? <Product /> : <Navigate to="/" replace />}
           />
           <Route
             path="/service"
-            element={auth ? <Service /> : <Navigate to="/" />}
+            element={auth ? <Service /> : <Navigate to="/" replace />}
           />
           <Route
             path="/financial"
-            element={auth ? <Financial /> : <Navigate to="/" />}
+            element={auth ? <Financial /> : <Navigate to="/" replace />}
           />
           <Route
             path="/appointment"
-            element={auth ? <Appointment /> : <Navigate to="/" />}
+            element={auth ? <Appointment /> : <Navigate to="/" replace />}
           />
           <Route
             path="/reports"
-            element={auth ? <Reports /> : <Navigate to="/" />}
+            element={auth ? <Reports /> : <Navigate to="/" replace />}
           />
           <Route
             path="/settings"
-            element={auth ? <Settings /> : <Navigate to="/" />}
+            element={auth ? <Settings /> : <Navigate to="/" replace />}
           />
-          <Route path="/help" element={auth ? <Help /> : <Navigate to="/" />} />
+          <Route
+            path="/help"
+            element={auth ? <Help /> : <Navigate to="/" replace />}
+          />
         </Routes>
       </BrowserRouter>
     </div>

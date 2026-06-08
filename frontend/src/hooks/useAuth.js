@@ -1,38 +1,21 @@
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-
-import { profile } from "../slices/userSlice";
-import { logout } from "../slices/authSlice";
+import { useSelector } from "react-redux";
 
 export const useAuth = () => {
-  const dispatch = useDispatch();
-
-  const { user: authUser } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.auth);
 
   const [auth, setAuth] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const validateSession = async () => {
-      if (!authUser?.token) {
-        setAuth(false);
-        setLoading(false);
-        return;
-      }
+    if (user?.token) {
+      setAuth(true);
+    } else {
+      setAuth(false);
+    }
 
-      try {
-        await dispatch(profile()).unwrap();
-        setAuth(true);
-      } catch (error) {
-        dispatch(logout());
-        setAuth(false);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    validateSession();
-  }, [authUser, dispatch]);
+    setLoading(false);
+  }, [user]);
 
   return { auth, loading };
 };
