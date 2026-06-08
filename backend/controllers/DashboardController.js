@@ -6,7 +6,7 @@ const Product = require("../models/Product");
 const Client = require("../models/Client");
 const Appointment = require("../models/Appointment");
 const Service = require("../models/Service");
-const Reports = require("../models/reports");
+const Reports = require("../models/Reports");
 
 const getCompanyId = (reqUser) => {
   return reqUser.company?._id || reqUser.company;
