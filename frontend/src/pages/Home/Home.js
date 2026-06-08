@@ -48,11 +48,11 @@ const Home = () => {
     error.toLowerCase().includes("muitas tentativas");
 
   //Handle field login attempts
-  useEffect(() => {
-    if (error) {
-      increaseFailedAttempts();
-    }
-  }, [error, increaseFailedAttempts]);
+  // useEffect(() => {
+  //   if (error) {
+  //     increaseFailedAttempts();
+  //   }
+  // }, [error, increaseFailedAttempts]);
 
   //Sign in user
   const handleSubmit = async (e) => {
@@ -71,11 +71,15 @@ const Home = () => {
 
     dispatch(reset());
 
-    const result = await dispatch(login(userData));
+    try {
+      const loggedUser = await dispatch(login(userData)).unwrap();
 
-    if (login.fulfilled.match(result)) {
-      resetForm();
-      navigate("/painel", { replace: true });
+      if (loggedUser?.token) {
+        resetForm();
+        navigate("/painel", { replace: true });
+      }
+    } catch (error) {
+      increaseFailedAttempts();
     }
   };
 
