@@ -7,7 +7,7 @@ const {
   getAllSales,
   getSaleById,
   updateSale,
-} = require("../controllers/salesController");
+} = require("../controllers/SalesController");
 
 // Middlewares
 const authGuard = require("../middlewares/authGuard");

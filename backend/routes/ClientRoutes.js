@@ -8,7 +8,7 @@ const {
   getClientById,
   updateClient,
   deleteClient,
-} = require("../controllers/clientController");
+} = require("../controllers/ClientController");
 
 // Middlewares
 const authGuard = require("../middlewares/authGuard");
