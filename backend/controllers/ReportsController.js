@@ -1,4 +1,4 @@
-const Report = require("../models/reports");
+const Report = require("../models/Reports");
 
 const Financial = require("../models/Financial");
 const Sale = require("../models/Sales");
