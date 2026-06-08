@@ -40,20 +40,12 @@ const Home = () => {
   } = useLoginForm();
 
   //Redux state
-  const { loading, error, user } = useSelector((state) => state.auth);
+  const { loading, error } = useSelector((state) => state.auth);
 
   //Detect temporary login rate limit
   const isRateLimited =
     typeof error === "string" &&
     error.toLowerCase().includes("muitas tentativas");
-
-  //Redirect after sucessful login
-  useEffect(() => {
-    if (user?.token) {
-      resetForm();
-      navigate("/painel", { replace: true });
-    }
-  }, [user, navigate, resetForm]);
 
   //Handle field login attempts
   useEffect(() => {
@@ -63,18 +55,13 @@ const Home = () => {
   }, [error, increaseFailedAttempts]);
 
   //Sign in user
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const isValid = validateForm(shouldShowCaptcha);
 
-    if (!isValid) {
-      return;
-    }
-
-    if (isRateLimited) {
-      return;
-    }
+    if (!isValid) return;
+    if (isRateLimited) return;
 
     const userData = {
       email: formData.email.trim(),
@@ -83,7 +70,13 @@ const Home = () => {
     };
 
     dispatch(reset());
-    dispatch(login(userData));
+
+    const result = await dispatch(login(userData));
+
+    if (login.fulfilled.match(result)) {
+      resetForm();
+      navigate("/painel", { replace: true });
+    }
   };
 
   return (
