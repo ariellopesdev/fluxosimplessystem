@@ -8,6 +8,9 @@ const port = process.env.PORT || 5000;
 
 const app = express();
 
+// Trust proxy for Render/Vercel requests
+app.set("trust proxy", 1);
+
 // config JSON and form data response
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
