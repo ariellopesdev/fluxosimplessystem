@@ -29,7 +29,6 @@ const Home = () => {
     formData,
     errors,
     showPassword,
-    hasErrors,
     shouldShowCaptcha,
     setShowPassword,
     handleChange,
@@ -79,6 +78,7 @@ const Home = () => {
         navigate("/painel", { replace: true });
       }
     } catch (error) {
+      console.log("Erro no login:", error);
       increaseFailedAttempts();
     }
   };
@@ -148,7 +148,6 @@ const Home = () => {
               type="submit"
               value="Entrar"
               className="login__btn--primary"
-              disabled={hasErrors}
             />
           )}
           {loading && (
