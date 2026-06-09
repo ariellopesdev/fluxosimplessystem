@@ -33,7 +33,7 @@ const {
 router.post(
   "/register",
   authGuard,
-  roleGuard("SUPER_ADMIN"),
+  roleGuard("SUPER_ADMIN", "ADMIN"),
   userCreateValidation(),
   validate,
   register,

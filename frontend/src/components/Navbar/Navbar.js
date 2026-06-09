@@ -17,7 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 //Redux
 import { logout, reset } from "../../slices/authSlice";
-import { profile } from "../../slices/userSlice";
+import { profile, resetUser } from "../../slices/userSlice";
 
 const Navbar = ({ toggleAside, setPage }) => {
   const { auth } = useAuth();
@@ -42,17 +42,18 @@ const Navbar = ({ toggleAside, setPage }) => {
 
   // Load user data
   useEffect(() => {
-    if (auth && !user?._id) {
+    if (auth) {
       dispatch(profile());
     }
-  }, [dispatch, auth, user?._id]);
+  }, [dispatch, auth]);
 
   // Logout user
   const handleLogout = () => {
     dispatch(logout());
     dispatch(reset());
+    dispatch(resetUser());
 
-    navigate("/");
+    navigate("/", { replace: true });
   };
 
   // Navigate to painel page

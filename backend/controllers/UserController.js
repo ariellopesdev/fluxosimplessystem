@@ -45,20 +45,20 @@ const generateToken = (user) => {
 
 // Register a new user account
 const register = async (req, res) => {
-  const { name, email, password, companyName, cnpj, role } = req.body;
+  const { name, email, password, companyName, role } = req.body;
 
-  // Check if user exists
+  const cnpj = String(req.body.cnpj || "").replace(/[^\d]+/g, "");
+
   const user = await User.findOne({ email });
 
   if (user) {
-    res
-      .status(422)
-      .json({ errors: ["Já existe um usuário cadastrado com este e-mail."] });
-    return;
+    return res.status(422).json({
+      errors: ["Já existe um usuário cadastrado com este e-mail."],
+    });
   }
 
-  // Verify if company exists
   let company = await Company.findOne({ cnpj });
+
   if (!company) {
     company = await Company.create({
       name: companyName,
@@ -66,18 +66,9 @@ const register = async (req, res) => {
     });
   }
 
-  // Prevent unauthorized SUPER_ADMIN creation
-  if (role === "SUPER_ADMIN" && req.user.role !== "SUPER_ADMIN") {
-    return res.status(403).json({
-      errors: ["You do not have permission to create SUPER_ADMIN users."],
-    });
-  }
-
-  // Generate password hase
   const salt = await bcrypt.genSalt();
   const passwordHash = await bcrypt.hash(password, salt);
 
-  // Create user
   const newUser = await User.create({
     name,
     email,
@@ -86,19 +77,18 @@ const register = async (req, res) => {
     role: role || "USER",
   });
 
-  // If user was created successfully, return the token
   if (!newUser) {
-    res.status(422).json({
+    return res.status(422).json({
       errors: ["Houve um erro, por favor tente novamente mais tarde."],
     });
-    return;
   }
 
-  res.status(201).json({
+  return res.status(201).json({
     _id: newUser._id,
     name: newUser.name,
     email: newUser.email,
     role: newUser.role,
+    company: company._id,
     token: generateToken(newUser),
   });
 };
