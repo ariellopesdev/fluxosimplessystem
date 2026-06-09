@@ -683,14 +683,8 @@ const Financial = () => {
 
       {showFinancialModal &&
         createPortal(
-          <div
-            className="financial__modalOverlay"
-            onClick={handleCloseFinancialModal}
-          >
-            <div
-              className="financial__modal"
-              onClick={(e) => e.stopPropagation()}
-            >
+          <div className="financial__modalOverlay">
+            <div className="financial__modal">
               <div className="financial__modalHeader">
                 <h3>
                   {editId ? "Editar registro" : "Novo registro financeiro"}
@@ -1005,11 +999,8 @@ const Financial = () => {
       {showDetailsModal &&
         detailsData &&
         createPortal(
-          <div className="financial__modalOverlay" onClick={closeDetailsModal}>
-            <div
-              className="financial__modal details"
-              onClick={(e) => e.stopPropagation()}
-            >
+          <div className="financial__modalOverlay">
+            <div className="financial__modal details">
               <div className="financial__modalHeader">
                 <h3>Dados do registro</h3>
 
@@ -1141,11 +1132,8 @@ const Financial = () => {
 
       {showHistoryModal &&
         createPortal(
-          <div className="financial__modalOverlay" onClick={closeHistoryModal}>
-            <div
-              className="financial__modal"
-              onClick={(e) => e.stopPropagation()}
-            >
+          <div className="financial__modalOverlay">
+            <div className="financial__modal">
               <div className="financial__modalHeader">
                 <h3>Histórico Financeiro</h3>
 
@@ -1262,11 +1250,8 @@ const Financial = () => {
       {showDeleteModal &&
         selectedDeleteFinancial &&
         createPortal(
-          <div className="financial__modalOverlay" onClick={closeDeleteModal}>
-            <div
-              className="financial__deleteModal"
-              onClick={(e) => e.stopPropagation()}
-            >
+          <div className="financial__modalOverlay">
+            <div className="financial__deleteModal">
               <div className="financial__modalHeader">
                 <h3>Excluir registro</h3>
 

@@ -388,14 +388,8 @@ const Register = () => {
 
       {showAccessModal &&
         createPortal(
-          <div
-            className="registerAccess__modalOverlay"
-            onClick={handleCloseAccessModal}
-          >
-            <div
-              className="registerAccess__modal"
-              onClick={(e) => e.stopPropagation()}
-            >
+          <div className="registerAccess__modalOverlay">
+            <div className="registerAccess__modal">
               <div className="registerAccess__modalHeader">
                 <h3>{selectedAccess ? "Editar Acesso" : "Novo Acesso"}</h3>
 
@@ -445,14 +439,8 @@ const Register = () => {
       {showDeleteModal &&
         selectedDeleteUser &&
         createPortal(
-          <div
-            className="registerAccess__modalOverlay"
-            onClick={closeDeleteModal}
-          >
-            <div
-              className="registerAccess__deleteModal"
-              onClick={(e) => e.stopPropagation()}
-            >
+          <div className="registerAccess__modalOverlay">
+            <div className="registerAccess__deleteModal">
               <div className="registerAccess__modalHeader">
                 <h3>Excluir Acesso</h3>
 

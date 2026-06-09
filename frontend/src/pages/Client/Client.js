@@ -1305,11 +1305,8 @@ const Clients = () => {
       {showDeleteModal &&
         selectedDeleteClient &&
         createPortal(
-          <div className="clients__modalOverlay" onClick={closeDeleteModal}>
-            <div
-              className="clients__deleteModal"
-              onClick={(e) => e.stopPropagation()}
-            >
+          <div className="clients__modalOverlay">
+            <div className="clients__deleteModal">
               <div className="clients__modalHeader">
                 <h3>Excluir Cliente</h3>
 

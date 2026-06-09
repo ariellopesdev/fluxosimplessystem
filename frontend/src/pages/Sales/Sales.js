@@ -602,11 +602,8 @@ const Sales = () => {
 
       {showSaleModal &&
         createPortal(
-          <div className="sales__modalOverlay" onClick={handleCloseSaleModal}>
-            <div
-              className="sales__modal sales__receiptModal"
-              onClick={(e) => e.stopPropagation()}
-            >
+          <div className="sales__modalOverlay">
+            <div className="sales__modal sales__receiptModal">
               <div className="sales__modalHeader">
                 <h3>Nova Venda</h3>
 
@@ -903,11 +900,8 @@ const Sales = () => {
       {showPaymentModal &&
         selectedSale &&
         createPortal(
-          <div
-            className="sales__modalOverlay"
-            onClick={handleClosePaymentModal}
-          >
-            <div className="sales__modal" onClick={(e) => e.stopPropagation()}>
+          <div className="sales__modalOverlay">
+            <div className="sales__modal">
               <div className="sales__modalHeader">
                 <h3>Editar Pagamento</h3>
 
@@ -1018,11 +1012,8 @@ const Sales = () => {
       {showDetailsModal &&
         detailsSale &&
         createPortal(
-          <div className="sales__modalOverlay" onClick={closeDetailsModal}>
-            <div
-              className="sales__modal sales__detailsModal"
-              onClick={(e) => e.stopPropagation()}
-            >
+          <div className="sales__modalOverlay">
+            <div className="sales__modal sales__detailsModal">
               <div className="sales__modalHeader">
                 <h3>Dados da Venda</h3>
 

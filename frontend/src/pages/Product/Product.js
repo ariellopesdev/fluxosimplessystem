@@ -438,11 +438,9 @@ const Product = () => {
           createPortal(
             <div
               className="product__modalOverlay"
-              onClick={handleCloseProductModal}
             >
               <div
                 className="product__modal"
-                onClick={(e) => e.stopPropagation()}
               >
                 <div className="product__modalHeader">
                   <h3>{editId ? "Editar Produto" : "Novo Produto"}</h3>
@@ -566,10 +564,9 @@ const Product = () => {
         {showDeleteModal &&
           selectedDeleteProduct &&
           createPortal(
-            <div className="product__modalOverlay" onClick={closeDeleteModal}>
+            <div className="product__modalOverlay">
               <div
                 className="product__deleteModal"
-                onClick={(e) => e.stopPropagation()}
               >
                 <div className="product__modalHeader">
                   <h3>Excluir Produto</h3>

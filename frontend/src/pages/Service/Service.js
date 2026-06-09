@@ -342,14 +342,8 @@ const Services = () => {
 
       {showServiceModal &&
         createPortal(
-          <div
-            className="services__modalOverlay"
-            onClick={handleCloseServiceModal}
-          >
-            <div
-              className="services__modal"
-              onClick={(e) => e.stopPropagation()}
-            >
+          <div className="services__modalOverlay">
+            <div className="services__modal">
               <div className="services__modalHeader">
                 <h3>{editId ? "Editar Serviço" : "Novo Serviço"}</h3>
 
@@ -580,11 +574,8 @@ const Services = () => {
       {showDeleteModal &&
         selectedDeleteService &&
         createPortal(
-          <div className="services__modalOverlay" onClick={closeDeleteModal}>
-            <div
-              className="services__deleteModal"
-              onClick={(e) => e.stopPropagation()}
-            >
+          <div className="services__modalOverlay">
+            <div className="services__deleteModal">
               <div className="services__modalHeader">
                 <h3>Excluir Serviço</h3>
 

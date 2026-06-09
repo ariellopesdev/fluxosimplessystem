@@ -1082,11 +1082,8 @@ const Reports = () => {
       {showReportModal &&
         selectedReport &&
         createPortal(
-          <div className="reports__modalOverlay" onClick={closeReportModal}>
-            <div
-              className="reports__modal"
-              onClick={(e) => e.stopPropagation()}
-            >
+          <div className="reports__modalOverlay">
+            <div className="reports__modal">
               <div className="reports__modalHeader">
                 <h3>{selectedReport.title}</h3>
 
@@ -1133,11 +1130,8 @@ const Reports = () => {
       {showDeleteModal &&
         selectedDeleteReport &&
         createPortal(
-          <div className="reports__modalOverlay" onClick={closeDeleteModal}>
-            <div
-              className="reports__deleteModal"
-              onClick={(e) => e.stopPropagation()}
-            >
+          <div className="reports__modalOverlay">
+            <div className="reports__deleteModal">
               <div className="reports__modalHeader">
                 <h3>Excluir relatório</h3>
 
