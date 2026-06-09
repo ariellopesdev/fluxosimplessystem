@@ -5,13 +5,13 @@
   bottom: -140px;
   left: 0;
   width: 100%;
-  padding: 14px 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  border-top: 1px solid var(--border);
+  padding: 14px 10px;
   background: rgba(255, 255, 255, 0.55);
+  border-top: 1px solid var(--border);
   backdrop-filter: blur(8px);
 }
 
@@ -19,14 +19,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 14px;
   flex-wrap: wrap;
+  gap: 14px;
 }
 
 .footer--links button {
-  border: none;
   background: transparent;
   color: var(--text-light);
+  border: none;
   font-size: clamp(0.75rem, 1.2vw, 0.9rem);
   cursor: pointer;
   transition:
@@ -40,83 +40,155 @@
 }
 
 .footer--copyright p {
+  margin: 0;
   color: var(--text-light);
   font-size: clamp(0.72rem, 1vw, 0.85rem);
 }
 
 .footer--copyright a {
   color: var(--text-light);
-  text-decoration: none;
   font-weight: var(--weight-700);
+  text-decoration: none;
 }
 
 .footer--copyright a:hover {
   color: var(--primary);
 }
 
-/************ MODAL ************/
+/************ MODAL OVERLAY ************/
 
 .footer__modalOverlay {
   position: fixed;
   inset: 0;
   z-index: 99999;
+  width: 100vw;
+  height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
-  background: rgba(0, 0, 0, 0.68);
-  backdrop-filter: blur(4px);
+  padding: var(--space-xl);
+  background: rgba(15, 23, 42, 0.68);
+  backdrop-filter: blur(5px);
 }
+
+/************ MODAL CONTAINER ************/
 
 .footer__modal {
   position: relative;
-  width: min(760px, 100%);
+  width: min(100%, 680px);
   max-height: calc(100dvh - 48px);
-  overflow-y: auto;
-  background: var(--surface);
-  border-radius: 18px;
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
-  animation: footerModalEnter 0.22s ease both;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  animation: footerModalFade 0.2s ease;
 }
+
+/************ CLOSE BUTTON ************/
+
+.footer__close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 3;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.16);
+  color: var(--color-white);
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.1s ease,
+    opacity 0.2s ease;
+}
+
+.footer__close svg {
+  display: block;
+  font-size: 1.35rem;
+}
+
+.footer__close:hover {
+  background: rgba(255, 255, 255, 0.26);
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+.footer__close:active {
+  transform: scale(0.96);
+}
+
+/************ MODAL HERO ************/
 
 .footer__modalHero {
   display: flex;
   align-items: center;
-  gap: 18px;
-  padding: 28px 32px;
-  background: linear-gradient(135deg, var(--primary), var(--primary-hover));
-  color: var(--surface);
-  border-radius: 18px 18px 0 0;
+  gap: var(--space-md);
+  padding: var(--space-2xl);
+  padding-right: 78px;
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-primary-hover)
+  );
+  color: var(--color-white);
 }
 
-.footer__modalHero span {
-  width: 58px;
-  height: 58px;
+.footer__modalHero > span {
+  width: 50px;
+  height: 50px;
+  flex: 0 0 50px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: rgba(255, 255, 255, 0.18);
-  border-radius: 16px;
-  font-size: 1.7rem;
+  border-radius: var(--radius-lg);
+}
+
+.footer__modalHero svg {
+  font-size: 1.5rem;
 }
 
 .footer__modalHero h2 {
-  margin-bottom: 4px;
-  font-size: clamp(1.2rem, 2vw, 1.45rem);
+  margin: 0;
+  color: var(--color-white);
+  font-size: clamp(1.18rem, 2vw, 1.55rem);
+  font-weight: var(--weight-bold);
+  line-height: 1.2;
 }
 
 .footer__modalHero p {
+  margin: 5px 0 0;
   color: rgba(255, 255, 255, 0.9);
+  font-size: clamp(0.82rem, 1vw, 0.92rem);
+  line-height: 1.4;
 }
+
+/************ MODAL BODY ************/
 
 .footer__modalBody {
-  padding: 28px 32px;
+  flex: 1;
+  max-height: 56vh;
+  padding: var(--space-2xl);
+  overflow-y: auto;
 }
 
-.footer__modalBody > p {
-  margin-bottom: 18px;
-  color: var(--text-light);
-  line-height: 1.7;
+.footer__modalBody p {
+  margin: 0 0 var(--space-lg);
+  color: var(--color-text-muted);
+  font-size: clamp(0.86rem, 1vw, 0.95rem);
+  line-height: 1.65;
+}
+
+.footer__modalBody p:last-child {
+  margin-bottom: 0;
 }
 
 /************ INFO GRID ************/
@@ -124,134 +196,149 @@
 .footer__infoGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-  margin: 22px 0;
+  gap: var(--space-md);
+  margin: var(--space-lg) 0;
 }
 
 .footer__infoGrid > div,
 .footer__requestCard {
-  padding: 16px;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  background: #f9fafb;
+  min-height: 100%;
+  padding: var(--space-lg);
+  background: var(--color-surface-soft);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
 }
 
-.footer__infoGrid strong {
+.footer__infoGrid strong,
+.footer__requestCard strong {
   display: block;
-  margin-bottom: 8px;
-  color: var(--text);
-  font-size: 0.92rem;
+  margin-bottom: var(--space-xs);
+  color: var(--color-text);
+  font-size: clamp(0.82rem, 1vw, 0.92rem);
+  font-weight: var(--weight-bold);
 }
 
-.footer__infoGrid p {
-  color: var(--text-light);
-  font-size: clamp(0.78rem, 0.9vw, 0.84rem);
+.footer__infoGrid p,
+.footer__requestCard p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: clamp(0.76rem, 0.9vw, 0.84rem);
   line-height: 1.5;
 }
 
-/************ PRIVACY ACTIONS ************/
+/************ PRIVACY CENTER CARDS ************/
+
+.footer__infoGrid--actions {
+  align-items: stretch;
+}
 
 .footer__requestCard {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-xs);
   text-align: left;
   cursor: pointer;
   transition:
-    transform 0.2s ease,
     border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    background-color 0.2s ease;
+    background-color 0.2s ease,
+    transform 0.1s ease,
+    box-shadow 0.2s ease;
+}
+
+.footer__requestCard span {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-xs);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  border-radius: var(--radius-md);
+}
+
+.footer__requestCard svg {
+  font-size: 1rem;
 }
 
 .footer__requestCard:hover {
-  transform: translateY(-3px);
-  border-color: var(--primary);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
-  background: rgba(5, 150, 105, 0.04);
+  border-color: var(--color-primary);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+  transform: translateY(-1px);
 }
 
 .footer__requestCard.active {
-  border-color: var(--primary);
-  background: rgba(5, 150, 105, 0.08);
-  box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.1);
+  background: var(--color-primary-soft);
+  border-color: var(--color-primary);
 }
 
 /************ PRIVACY MESSAGE ************/
 
 .footer__privacyRequest {
-  margin-top: 18px;
-  padding: 18px;
+  margin: var(--space-lg) 0;
+  padding: var(--space-lg);
   background: rgba(59, 130, 246, 0.08);
   border: 1px solid rgba(59, 130, 246, 0.18);
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
 }
 
 .footer__privacyRequest strong {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: var(--space-xs);
   color: #2563eb;
+  font-size: clamp(0.88rem, 1vw, 0.98rem);
+  font-weight: var(--weight-bold);
 }
 
 .footer__privacyRequest p {
-  color: var(--text-light);
+  margin: 0;
+  color: var(--color-text-muted);
   line-height: 1.6;
 }
 
-/************ FOOTER MODAL ACTIONS ************/
+/************ MODAL FOOTER ************/
 
 .footer__modalFooter {
   display: flex;
   justify-content: flex-end;
-  padding: 18px 32px;
-  border-top: 1px solid var(--border);
+  padding: var(--space-lg) var(--space-2xl);
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
 }
 
 .footer__modalFooter button {
+  height: 40px;
+  padding: 0 var(--space-lg);
+  background: var(--color-primary);
+  color: var(--color-white);
   border: none;
-  border-radius: 10px;
-  padding: 11px 18px;
-  background: var(--primary);
-  color: var(--surface);
-  font-weight: var(--weight-700);
+  border-radius: var(--radius-md);
+  font-size: clamp(0.82rem, 1vw, 0.9rem);
+  font-weight: var(--weight-bold);
   cursor: pointer;
   transition:
     background-color 0.2s ease,
-    transform 0.15s ease;
+    transform 0.1s ease,
+    box-shadow 0.2s ease;
 }
 
 .footer__modalFooter button:hover {
-  background: var(--primary-hover);
+  background: var(--color-primary-hover);
+  box-shadow: 0 6px 14px rgba(16, 185, 129, 0.22);
 }
 
 .footer__modalFooter button:active {
   transform: scale(0.98);
 }
 
-/************ CLOSE BUTTON ************/
-
-.footer__close {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  width: 38px;
-  height: 38px;
-  border: none;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.18);
-  color: var(--surface);
-  font-size: clamp(1.2rem, 2vw, 1.4rem);
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.footer__close:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
-
 /************ ANIMATION ************/
 
-@keyframes footerModalEnter {
+@keyframes footerModalFade {
   from {
     opacity: 0;
-    transform: translateY(12px) scale(0.98);
+    transform: translateY(-8px) scale(0.99);
   }
 
   to {
@@ -268,20 +355,38 @@
     bottom: -40px;
   }
 
+  .footer__modalOverlay {
+    align-items: center;
+    padding: var(--space-md);
+  }
+
+  .footer__modal {
+    max-height: calc(100dvh - 24px);
+  }
+
+  .footer__modalHero {
+    align-items: flex-start;
+    padding: var(--space-xl);
+    padding-right: 68px;
+  }
+
+  .footer__modalHero > span {
+    width: 46px;
+    height: 46px;
+    flex-basis: 46px;
+  }
+
   .footer__infoGrid {
     grid-template-columns: 1fr;
   }
 
-  .footer__modalHero {
-    flex-direction: column;
-    align-items: flex-start;
+  .footer__modalBody {
+    max-height: 58vh;
+    padding: var(--space-xl);
   }
 
-  .footer__modalBody,
-  .footer__modalFooter,
-  .footer__modalHero {
-    padding-left: 22px;
-    padding-right: 22px;
+  .footer__modalFooter {
+    padding: var(--space-lg);
   }
 }
 
@@ -290,13 +395,14 @@
     padding: 12px;
   }
 
-  .footer__modal {
-    max-height: calc(100dvh - 24px);
+  .footer__modalHero {
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding-right: 62px;
   }
 
-  .footer__modalHero span {
-    width: 48px;
-    height: 48px;
+  .footer__modalHero h2 {
+    font-size: clamp(1.05rem, 5vw, 1.25rem);
   }
 
   .footer__modalFooter {
@@ -305,5 +411,12 @@
 
   .footer__modalFooter button {
     width: 100%;
+  }
+
+  .footer__close {
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
   }
 }

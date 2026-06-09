@@ -3,6 +3,7 @@ import "./Footer.css";
 
 //Hooks
 import { useEffect, useState } from "react";
+import { useModal } from "../../hooks/useModal";
 
 //Icons
 import {
@@ -13,41 +14,31 @@ import {
   FaEdit,
   FaTrashAlt,
 } from "react-icons/fa";
+import { IoClose } from "react-icons/io5";
 
 const Footer = () => {
-  //Modal state
-  const [modal, setModal] = useState(null);
-  //Privacy request state
+  const {
+    isOpen: showFooterModal,
+    modalData: selectedModal,
+    openModal,
+    closeModal,
+  } = useModal();
+
   const [privacyRequest, setPrivacyRequest] = useState(null);
 
-  //Open modal
-  const openModal = (modalName) => {
-    setModal(modalName);
-    setPrivacyRequest(null);
-  };
-
-  //Close modal
-  const closeModal = () => {
-    setModal(null);
-    setPrivacyRequest(null);
-  };
-
-  //Close modal with ESC key
+  // Limpa solicitação interna sempre que o modal é fechado
   useEffect(() => {
-    const handleEsc = (e) => {
-      if (e.key === "Escape") {
-        closeModal();
-      }
-    };
+    if (!showFooterModal) {
+      setPrivacyRequest(null);
+    }
+  }, [showFooterModal]);
 
-    window.addEventListener("keydown", handleEsc);
+  // Abre modal do footer e reseta solicitação de privacidade
+  const handleOpenModal = (modalName) => {
+    setPrivacyRequest(null);
+    openModal(modalName);
+  };
 
-    return () => {
-      window.removeEventListener("keydown", handleEsc);
-    };
-  }, []);
-
-  //Privacy request messages
   const privacyRequestContent = {
     export: {
       title: "Solicitação de exportação",
@@ -63,7 +54,6 @@ const Footer = () => {
     },
   };
 
-  //Modal content
   const modalContent = {
     privacy: {
       icon: <FaShieldAlt />,
@@ -76,20 +66,24 @@ const Footer = () => {
             funcionamento da plataforma, como informações de usuários, empresas,
             clientes, produtos, vendas, agendamentos e relatórios.
           </p>
+
           <div className="footer__infoGrid">
             <div>
               <strong>Coleta limitada</strong>
               <p>Usamos somente dados essenciais para operação do sistema.</p>
             </div>
+
             <div>
               <strong>Proteção de dados</strong>
               <p>As informações ficam vinculadas à empresa responsável.</p>
             </div>
+
             <div>
               <strong>Sem venda de dados</strong>
               <p>Não comercializamos informações cadastradas no sistema.</p>
             </div>
           </div>
+
           <p>
             O uso da plataforma implica ciência de que os dados inseridos são de
             responsabilidade da empresa cadastrada.
@@ -108,6 +102,7 @@ const Footer = () => {
             A Central de Privacidade reúne orientações sobre acesso, correção,
             exportação ou remoção de informações cadastradas.
           </p>
+
           <div className="footer__infoGrid footer__infoGrid--actions">
             <button
               type="button"
@@ -122,6 +117,7 @@ const Footer = () => {
               <strong>Exportação</strong>
               <p>Solicite uma cópia dos dados vinculados à sua conta.</p>
             </button>
+
             <button
               type="button"
               className={`footer__requestCard ${
@@ -135,6 +131,7 @@ const Footer = () => {
               <strong>Correção</strong>
               <p>Faça alteração de informações incorretas ou desatualizadas.</p>
             </button>
+
             <button
               type="button"
               className={`footer__requestCard ${
@@ -176,45 +173,52 @@ const Footer = () => {
             empresas na organização de clientes, vendas, produtos, serviços,
             agendamentos, financeiro, relatórios e dashboard.
           </p>
+
           <div className="footer__infoGrid">
             <div>
               <strong>Gestão integrada</strong>
               <p>Centraliza os principais módulos da empresa em um só lugar.</p>
             </div>
+
             <div>
               <strong>Fluxo simples</strong>
               <p>Interface objetiva para facilitar o uso no dia a dia.</p>
             </div>
+
             <div>
               <strong>Desenvolvimento</strong>
               <p>Criado por Ariel Lopes como solução web fullstack.</p>
             </div>
           </div>
+
           <p>Versão 1.0.0 — Fluxo Simples System © 2026.</p>
         </>
       ),
     },
   };
 
-  const currentModal = modalContent[modal];
+  const currentModal = modalContent[selectedModal];
 
   return (
     <>
       <footer id="footer">
-        {/* Footer Links */}
         <div className="footer--links">
-          <button type="button" onClick={() => openModal("privacy")}>
+          <button type="button" onClick={() => handleOpenModal("privacy")}>
             Política de Privacidade
           </button>
-          <button type="button" onClick={() => openModal("privacyCenter")}>
+
+          <button
+            type="button"
+            onClick={() => handleOpenModal("privacyCenter")}
+          >
             Central de Privacidade
           </button>
-          <button type="button" onClick={() => openModal("about")}>
+
+          <button type="button" onClick={() => handleOpenModal("about")}>
             Sobre
           </button>
         </div>
 
-         {/* Footer Copyright */}
         <div className="footer--copyright">
           <p>
             &copy;{" "}
@@ -230,31 +234,28 @@ const Footer = () => {
         </div>
       </footer>
 
-       {/* Modal */}
-      {currentModal && (
-        <div className="footer__modalOverlay" onClick={closeModal}>
-          <div className="footer__modal" onClick={(e) => e.stopPropagation()}>
-
-             {/* Close Button */}
+      {showFooterModal && currentModal && (
+        <div className="footer__modalOverlay">
+          <div className="footer__modal">
             <button
               type="button"
               className="footer__close"
               onClick={closeModal}
             >
-              ×
+              <IoClose />
             </button>
 
-             {/* Modal Header */}
             <div className="footer__modalHero">
               <span>{currentModal.icon}</span>
+
               <div>
                 <h2>{currentModal.title}</h2>
                 <p>{currentModal.subtitle}</p>
               </div>
             </div>
+
             <div className="footer__modalBody">{currentModal.body}</div>
 
-             {/* Modal Footer */}
             <div className="footer__modalFooter">
               <button type="button" onClick={closeModal}>
                 Entendi
