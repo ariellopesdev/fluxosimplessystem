@@ -94,7 +94,7 @@ const userUpdateValidation = () => {
     body("email").optional().trim().isEmail().withMessage("E-mail inválido."),
 
     body("password")
-      .optional()
+      .optional({ checkFalsy: true })
       .trim()
       .isLength({ min: 6 })
       .withMessage("A senha precisa ter no mínimo 6 caracteres.")
@@ -112,7 +112,7 @@ const userUpdateValidation = () => {
       .withMessage("O nome da empresa deve ter no mínimo 2 caracteres."),
 
     body("cnpj")
-      .optional()
+      .optional({ checkFalsy: true })
       .trim()
       .custom((value) => {
         if (value && !isValidCNPJ(value)) {

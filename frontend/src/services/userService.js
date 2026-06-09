@@ -60,11 +60,47 @@ const getUserDetails = async (id) => {
   }
 };
 
+const getUsers = async (token) => {
+  const config = requestConfig("GET", null, token);
+
+  try {
+    const res = await fetch(api + "/users", config);
+    return await res.json();
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const updateUser = async (id, data, token) => {
+  const config = requestConfig("PUT", data, token);
+
+  try {
+    const res = await fetch(api + "/users/" + id, config);
+    return await res.json();
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const deleteUser = async (id, token) => {
+  const config = requestConfig("DELETE", null, token);
+
+  try {
+    const res = await fetch(api + "/users/" + id, config);
+    return await res.json();
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 const userService = {
   profile,
   updateProfile,
   getUserDetails,
   createUser,
+  getUsers,
+  updateUser,
+  deleteUser,
 };
 
 export default userService;

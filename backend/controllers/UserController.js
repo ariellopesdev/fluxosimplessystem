@@ -357,6 +357,134 @@ const resetPassword = async (req, res) => {
   }
 };
 
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find()
+      .select("-password")
+      .populate("company")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({
+      errors: ["Erro ao buscar usuários."],
+    });
+  }
+};
+
+const updateUserByAdmin = async (req, res) => {
+  const { id } = req.params;
+  const { name, email, password, companyName, cnpj, role } = req.body;
+
+  if (req.user._id.toString() === id) {
+    return res.status(422).json({
+      errors: ["Edite seu próprio usuário pela tela de perfil."],
+    });
+  }
+
+  try {
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json({
+        errors: ["Usuário não encontrado."],
+      });
+    }
+
+    const normalizedCnpj = String(cnpj || "").replace(/[^\d]+/g, "");
+
+    if (email && email !== user.email) {
+      const emailExists = await User.findOne({ email });
+
+      if (emailExists) {
+        return res.status(422).json({
+          errors: ["Já existe um usuário cadastrado com este e-mail."],
+        });
+      }
+
+      user.email = email;
+    }
+
+    if (name) user.name = name;
+
+    if (role) {
+      if (!["USER", "ADMIN"].includes(role)) {
+        return res.status(422).json({
+          errors: ["Tipo de usuário inválido."],
+        });
+      }
+
+      user.role = role;
+    }
+
+    if (normalizedCnpj) {
+      let company = await Company.findOne({ cnpj: normalizedCnpj });
+
+      if (!company) {
+        if (!companyName) {
+          return res.status(422).json({
+            errors: ["O nome da empresa é obrigatório."],
+          });
+        }
+
+        company = await Company.create({
+          name: companyName,
+          cnpj: normalizedCnpj,
+        });
+      }
+
+      user.company = company._id;
+    }
+
+    if (password) {
+      const salt = await bcrypt.genSalt();
+      user.password = await bcrypt.hash(password, salt);
+    }
+
+    await user.save();
+
+    const updatedUser = await User.findById(id)
+      .select("-password")
+      .populate("company");
+
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    res.status(500).json({
+      errors: ["Erro ao atualizar usuário."],
+    });
+  }
+};
+
+const deleteUserByAdmin = async (req, res) => {
+  const { id } = req.params;
+
+  if (req.user._id.toString() === id) {
+    return res.status(422).json({
+      errors: ["Você não pode excluir o próprio usuário."],
+    });
+  }
+
+  try {
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json({
+        errors: ["Usuário não encontrado."],
+      });
+    }
+
+    await User.findByIdAndDelete(id);
+
+    res.status(200).json({
+      message: "Usuário excluído com sucesso.",
+    });
+  } catch (error) {
+    res.status(500).json({
+      errors: ["Erro ao excluir usuário."],
+    });
+  }
+};
+
 //Export user controller actions
 module.exports = {
   register,
@@ -366,4 +494,7 @@ module.exports = {
   getUserById,
   forgotPassword,
   resetPassword,
+  getAllUsers,
+  updateUserByAdmin,
+  deleteUserByAdmin,
 };

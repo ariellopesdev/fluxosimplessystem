@@ -1,4 +1,4 @@
-/************ REGISTER PAGE ************/
+/************ REGISTER PAGE - ADMIN FORM ************/
 
 #register {
   width: 100%;
@@ -62,8 +62,6 @@
   box-shadow: var(--shadow-md);
 }
 
-/************ GROUPS ************/
-
 .form__group--register {
   display: flex;
   flex-direction: column;
@@ -83,10 +81,10 @@
   letter-spacing: 0.2px;
 }
 
-/************ INPUTS & SELECT ************/
-
 .form__register input,
-.form__register select {
+.form__register select,
+.registerAccess__form input,
+.registerAccess__form select {
   width: 100%;
   height: 44px;
   padding: 0 var(--space-md);
@@ -102,22 +100,27 @@
 }
 
 .form__register input:hover,
-.form__register select:hover {
+.form__register select:hover,
+.registerAccess__form input:hover,
+.registerAccess__form select:hover {
   border-color: var(--color-primary);
 }
 
 .form__register input:focus,
-.form__register select:focus {
+.form__register select:focus,
+.registerAccess__form input:focus,
+.registerAccess__form select:focus {
   border-color: var(--color-primary);
   outline: none;
   box-shadow: 0 0 0 4px var(--color-primary-soft);
 }
 
-.form__register input::placeholder {
+.form__register input::placeholder,
+.registerAccess__form input::placeholder {
   color: var(--color-text-light);
 }
 
-/************ INPUT ERROR ************/
+/************ ERROR ************/
 
 .input__error {
   background: #fffafa !important;
@@ -147,7 +150,7 @@
     background-color 0.3s ease;
 }
 
-/************ BUTTON ************/
+/************ ADMIN BUTTON ************/
 
 .register__btn--primary {
   grid-column: 1 / -1;
@@ -182,7 +185,459 @@
   box-shadow: none;
 }
 
-/************ MESSAGES INSIDE FORM ************/
+/************ SUPER ADMIN - ACCESS PAGE ************/
+
+.registerAccess {
+  width: 100%;
+  display: block !important;
+}
+
+.registerAccess__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-xl);
+}
+
+.registerAccess__header h2 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin: 0;
+  color: var(--color-text);
+  font-size: clamp(1.3rem, 2vw, 1.8rem);
+  font-weight: var(--weight-bold);
+}
+
+.registerAccess__header h2 svg {
+  font-size: clamp(1.15rem, 1.6vw, 1.4rem);
+}
+
+.registerAccess__btn {
+  background: var(--color-primary);
+  color: var(--color-white);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: clamp(0.85rem, 1vw, 0.95rem);
+  font-weight: var(--weight-bold);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease,
+    opacity 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.registerAccess__btn:hover {
+  background: var(--color-primary-hover);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.28);
+}
+
+.registerAccess__btn:active {
+  transform: scale(0.98);
+}
+
+.registerAccess__btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.registerAccess__btnSecondary {
+  background: var(--color-surface-soft);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  box-shadow: none;
+}
+
+.registerAccess__btnSecondary:hover {
+  background: var(--color-border);
+  box-shadow: none;
+}
+
+.registerAccess__btnDanger {
+  background: var(--color-danger);
+  box-shadow: none;
+}
+
+.registerAccess__btnDanger:hover {
+  background: #b91c1c;
+  box-shadow: none;
+}
+
+/************ CARDS ************/
+
+.registerAccess__cards {
+  display: flex;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-xl);
+}
+
+.registerAccessCard {
+  flex: 1;
+  padding: var(--space-xl);
+  border-radius: var(--radius-lg);
+  color: var(--color-white);
+  font-size: clamp(0.9rem, 1vw, 1rem);
+  font-weight: var(--weight-bold);
+}
+
+.green {
+  background: var(--color-success);
+}
+
+.blue {
+  background: var(--color-info);
+}
+
+.orange {
+  background: var(--color-warning);
+}
+
+.red {
+  background: var(--color-danger);
+}
+
+/************ FILTER ************/
+
+.registerAccess__filters {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xl);
+}
+
+.registerAccess__filters input {
+  width: 260px;
+  height: 42px;
+  padding: 0 var(--space-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border-dark);
+  border-radius: var(--radius-md);
+  font-size: clamp(0.86rem, 1vw, 0.95rem);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.registerAccess__filters input:hover {
+  border-color: var(--color-primary);
+}
+
+.registerAccess__filters input:focus {
+  border-color: var(--color-primary);
+  outline: none;
+  box-shadow: 0 0 0 4px var(--color-primary-soft);
+}
+
+.registerAccess__filters input::placeholder {
+  color: var(--color-text-light);
+}
+
+/************ TABLE ************/
+
+.registerAccess__table {
+  width: 100%;
+  overflow-x: auto;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+}
+
+.registerAccess__table table {
+  width: 100%;
+  min-width: 950px;
+  background: var(--color-surface);
+  border-collapse: collapse;
+}
+
+.registerAccess__table th,
+.registerAccess__table td {
+  padding: var(--space-md);
+  vertical-align: middle;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-size: clamp(0.78rem, 0.9vw, 0.88rem);
+}
+
+.registerAccess__table th {
+  background: var(--color-surface-soft);
+  color: var(--color-text-muted);
+  font-size: clamp(0.72rem, 0.85vw, 0.8rem);
+  font-weight: var(--weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.registerAccess__table th:nth-child(1),
+.registerAccess__table td:nth-child(1),
+.registerAccess__table th:nth-child(2),
+.registerAccess__table td:nth-child(2) {
+  text-align: left;
+}
+
+.registerAccess__table th:nth-child(n + 3),
+.registerAccess__table td:nth-child(n + 3) {
+  text-align: center;
+}
+
+.registerAccess__table td strong {
+  display: block;
+  margin-bottom: var(--space-xs);
+  color: var(--color-text);
+  font-size: clamp(0.86rem, 1vw, 0.95rem);
+}
+
+.registerAccess__table td > span:not(.registerAccess__actionIcon) {
+  display: block;
+  color: var(--color-text-muted);
+  font-size: clamp(0.76rem, 0.9vw, 0.84rem);
+}
+
+.registerAccess__table tbody tr:nth-child(even) {
+  background: var(--color-surface-soft);
+}
+
+.registerAccess__table tbody tr:hover {
+  background: var(--color-primary-soft);
+}
+
+.registerAccess__table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.registerAccess__empty {
+  margin: 0;
+  padding: var(--space-xl);
+  color: var(--color-text-muted);
+  background: var(--color-surface-soft);
+  font-size: clamp(0.84rem, 1vw, 0.95rem);
+}
+
+/************ STATUS ************/
+
+.status {
+  font-size: clamp(0.76rem, 0.9vw, 0.84rem);
+  font-weight: var(--weight-bold);
+}
+
+.status.active {
+  color: var(--color-success);
+}
+
+.status.inactive {
+  color: var(--color-danger);
+}
+
+/************ ACTION ICONS ************/
+
+.table__edit--close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+}
+
+.registerAccess__actionIcon {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: inherit;
+  font-size: clamp(1.05rem, 1.3vw, 1.25rem) !important;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.registerAccess__actionIcon svg {
+  font-size: inherit;
+}
+
+.registerAccess__actionIcon:hover {
+  transform: scale(1.1);
+  opacity: 0.8;
+}
+
+.registerAccess__actionIcon.edit {
+  color: var(--color-info);
+}
+
+.registerAccess__actionIcon.delete {
+  color: var(--color-danger);
+}
+
+/************ MODAL ************/
+
+.registerAccess__modalOverlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+  background: rgba(0, 0, 0, 0.68);
+  backdrop-filter: blur(3px);
+  overflow-y: auto;
+  z-index: 99999;
+}
+
+.registerAccess__modal,
+.registerAccess__deleteModal {
+  width: 100%;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  animation: modalFade 0.2s ease;
+}
+
+.registerAccess__modal {
+  max-width: 860px;
+  max-height: 95vh;
+  overflow-y: auto;
+  padding: var(--space-3xl);
+}
+
+.registerAccess__deleteModal {
+  max-width: 420px;
+  overflow: hidden;
+}
+
+.registerAccess__modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-xl);
+  padding-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.registerAccess__deleteModal .registerAccess__modalHeader {
+  margin-bottom: 0;
+  padding: var(--space-xl);
+}
+
+.registerAccess__modalHeader h3 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: clamp(1.1rem, 1.6vw, 1.4rem);
+  font-weight: var(--weight-bold);
+}
+
+.registerAccess__closeBtn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.1s ease,
+    border-color 0.2s ease;
+}
+
+.registerAccess__closeBtn svg {
+  font-size: clamp(1.2rem, 1.5vw, 1.4rem);
+}
+
+.registerAccess__closeBtn:hover {
+  background: var(--color-surface-soft);
+  color: var(--color-text);
+  border-color: var(--color-border-dark);
+}
+
+.registerAccess__closeBtn:active {
+  transform: scale(0.96);
+}
+
+/************ SUPER ADMIN FORM ************/
+
+.registerAccess__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.registerAccess__section {
+  margin-bottom: var(--space-lg);
+  padding: var(--space-lg);
+  background: var(--color-surface-soft);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.registerAccess__section h4 {
+  margin: 0 0 var(--space-md);
+  color: var(--color-text);
+  font-size: clamp(0.95rem, 1.3vw, 1.1rem);
+  font-weight: var(--weight-bold);
+}
+
+.registerAccess__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-md);
+}
+
+.registerAccess__grid .form__group--register:nth-child(1),
+.registerAccess__grid .form__group--register:nth-child(6),
+.registerAccess__grid .form__group--register:nth-child(7) {
+  grid-column: 1 / -1;
+}
+
+.registerAccess__form .message {
+  margin-top: 2px;
+  margin-bottom: 0;
+  padding: 8px 10px;
+  font-size: clamp(0.72rem, 0.85vw, 0.78rem);
+}
+
+/************ DELETE MODAL ************/
+
+.registerAccess__deleteContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-xl);
+}
+
+.registerAccess__deleteContent p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: clamp(0.88rem, 1vw, 0.95rem);
+}
+
+.registerAccess__deleteContent strong {
+  color: var(--color-text);
+  font-size: clamp(1rem, 1.1vw, 1.1rem);
+}
+
+.registerAccess__deleteContent span {
+  color: var(--color-danger);
+  font-size: clamp(0.8rem, 0.9vw, 0.88rem);
+}
+
+.registerAccess__deleteActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-md);
+  padding: var(--space-xl);
+  border-top: 1px solid var(--color-border);
+}
+
+/************ MESSAGES ************/
 
 .form__group--register .message {
   margin-top: 2px;
@@ -195,11 +650,40 @@
   grid-column: 1 / -1;
 }
 
+/************ ANIMATION ************/
+
+@keyframes modalFade {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /************ RESPONSIVE ************/
 
 @media (max-width: 900px) {
   #register__main {
     max-width: 100%;
+  }
+
+  .registerAccess__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .registerAccess__grid .form__group--register:nth-child(1),
+  .registerAccess__grid .form__group--register:nth-child(6),
+  .registerAccess__grid .form__group--register:nth-child(7) {
+    grid-column: auto;
+  }
+
+  .registerAccess__cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
   }
 }
 
@@ -223,6 +707,38 @@
   .form__register > .message {
     grid-column: auto;
   }
+
+  .registerAccess__header {
+    flex-direction: column;
+    gap: var(--space-md);
+    align-items: stretch;
+  }
+
+  .registerAccess__btn {
+    width: 100%;
+  }
+
+  .registerAccess__cards {
+    grid-template-columns: 1fr;
+  }
+
+  .registerAccess__filters {
+    flex-direction: column;
+  }
+
+  .registerAccess__filters input {
+    width: 100%;
+  }
+
+  .registerAccess__modalOverlay {
+    align-items: flex-start;
+    padding: var(--space-md);
+  }
+
+  .registerAccess__modal {
+    max-height: calc(100dvh - 24px);
+    padding: var(--space-lg);
+  }
 }
 
 @media (max-width: 480px) {
@@ -240,7 +756,13 @@
 
   .form__register input,
   .form__register select,
-  .register__btn--primary {
+  .register__btn--primary,
+  .registerAccess__form input,
+  .registerAccess__form select {
     height: 42px;
+  }
+
+  .registerAccess__deleteActions {
+    flex-direction: column;
   }
 }

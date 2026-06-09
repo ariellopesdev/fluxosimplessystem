@@ -3,6 +3,7 @@ import userService from "../services/userService";
 
 const initialState = {
   user: {},
+  users: [],
   error: false,
   success: false,
   loading: false,
@@ -71,6 +72,54 @@ export const createUser = createAsyncThunk(
     }
 
     return data;
+  },
+);
+
+//Get users by admin
+export const getUsers = createAsyncThunk(
+  "user/getUsers",
+  async (_, thunkAPI) => {
+    const token = thunkAPI.getState().auth.user.token;
+
+    const data = await userService.getUsers(token);
+
+    if (data?.errors) {
+      return thunkAPI.rejectWithValue(data.errors[0]);
+    }
+
+    return data;
+  },
+);
+
+//Update an user by admin
+export const updateUser = createAsyncThunk(
+  "user/updateUser",
+  async ({ id, userData }, thunkAPI) => {
+    const token = thunkAPI.getState().auth.user.token;
+
+    const data = await userService.updateUser(id, userData, token);
+
+    if (data?.errors) {
+      return thunkAPI.rejectWithValue(data.errors[0]);
+    }
+
+    return data;
+  },
+);
+
+//Delete an user by admin
+export const deleteUser = createAsyncThunk(
+  "user/deleteUser",
+  async (id, thunkAPI) => {
+    const token = thunkAPI.getState().auth.user.token;
+
+    const data = await userService.deleteUser(id, token);
+
+    if (data?.errors) {
+      return thunkAPI.rejectWithValue(data.errors[0]);
+    }
+
+    return id;
   },
 );
 
@@ -148,6 +197,55 @@ export const userSlice = createSlice({
         state.message = "Usuário criado com sucesso!";
       })
       .addCase(createUser.rejected, (state, action) => {
+        state.loading = false;
+        state.success = false;
+        state.error = action.payload;
+      })
+      .addCase(getUsers.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getUsers.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = true;
+        state.error = null;
+        state.users = action.payload;
+      })
+      .addCase(getUsers.rejected, (state, action) => {
+        state.loading = false;
+        state.success = false;
+        state.error = action.payload;
+      })
+      .addCase(updateUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = true;
+        state.error = null;
+        state.message = "Usuário atualizado com sucesso!";
+        state.users = state.users.map((user) =>
+          user._id === action.payload._id ? action.payload : user,
+        );
+      })
+      .addCase(updateUser.rejected, (state, action) => {
+        state.loading = false;
+        state.success = false;
+        state.error = action.payload;
+      })
+      .addCase(deleteUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = true;
+        state.error = null;
+        state.message = "Usuário excluído com sucesso!";
+        state.users = state.users.filter((user) => user._id !== action.payload);
+      })
+      .addCase(deleteUser.rejected, (state, action) => {
         state.loading = false;
         state.success = false;
         state.error = action.payload;

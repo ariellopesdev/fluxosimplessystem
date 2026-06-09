@@ -10,6 +10,9 @@ const {
   getUserById,
   forgotPassword,
   resetPassword,
+  getAllUsers,
+  updateUserByAdmin,
+  deleteUserByAdmin,
 } = require("../controllers/UserController");
 
 // Middlewares
@@ -62,5 +65,18 @@ router.put(
   resetPassword,
 );
 router.get("/:id", getUserById);
+
+router.get("/", authGuard, roleGuard("SUPER_ADMIN"), getAllUsers);
+
+router.put(
+  "/:id",
+  authGuard,
+  roleGuard("SUPER_ADMIN"),
+  userUpdateValidation(),
+  validate,
+  updateUserByAdmin,
+);
+
+router.delete("/:id", authGuard, roleGuard("SUPER_ADMIN"), deleteUserByAdmin);
 
 module.exports = router;

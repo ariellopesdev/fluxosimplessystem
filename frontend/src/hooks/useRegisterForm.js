@@ -146,16 +146,25 @@ export const useRegisterForm = () => {
   };
 
   //Validate all form fields before submit
-  const validateForm = () => {
+  const validateForm = (isEditing = false) => {
     const validationErrors = {
       name: getFieldError("name", formData.name),
       email: getFieldError("email", formData.email),
-      password: getFieldError("password", formData.password),
-      confirmPassword: getFieldError(
-        "confirmPassword",
-        formData.confirmPassword,
-        formData.password,
-      ),
+
+      password:
+        isEditing && !formData.password
+          ? ""
+          : getFieldError("password", formData.password),
+
+      confirmPassword:
+        isEditing && !formData.password && !formData.confirmPassword
+          ? ""
+          : getFieldError(
+              "confirmPassword",
+              formData.confirmPassword,
+              formData.password,
+            ),
+
       companyName: getFieldError("companyName", formData.companyName),
       cnpj: getFieldError("cnpj", formData.cnpj),
     };
