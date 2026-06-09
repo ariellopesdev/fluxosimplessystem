@@ -1,5 +1,9 @@
 /************ HOME-INFO ************/
 
+#home {
+  min-height: 100dvh;
+}
+
 #home__info {
   min-width: 380px;
   width: 40%;

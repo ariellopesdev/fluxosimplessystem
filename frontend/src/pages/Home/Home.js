@@ -46,13 +46,6 @@ const Home = () => {
     typeof error === "string" &&
     error.toLowerCase().includes("muitas tentativas");
 
-  //Handle field login attempts
-  // useEffect(() => {
-  //   if (error) {
-  //     increaseFailedAttempts();
-  //   }
-  // }, [error, increaseFailedAttempts]);
-
   //Sign in user
   const handleSubmit = async (e) => {
     e.preventDefault();
