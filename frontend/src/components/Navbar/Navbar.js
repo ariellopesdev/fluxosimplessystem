@@ -19,7 +19,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout, reset } from "../../slices/authSlice";
 import { profile } from "../../slices/userSlice";
 
-const Navbar = ({ toggleAside }) => {
+const Navbar = ({ toggleAside, setPage }) => {
   const { auth } = useAuth();
   const { user } = useSelector((state) => state.user);
 
@@ -55,6 +55,16 @@ const Navbar = ({ toggleAside }) => {
     navigate("/");
   };
 
+  // Navigate to painel page
+  const handleBrandClick = () => {
+    if (auth && setPage) {
+      setPage("dashboard");
+      navigate("/painel", { replace: true });
+      return;
+    }
+    navigate("/");
+  };
+
   return (
     <nav id="nav">
       {/* MOBILE MENU BUTTON */}
@@ -63,11 +73,13 @@ const Navbar = ({ toggleAside }) => {
       </button>
 
       {/* BRAND */}
-      <Link to="/" className="nav__brandLink">
-        <button type="button" className="nav--company">
-          fluxo simples <span className="nav--highlight">system</span>
-        </button>
-      </Link>
+      <button
+        type="button"
+        className="nav__brandLink nav--company"
+        onClick={handleBrandClick}
+      >
+        fluxo simples <span className="nav--highlight">system</span>
+      </button>
 
       {auth ? (
         /* USER INFO */

@@ -37,7 +37,7 @@ const Painel = () => {
 
   return (
     <div id="painel">
-      <Navbar toggleAside={toggleAside} />
+      <Navbar toggleAside={toggleAside} setPage={setPage}/>
       <Aside
         setPage={setPage}
         page={page}
