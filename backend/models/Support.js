@@ -45,6 +45,11 @@ const supportSchema = new Schema(
       required: true,
       trim: true,
     },
+    ticketNumber: {
+      type: Number,
+      unique: true,
+      index: true,
+    },
 
     category: {
       type: String,
@@ -72,7 +77,7 @@ const supportSchema = new Schema(
 
     status: {
       type: String,
-      enum: ["OPEN", "IN_PROGRESS", "ANSWERED", "CLOSED"],
+      enum: ["OPEN", "IN_PROGRESS", "ANSWERED", "CLOSED", "CANCELED"],
       default: "OPEN",
     },
 

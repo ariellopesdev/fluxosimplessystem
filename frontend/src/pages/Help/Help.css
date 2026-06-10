@@ -87,7 +87,7 @@
   transform: scale(0.97);
 }
 
-/************ CARDS ************/
+/************ CATEGORY CARDS ************/
 
 .help__cards {
   display: grid;
@@ -265,7 +265,7 @@
   border-color: var(--color-primary);
 }
 
-/************ SUPPORT TICKETS ************/
+/************ USER SUPPORT TICKETS ************/
 
 .help__tickets {
   margin-top: var(--space-2xl);
@@ -386,7 +386,7 @@
   font-weight: var(--weight-black);
 }
 
-/************ SUPPORT ************/
+/************ SUPPORT BOX ************/
 
 .help__support {
   text-align: center;
@@ -443,7 +443,7 @@
   font-size: clamp(0.84rem, 1vw, 0.95rem);
 }
 
-/************ MODAL ************/
+/************ USER MODAL ************/
 
 .help__modalOverlay {
   position: fixed;
@@ -522,7 +522,7 @@
 }
 
 .help__modalHeader .help__closeBtn svg {
-  font-size: 1.25rem;
+  font-size: clamp(1.15rem, 1.5vw, 1.25rem);
 }
 
 /************ SUPPORT FORM ************/
@@ -596,7 +596,7 @@
   font-size: clamp(0.72rem, 0.85vw, 0.78rem);
 }
 
-/************ CHAT ************/
+/************ USER CHAT ************/
 
 .help__chat {
   max-height: 430px;
@@ -671,6 +671,817 @@
   box-shadow: 0 0 0 4px var(--color-primary-soft);
 }
 
+/************ SUPER ADMIN PAGE ************/
+
+.helpAccess {
+  width: 100%;
+  display: block !important;
+  gap: 0;
+}
+
+.helpAccess__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-xl);
+}
+
+.helpAccess__header h2 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin: 0;
+  color: var(--color-text);
+  font-size: clamp(1.3rem, 2vw, 1.8rem);
+  font-weight: var(--weight-bold);
+}
+
+.helpAccess__header h2 svg {
+  color: var(--color-text);
+  font-size: clamp(1.15rem, 1.6vw, 1.4rem);
+}
+
+.helpAccess__btn {
+  padding: 10px 15px;
+  background: var(--color-primary);
+  color: var(--color-white);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: clamp(0.85rem, 1vw, 0.95rem);
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease,
+    opacity 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.helpAccess__btn:hover {
+  background: var(--color-primary-hover);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.28);
+}
+
+.helpAccess__btn:active {
+  transform: scale(0.98);
+}
+
+.helpAccess__btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.helpAccess__btnSecondary {
+  background: var(--color-surface-soft);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  box-shadow: none;
+}
+
+.helpAccess__btnSecondary:hover {
+  background: var(--color-border);
+  box-shadow: none;
+}
+
+.helpAccess__btnDanger {
+  background: var(--color-danger);
+  box-shadow: none;
+}
+
+.helpAccess__btnDanger:hover {
+  background: #b91c1c;
+  box-shadow: none;
+}
+
+/************ SUPER ADMIN CARDS ************/
+
+.helpAccess__cards {
+  display: flex;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-xl);
+}
+
+.helpAccessCard {
+  flex: 1;
+  padding: var(--space-xl);
+  color: var(--color-white);
+  border: none;
+  border-radius: var(--radius-lg);
+  font-size: clamp(0.9rem, 1vw, 1rem);
+  font-weight: var(--weight-bold);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    opacity 0.2s ease,
+    outline 0.2s ease;
+}
+
+.helpAccessCard:hover {
+  opacity: 0.92;
+}
+
+.helpAccessCard.active {
+  outline: 3px solid rgba(15, 23, 42, 0.18);
+  transform: translateY(-2px);
+}
+
+.helpAccessCard.green {
+  background: var(--color-success);
+}
+
+.helpAccessCard.blue {
+  background: var(--color-info);
+}
+
+.helpAccessCard.orange {
+  background: var(--color-warning);
+}
+
+.helpAccessCard.red {
+  background: var(--color-danger);
+}
+
+/************ SUPER ADMIN FILTER ************/
+
+.helpAccess__filters {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xl);
+}
+
+.helpAccess__filters input {
+  width: 260px;
+  height: 42px;
+  padding: 0 var(--space-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border-dark);
+  border-radius: var(--radius-md);
+  font-size: clamp(0.86rem, 1vw, 0.95rem);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.helpAccess__filters input:hover {
+  border-color: var(--color-primary);
+}
+
+.helpAccess__filters input:focus {
+  border-color: var(--color-primary);
+  outline: none;
+  box-shadow: 0 0 0 4px var(--color-primary-soft);
+}
+
+.helpAccess__filters input::placeholder {
+  color: var(--color-text-light);
+}
+
+.helpAccess__listHeader {
+  margin-bottom: var(--space-md);
+}
+
+.helpAccess__listHeader h3 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: clamp(1rem, 1.4vw, 1.2rem);
+  font-weight: var(--weight-bold);
+}
+
+/************ SUPER ADMIN TABLE ************/
+
+.helpAccess__table {
+  width: 100%;
+  overflow-x: auto;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+}
+
+.helpAccess__table table {
+  width: 100%;
+  min-width: 950px;
+  background: var(--color-surface);
+  border-collapse: collapse;
+}
+
+.helpAccess__table th,
+.helpAccess__table td {
+  padding: var(--space-md);
+  vertical-align: middle;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-size: clamp(0.78rem, 0.9vw, 0.88rem);
+}
+
+.helpAccess__table th {
+  background: var(--color-surface-soft);
+  color: var(--color-text-muted);
+  font-size: clamp(0.72rem, 0.85vw, 0.8rem);
+  font-weight: var(--weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.helpAccess__table th:nth-child(1),
+.helpAccess__table td:nth-child(1),
+.helpAccess__table th:nth-child(2),
+.helpAccess__table td:nth-child(2),
+.helpAccess__table th:nth-child(3),
+.helpAccess__table td:nth-child(3) {
+  text-align: left;
+}
+
+.helpAccess__table th:nth-child(n + 4),
+.helpAccess__table td:nth-child(n + 4) {
+  text-align: center;
+}
+
+.helpAccess__table td strong {
+  display: block;
+  margin-bottom: var(--space-xs);
+  color: var(--color-text);
+  font-size: clamp(0.86rem, 1vw, 0.95rem);
+}
+
+.helpAccess__table td > span:not(.helpAccess__actionIcon) {
+  display: block;
+  color: var(--color-text-muted);
+  font-size: clamp(0.76rem, 0.9vw, 0.84rem);
+}
+
+.helpAccess__table tbody tr:nth-child(even) {
+  background: var(--color-surface-soft);
+}
+
+.helpAccess__table tbody tr:hover {
+  background: var(--color-primary-soft);
+}
+
+.helpAccess__table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.helpAccess__empty {
+  margin: 0;
+  padding: var(--space-xl);
+  color: var(--color-text-muted);
+  background: var(--color-surface-soft);
+  font-size: clamp(0.84rem, 1vw, 0.95rem);
+  text-align: center;
+}
+
+/************ STATUS ************/
+
+.status {
+  font-size: clamp(0.76rem, 0.9vw, 0.84rem);
+  font-weight: var(--weight-bold);
+}
+
+.status.active {
+  color: var(--color-success);
+}
+
+.status.inactive {
+  color: var(--color-danger);
+}
+
+/************ SUPER ADMIN TABLE ACTIONS ************/
+
+.table__edit--close,
+.helpAccess__actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+}
+
+.helpAccess__actionButton {
+  padding: 7px 10px;
+  background: var(--color-primary);
+  color: var(--color-white);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: clamp(0.78rem, 0.9vw, 0.86rem);
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+}
+
+.helpAccess__actionButton:hover {
+  background: var(--color-primary-hover);
+}
+
+.helpAccess__actionButton.edit {
+  background: var(--color-info);
+}
+
+.helpAccess__actionButton.edit:hover {
+  background: #1d4ed8;
+}
+
+.helpAccess__actionButton.cancel {
+  background: var(--color-danger);
+}
+
+.helpAccess__actionButton.cancel:hover {
+  background: #b91c1c;
+}
+
+.helpAccess__actionIcon {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+  font-size: clamp(1.05rem, 1.3vw, 1.25rem) !important;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.helpAccess__actionIcon:hover {
+  transform: scale(1.1);
+  opacity: 0.8;
+}
+
+.helpAccess__actionIcon svg {
+  font-size: inherit;
+}
+
+.helpAccess__actionIcon.edit {
+  color: var(--color-info);
+}
+
+.helpAccess__actionIcon.delete {
+  color: var(--color-danger);
+}
+
+/************ SUPER ADMIN TUTORIALS ************/
+
+.helpAccess__tutorials {
+  margin-top: var(--space-xl);
+  padding: var(--space-xl);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+}
+
+.helpAccess__sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.helpAccess__sectionHeader h3 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: clamp(1rem, 1.3vw, 1.2rem);
+  font-weight: var(--weight-bold);
+}
+
+.helpAccess__sectionHeader p {
+  margin: 6px 0 0;
+  color: var(--color-text-muted);
+  font-size: clamp(0.82rem, 1vw, 0.9rem);
+}
+
+.helpAccess__tutorialGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--space-lg);
+}
+
+.helpAccess__tutorialCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  background: var(--color-surface-soft);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.helpAccess__tutorialCard strong {
+  display: block;
+  color: var(--color-text);
+  font-size: clamp(0.88rem, 1vw, 0.95rem);
+}
+
+.helpAccess__tutorialCard span {
+  display: inline-block;
+  margin-top: 4px;
+  color: var(--color-text-muted);
+  font-size: clamp(0.72rem, 0.85vw, 0.78rem);
+}
+
+.helpAccess__tutorialCard p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: clamp(0.82rem, 1vw, 0.9rem);
+  line-height: 1.5;
+}
+
+/************ SUPER ADMIN MODALS ************/
+
+.helpAccess__modalOverlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+  background: rgba(0, 0, 0, 0.68);
+  backdrop-filter: blur(3px);
+  overflow-y: auto;
+}
+
+.helpAccess__modal,
+.helpAccess__deleteModal {
+  width: 100%;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  animation: modalFade 0.2s ease;
+}
+
+.helpAccess__modal {
+  max-width: 880px;
+  max-height: 95vh;
+  overflow-y: auto;
+  padding: var(--space-2xl);
+}
+
+.helpAccess__ticketModal {
+  max-width: 880px;
+}
+
+.helpAccess__deleteModal {
+  max-width: 420px;
+  overflow: hidden;
+}
+
+.helpAccess__modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-lg);
+  padding-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.helpAccess__deleteModal .helpAccess__modalHeader {
+  margin-bottom: 0;
+  padding: var(--space-xl);
+}
+
+.helpAccess__modalHeader h3 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: clamp(1.15rem, 1.6vw, 1.45rem);
+  font-weight: var(--weight-bold);
+}
+
+.helpAccess__modalHeader small {
+  display: block;
+  margin-top: 3px;
+  color: var(--color-text-muted);
+  font-size: clamp(0.78rem, 0.9vw, 0.86rem);
+}
+
+.helpAccess__closeBtn {
+  width: 40px;
+  min-width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.1s ease,
+    border-color 0.2s ease;
+}
+
+.helpAccess__closeBtn:hover {
+  background: var(--color-surface-soft);
+  color: var(--color-text);
+  border-color: var(--color-border-dark);
+}
+
+.helpAccess__closeBtn:active {
+  transform: scale(0.96);
+}
+
+.helpAccess__closeBtn svg {
+  font-size: clamp(1.2rem, 1.5vw, 1.4rem);
+}
+
+/************ SUPER ADMIN MODAL FORM ************/
+
+.helpAccess__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.helpAccess__section {
+  margin-bottom: var(--space-lg);
+  padding: var(--space-lg);
+  background: var(--color-surface-soft);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.helpAccess__section h4 {
+  margin: 0 0 var(--space-md);
+  color: var(--color-text);
+  font-size: clamp(0.95rem, 1.3vw, 1.1rem);
+  font-weight: var(--weight-bold);
+}
+
+.helpAccess__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-md);
+}
+
+.form__group--helpAccess {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form__group--helpAccess.full {
+  grid-column: 1 / -1;
+}
+
+.form__group--helpAccess label {
+  color: var(--color-text-muted);
+  font-size: clamp(0.75rem, 0.9vw, 0.82rem);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.2px;
+}
+
+.helpAccess__form input,
+.helpAccess__form select,
+.helpAccess__form textarea {
+  width: 100%;
+  padding: 0 var(--space-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border-dark);
+  border-radius: var(--radius-md);
+  font-size: clamp(0.88rem, 1vw, 0.94rem);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.helpAccess__form input,
+.helpAccess__form select {
+  height: 44px;
+}
+
+.helpAccess__form textarea {
+  min-height: 120px;
+  padding-top: var(--space-md);
+  resize: none;
+}
+
+.helpAccess__form input:hover,
+.helpAccess__form select:hover,
+.helpAccess__form textarea:hover {
+  border-color: var(--color-primary);
+}
+
+.helpAccess__form input:focus,
+.helpAccess__form select:focus,
+.helpAccess__form textarea:focus {
+  border-color: var(--color-primary);
+  outline: none;
+  box-shadow: 0 0 0 4px var(--color-primary-soft);
+}
+
+.helpAccess__form input::placeholder,
+.helpAccess__form textarea::placeholder {
+  color: var(--color-text-light);
+}
+
+/************ SUPER ADMIN TICKET MODAL ************/
+
+.helpAccess__ticketSummary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.helpAccess__ticketDetails {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-md);
+}
+
+.helpAccess__ticketDetails div {
+  min-width: 0;
+  padding: var(--space-md);
+  background: var(--color-surface-soft);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.helpAccess__ticketDetails strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--color-text);
+  font-size: clamp(0.74rem, 0.85vw, 0.8rem);
+}
+
+.helpAccess__ticketDetails span {
+  display: block;
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: clamp(0.78rem, 0.9vw, 0.84rem);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.helpAccess__ticketDescription {
+  padding: var(--space-md);
+  background: var(--color-surface-soft);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.helpAccess__ticketDescription strong {
+  display: block;
+  margin-bottom: var(--space-xs);
+  color: var(--color-text);
+  font-size: clamp(0.84rem, 1vw, 0.92rem);
+}
+
+.helpAccess__ticketDescription p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: clamp(0.82rem, 1vw, 0.9rem);
+  line-height: 1.5;
+}
+
+.helpAccess__chatBox {
+  overflow: hidden;
+  margin-bottom: var(--space-lg);
+  background: #f8fafc;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+}
+
+.helpAccess__chatHeader {
+  padding: var(--space-md) var(--space-lg);
+  background: linear-gradient(
+    135deg,
+    var(--color-primary-soft),
+    rgba(16, 185, 129, 0.08)
+  );
+  border-bottom: 1px solid rgba(16, 185, 129, 0.18);
+}
+
+.helpAccess__chatHeader strong {
+  display: block;
+  color: var(--color-text);
+  font-size: clamp(0.9rem, 1vw, 1rem);
+}
+
+.helpAccess__chatHeader span {
+  display: block;
+  margin-top: 3px;
+  color: var(--color-text-muted);
+  font-size: clamp(0.74rem, 0.9vw, 0.82rem);
+}
+
+.helpAccess__chat {
+  max-height: 340px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  overflow-y: auto;
+  padding: var(--space-lg);
+}
+
+.helpAccess__chatMessage {
+  position: relative;
+  max-width: 72%;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  box-shadow: var(--shadow-sm);
+}
+
+.helpAccess__chatMessage.user {
+  align-self: flex-start;
+  background: var(--color-info-bg);
+  border-color: rgba(37, 99, 235, 0.25);
+}
+
+.helpAccess__chatMessage.admin {
+  align-self: flex-end;
+  background: var(--color-success-bg);
+  border-color: rgba(22, 163, 74, 0.25);
+}
+
+.helpAccess__chatMessage strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--color-text);
+  font-size: clamp(0.8rem, 0.95vw, 0.88rem);
+}
+
+.helpAccess__chatMessage p {
+  margin: 0;
+  color: var(--color-text);
+  font-size: clamp(0.82rem, 1vw, 0.92rem);
+  line-height: 1.45;
+}
+
+.helpAccess__chatMessage small {
+  display: block;
+  margin-top: 6px;
+  color: var(--color-text-muted);
+  font-size: clamp(0.68rem, 0.8vw, 0.74rem);
+}
+
+.helpAccess__closedInfo {
+  margin-bottom: var(--space-lg);
+  padding: var(--space-md);
+  background: var(--color-surface-soft);
+  border: 1px dashed var(--color-border-dark);
+  border-radius: var(--radius-lg);
+}
+
+.helpAccess__closedInfo strong {
+  display: block;
+  color: var(--color-text);
+  font-size: clamp(0.86rem, 1vw, 0.95rem);
+}
+
+.helpAccess__closedInfo span {
+  display: block;
+  margin-top: 4px;
+  color: var(--color-text-muted);
+  font-size: clamp(0.76rem, 0.9vw, 0.84rem);
+}
+
+/************ DELETE MODAL ************/
+
+.helpAccess__deleteContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-xl);
+}
+
+.helpAccess__deleteContent p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: clamp(0.88rem, 1vw, 0.95rem);
+}
+
+.helpAccess__deleteContent strong {
+  color: var(--color-text);
+  font-size: clamp(1rem, 1.1vw, 1.1rem);
+}
+
+.helpAccess__deleteContent span {
+  color: var(--color-danger);
+  font-size: clamp(0.8rem, 0.9vw, 0.88rem);
+}
+
+.helpAccess__deleteActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-md);
+  padding: var(--space-lg) 0 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.helpAccess__deleteModal .helpAccess__deleteActions {
+  padding: var(--space-xl);
+}
+
 /************ ERRORS ************/
 
 .help .input__error {
@@ -680,6 +1491,20 @@
 
 .help .input__error:focus {
   box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.12) !important;
+}
+
+/************ ANIMATION ************/
+
+@keyframes modalFade {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /************ RESPONSIVE ************/
@@ -697,6 +1522,71 @@
 
   .help__content {
     grid-template-columns: 1fr;
+  }
+
+  .helpAccess__ticketDetails {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .helpAccess__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .helpAccess__cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .helpAccess__header {
+    flex-direction: column;
+    gap: var(--space-md);
+    align-items: stretch;
+  }
+
+  .helpAccess__btn {
+    width: 100%;
+  }
+
+  .helpAccess__cards {
+    grid-template-columns: 1fr;
+  }
+
+  .helpAccess__filters {
+    flex-direction: column;
+  }
+
+  .helpAccess__filters input {
+    width: 100%;
+  }
+
+  .helpAccess__modalOverlay {
+    align-items: flex-start;
+    padding: var(--space-md);
+  }
+
+  .helpAccess__modal {
+    max-height: calc(100dvh - 24px);
+    padding: var(--space-lg);
+  }
+
+  .helpAccess__ticketDetails {
+    grid-template-columns: 1fr;
+  }
+
+  .helpAccess__chatMessage {
+    max-width: 90%;
+  }
+
+  .helpAccess__deleteActions {
+    flex-direction: column;
+  }
+
+  .helpAccess__deleteActions .helpAccess__btn {
+    width: 100%;
   }
 }
 
@@ -755,5 +1645,18 @@
 
   .help__modalHeader {
     align-items: flex-start;
+  }
+
+  .helpAccess__form input,
+  .helpAccess__form select {
+    height: 42px;
+  }
+
+  .helpAccess__chat {
+    max-height: 300px;
+  }
+
+  .helpAccess__chatMessage {
+    max-width: 100%;
   }
 }

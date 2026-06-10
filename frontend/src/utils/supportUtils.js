@@ -4,6 +4,7 @@ export const translateStatus = (status) => {
     IN_PROGRESS: "Em atendimento",
     ANSWERED: "Respondido",
     CLOSED: "Fechado",
+    CANCELED: "Cancelado",
   };
 
   return statuses[status] || "-";
@@ -17,6 +18,24 @@ export const translatePriority = (priority) => {
   };
 
   return priorities[priority] || "-";
+};
+
+export const translateCategory = (category) => {
+  const categories = {
+    ACCOUNT: "Conta",
+    PRODUCTS: "Produtos",
+    CLIENTS: "Clientes",
+    SERVICES: "Serviços",
+    APPOINTMENTS: "Agendamentos",
+    FINANCIAL: "Financeiro",
+    REPORTS: "Relatórios",
+    DASHBOARD: "Dashboard",
+    SETTINGS: "Configurações",
+    BUG: "Bug",
+    OTHER: "Outro",
+  };
+
+  return categories[category] || "-";
 };
 
 export const isAdminMessage = (senderRole) => {

@@ -62,7 +62,7 @@ const supportStatusValidation = () => {
     body("status")
       .notEmpty()
       .withMessage("O status é obrigatório.")
-      .isIn(["OPEN", "IN_PROGRESS", "ANSWERED", "CLOSED"])
+      .isIn(["OPEN", "IN_PROGRESS", "ANSWERED", "CLOSED", "CANCELED"])
       .withMessage("Status inválido."),
   ];
 };
@@ -71,7 +71,7 @@ const supportFilterValidation = () => {
   return [
     query("status")
       .optional()
-      .isIn(["OPEN", "IN_PROGRESS", "ANSWERED", "CLOSED"])
+      .isIn(["OPEN", "IN_PROGRESS", "ANSWERED", "CLOSED", "CANCELED"])
       .withMessage("Status inválido."),
 
     query("category")

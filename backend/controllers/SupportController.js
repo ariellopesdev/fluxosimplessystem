@@ -1,5 +1,6 @@
 const Support = require("../models/Support");
 const sendEmail = require("../utils/sendEmail");
+const Counter = require("../models/Counter");
 
 const getCompanyId = (reqUser) => {
   return reqUser.company?._id || reqUser.company;
@@ -66,9 +67,11 @@ const createSupportTicket = async (req, res) => {
   try {
     const reqUser = req.user;
     const companyId = getCompanyId(reqUser);
+    const ticketNumber = await getNextTicketNumber();
 
     const support = await Support.create({
       subject,
+      ticketNumber,
       category,
       priority,
       status: "OPEN",
@@ -89,7 +92,7 @@ const createSupportTicket = async (req, res) => {
       ],
     });
 
-    await notifySuperAdmin({
+    notifySuperAdmin({
       support,
       reqUser,
       message,
@@ -230,6 +233,12 @@ const addSupportMessage = async (req, res) => {
       });
     }
 
+    if (support.status === "CLOSED" || support.status === "CANCELED") {
+      return res.status(400).json({
+        errors: ["Não é possível responder um chamado finalizado."],
+      });
+    }
+
     support.messages.push({
       sender: req.user._id,
       senderName: req.user.name,
@@ -242,13 +251,17 @@ const addSupportMessage = async (req, res) => {
 
     support.lastMessageAt = new Date();
 
-    if (isAdmin) {
-      support.status = "ANSWERED";
-      support.assignedTo = req.user._id;
-    } else {
-      support.status = "OPEN";
+    // Qualquer mensagem em chamado ativo move/mantém em andamento
+    support.status = "IN_PROGRESS";
 
-      await notifySuperAdmin({
+    // Se quem respondeu foi suporte/admin, assume o atendimento
+    if (isAdmin) {
+      support.assignedTo = req.user._id;
+    }
+
+    // Se quem respondeu foi usuário/admin dono do chamado, notifica suporte
+    if (!isAdmin) {
+      notifySuperAdmin({
         support,
         reqUser: req.user,
         message,
@@ -304,7 +317,7 @@ const updateSupportStatus = async (req, res) => {
 
     support.status = status;
 
-    if (status === "CLOSED") {
+    if (status === "CLOSED" || status === "CANCELED") {
       support.closedAt = new Date();
     } else {
       support.closedAt = undefined;
@@ -331,6 +344,16 @@ const updateSupportStatus = async (req, res) => {
       errors: ["Erro ao atualizar status do chamado."],
     });
   }
+};
+
+const getNextTicketNumber = async () => {
+  const counter = await Counter.findOneAndUpdate(
+    { name: "support_ticket" },
+    { $inc: { sequence: 1 } },
+    { new: true, upsert: true },
+  );
+
+  return counter.sequence;
 };
 
 module.exports = {
