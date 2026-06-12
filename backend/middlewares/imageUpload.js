@@ -5,6 +5,7 @@ const path = require("path");
 const imageStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     let folder = "";
+
     if (req.baseUrl.includes("users")) {
       folder = "users";
     } else if (req.baseUrl.includes("products")) {
@@ -15,19 +16,33 @@ const imageStorage = multer.diskStorage({
 
     cb(null, `uploads/${folder}/`);
   },
+
   filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
+    const extension = path.extname(file.originalname).toLowerCase();
+
+    cb(null, Date.now() + extension);
   },
 });
 
 const imageUpload = multer({
   storage: imageStorage,
+
   fileFilter(req, file, cb) {
-    if (!file.originalname.match(/\.(png|jpg)$/)) {
-      //Upload only png and jpg formats
-      return cb(new Error("Por favor, envie apenas png ou jpg."));
+    const allowedExtensions = /\.(jpeg|jpg|png|webp)$/i;
+    const allowedMimeTypes = /^image\/(jpeg|jpg|png|webp)$/;
+
+    const isValidExtension = allowedExtensions.test(file.originalname);
+    const isValidMimeType = allowedMimeTypes.test(file.mimetype);
+
+    if (!isValidExtension || !isValidMimeType) {
+      return cb(
+        new Error(
+          "Por favor, envie apenas imagens nos formatos jpeg, jpg, png ou webp.",
+        ),
+      );
     }
-    cb(undefined, true);
+
+    cb(null, true);
   },
 });
 
