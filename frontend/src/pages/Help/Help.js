@@ -14,6 +14,7 @@ import {
   resetMessage,
   resetSelectedTicket,
   updateSupportStatus,
+  markSupportTicketAsRead,
 } from "../../slices/supportSlice";
 
 // Icons
@@ -130,6 +131,12 @@ const Help = () => {
     closeDeleteTutorialModal,
   );
 
+  // Close user support ticket chat
+  const handleCloseChatModal = () => {
+    closeChatModal();
+    dispatch(resetSelectedTicket());
+  };
+
   const {
     supportData,
     supportErrors,
@@ -139,7 +146,12 @@ const Help = () => {
     handleSupportChange,
     handleCreateSupport,
     handleSendMessage,
-  } = useHelpSupport(dispatch, selectedTicket, closeSupportModal);
+  } = useHelpSupport(
+    dispatch,
+    selectedTicket,
+    closeSupportModal,
+    handleCloseChatModal,
+  );
 
   // Normalize ticket list based on current role
   const ticketsList = useMemo(() => {
@@ -242,20 +254,18 @@ const Help = () => {
   // Open user support ticket chat
   const handleOpenTicket = async (id) => {
     await dispatch(getSupportTicketById(id));
+    await dispatch(markSupportTicketAsRead(id));
     openChatModal();
   };
 
-  // Close user support ticket chat
-  const handleCloseChatModal = () => {
-    closeChatModal();
-    dispatch(resetSelectedTicket());
-  };
-
   // Open admin ticket details
-  const handleOpenAdminTicket = (ticket) => {
+  const handleOpenAdminTicket = async (ticket) => {
     setSelectedAdminTicket(ticket);
     setChatMessage("");
     openAdminTicketModal();
+
+    await dispatch(markSupportTicketAsRead(ticket._id));
+    dispatch(getAllSupportTickets());
   };
 
   // Close admin ticket details

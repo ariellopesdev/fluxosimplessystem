@@ -7,6 +7,10 @@ import { useEffect, useState } from "react";
 // Redux
 import { useDispatch, useSelector } from "react-redux";
 import { getDashboard, resetMessage } from "../../slices/dashboardSlice";
+import {
+  getAllSupportTickets,
+  getMySupportTickets,
+} from "../../slices/supportSlice";
 
 // Components
 import Message from "../../components/Message/Message";
@@ -45,6 +49,14 @@ const Dashboard = () => {
     message,
   } = useSelector((state) => state.dashboard);
 
+  const { user: loggedUser } = useSelector((state) => state.auth);
+
+  const { tickets, myTickets } = useSelector((state) => state.support);
+
+  const isSuperAdmin = loggedUser?.role === "SUPER_ADMIN";
+  const isAdmin = loggedUser?.role === "ADMIN";
+  const isSupportManager = isSuperAdmin || isAdmin;
+
   const [filters, setFilters] = useState({
     period: "CURRENT_MONTH",
     startDate: "",
@@ -60,6 +72,14 @@ const Dashboard = () => {
       }),
     );
   }, [dispatch]);
+
+  useEffect(() => {
+    if (isSupportManager) {
+      dispatch(getAllSupportTickets());
+    } else {
+      dispatch(getMySupportTickets());
+    }
+  }, [dispatch, isSupportManager]);
 
   useEffect(() => {
     if (message || error) {
@@ -105,6 +125,7 @@ const Dashboard = () => {
       SERVICES: "Serviços",
       REPORTS: "Relatórios",
       GENERAL: "Geral",
+      SUPPORT: "Suporte",
     };
 
     return modules[module] || module || "-";
@@ -127,12 +148,112 @@ const Dashboard = () => {
   const dashboardCharts = charts || {};
   const dashboardAlerts = Array.isArray(alerts) ? alerts : [];
   const activities = Array.isArray(recentActivities) ? recentActivities : [];
-
   const financialEvolution = dashboardCharts.financialEvolution || [];
   const salesEvolution = dashboardCharts.salesEvolution || [];
   const appointmentStatus = dashboardCharts.appointmentStatus || [];
   const topProducts = dashboardCharts.topProducts || [];
   const topClients = dashboardCharts.topClients || [];
+
+  const formatTicketNumber = (ticket) => {
+    const number = ticket.ticketNumber || ticket._id?.slice(-4) || "0000";
+
+    return `#${String(number).padStart(4, "0")}`;
+  };
+
+  const getLastTicketMessage = (ticket) => {
+    const messages = Array.isArray(ticket.messages) ? ticket.messages : [];
+
+    return messages[messages.length - 1] || null;
+  };
+
+  const isMessageFromSupport = (message) => {
+    return (
+      message?.senderRole === "SUPER_ADMIN" || message?.senderRole === "ADMIN"
+    );
+  };
+
+  const buildSupportAlerts = () => {
+    const supportTickets = isSupportManager ? tickets : myTickets;
+    const normalizedTickets = Array.isArray(supportTickets)
+      ? supportTickets
+      : [];
+
+    return normalizedTickets
+      .filter((ticket) => {
+        const lastMessage = getLastTicketMessage(ticket);
+
+        if (isSupportManager) {
+          return (
+            ticket.status === "OPEN" ||
+            (ticket.status === "IN_PROGRESS" &&
+              !isMessageFromSupport(lastMessage) &&
+              lastMessage?.readByAdmin === false)
+          );
+        }
+
+        return (
+          (ticket.status === "IN_PROGRESS" &&
+            isMessageFromSupport(lastMessage) &&
+            lastMessage?.readByUser === false) ||
+          (ticket.status === "CLOSED" && lastMessage?.readByUser === false) ||
+          (ticket.status === "CANCELED" && lastMessage?.readByUser === false)
+        );
+      })
+      .map((ticket) => {
+        const lastMessage = getLastTicketMessage(ticket);
+        const ticketNumber = formatTicketNumber(ticket);
+
+        if (isSupportManager) {
+          if (ticket.status === "OPEN") {
+            return {
+              type: "WARNING",
+              module: "SUPPORT",
+              referenceId: ticket._id,
+              title: `Novo chamado ${ticketNumber}`,
+              message: `${ticket.openedBy?.name || "Usuário"} abriu: ${ticket.subject}`,
+            };
+          }
+
+          return {
+            type: "INFO",
+            module: "SUPPORT",
+            referenceId: ticket._id,
+            title: `Chamado respondido ${ticketNumber}`,
+            message: `${lastMessage?.senderName || "Usuário"} respondeu: ${ticket.subject}`,
+          };
+        }
+
+        if (ticket.status === "CLOSED") {
+          return {
+            type: "SUCCESS",
+            module: "SUPPORT",
+            referenceId: ticket._id,
+            title: `Chamado concluído ${ticketNumber}`,
+            message: `Seu chamado "${ticket.subject}" foi concluído.`,
+          };
+        }
+
+        if (ticket.status === "CANCELED") {
+          return {
+            type: "DANGER",
+            module: "SUPPORT",
+            referenceId: ticket._id,
+            title: `Chamado cancelado ${ticketNumber}`,
+            message: `Seu chamado "${ticket.subject}" foi cancelado.`,
+          };
+        }
+
+        return {
+          type: "INFO",
+          module: "SUPPORT",
+          referenceId: ticket._id,
+          title: `Resposta no chamado ${ticketNumber}`,
+          message: `O suporte respondeu seu chamado "${ticket.subject}".`,
+        };
+      });
+  };
+  const supportAlerts = buildSupportAlerts();
+  const mergedAlerts = [...supportAlerts, ...dashboardAlerts];
 
   return (
     <div id="dashboard-page">
@@ -483,11 +604,11 @@ const Dashboard = () => {
           <div className="dashboardPage__alerts">
             <h3>Alertas</h3>
 
-            {dashboardAlerts.length === 0 && (
+            {mergedAlerts.length === 0 && (
               <p className="dashboardPage__empty">Nenhum alerta no momento.</p>
             )}
 
-            {dashboardAlerts.map((alert, index) => (
+            {mergedAlerts.map((alert, index) => (
               <div
                 key={`${alert.referenceId}-${index}`}
                 className={`dashboardPage__alert ${alert.type?.toLowerCase()}`}

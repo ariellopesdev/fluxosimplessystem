@@ -112,6 +112,21 @@ export const updateSupportStatus = createAsyncThunk(
   },
 );
 
+export const markSupportTicketAsRead = createAsyncThunk(
+  "support/markAsRead",
+  async (id, thunkAPI) => {
+    const token = thunkAPI.getState().auth.user.token;
+
+    const data = await supportService.markSupportTicketAsRead(id, token);
+
+    if (data.errors) {
+      return thunkAPI.rejectWithValue(data.errors[0]);
+    }
+
+    return data;
+  },
+);
+
 export const supportSlice = createSlice({
   name: "support",
   initialState,
@@ -266,6 +281,23 @@ export const supportSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
         state.success = false;
+      })
+      .addCase(markSupportTicketAsRead.fulfilled, (state, action) => {
+        if (action.payload.support) {
+          state.selectedTicket = action.payload.support;
+
+          state.myTickets = state.myTickets.map((ticket) =>
+            ticket._id === action.payload.support._id
+              ? action.payload.support
+              : ticket,
+          );
+
+          state.tickets = state.tickets.map((ticket) =>
+            ticket._id === action.payload.support._id
+              ? action.payload.support
+              : ticket,
+          );
+        }
       });
   },
 });

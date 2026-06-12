@@ -6,7 +6,12 @@ import {
   getMySupportTickets,
 } from "../slices/supportSlice";
 
-export const useHelpSupport = (dispatch, selectedTicket, closeSupportModal) => {
+export const useHelpSupport = (
+  dispatch,
+  selectedTicket,
+  closeSupportModal,
+  closeChatModal,
+) => {
   const [supportData, setSupportData] = useState({
     subject: "",
     category: "OTHER",
@@ -154,6 +159,10 @@ export const useHelpSupport = (dispatch, selectedTicket, closeSupportModal) => {
 
       setChatMessage("");
       setChatError("");
+
+      if (closeChatModal) {
+        closeChatModal();
+      }
     } catch (error) {
       console.error(error);
     }

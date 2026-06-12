@@ -106,6 +106,20 @@ const updateSupportStatus = async (id, data, token) => {
   }
 };
 
+const markSupportTicketAsRead = async (id, token) => {
+  const config = requestConfig("PATCH", null, token);
+
+  try {
+    const res = await fetch(api + "/support/" + id + "/read", config)
+      .then((res) => res.json())
+      .catch((err) => err);
+
+    return res;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 const supportService = {
   createSupportTicket,
   getMySupportTickets,
@@ -113,6 +127,7 @@ const supportService = {
   getSupportTicketById,
   addSupportMessage,
   updateSupportStatus,
+  markSupportTicketAsRead,
 };
 
 export default supportService;

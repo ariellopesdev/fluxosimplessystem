@@ -9,6 +9,7 @@ const {
   getSupportTicketById,
   addSupportMessage,
   updateSupportStatus,
+  markSupportTicketAsRead,
 } = require("../controllers/SupportController");
 
 // Middlewares
@@ -62,5 +63,7 @@ router.patch(
   validate,
   updateSupportStatus,
 );
+
+router.patch("/:id/read", authGuard, markSupportTicketAsRead);
 
 module.exports = router;

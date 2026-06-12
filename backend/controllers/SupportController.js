@@ -356,11 +356,75 @@ const getNextTicketNumber = async () => {
   return counter.sequence;
 };
 
+const markSupportTicketAsRead = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const support = await Support.findById(id);
+
+    if (!support) {
+      return res.status(404).json({
+        errors: ["Chamado não encontrado."],
+      });
+    }
+
+    const isOwner = support.openedBy.toString() === req.user._id.toString();
+    const isAdmin = isAdminUser(req.user);
+
+    const sameCompany =
+      support.company?.toString() === getCompanyId(req.user)?.toString();
+
+    const canAccess =
+      isOwner || req.user.role === "SUPER_ADMIN" || (isAdmin && sameCompany);
+
+    if (!canAccess) {
+      return res.status(403).json({
+        errors: ["Acesso negado."],
+      });
+    }
+
+    support.messages = support.messages.map((message) => {
+      if (isAdmin) {
+        message.readByAdmin = true;
+      }
+
+      if (isOwner) {
+        message.readByUser = true;
+      }
+
+      return message;
+    });
+
+    await support.save();
+
+    const updatedSupport = await Support.findById(support._id)
+      .populate("openedBy", "name email role")
+      .populate("assignedTo", "name email role");
+
+    res.status(200).json({
+      message: "Chamado marcado como lido.",
+      support: updatedSupport,
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      errors: ["Erro ao marcar chamado como lido."],
+    });
+  }
+};
+
 module.exports = {
+  getCompanyId,
+  isAdminUser,
+  translateCategory,
+  notifySuperAdmin,
   createSupportTicket,
   getMySupportTickets,
   getAllSupportTickets,
   getSupportTicketById,
   addSupportMessage,
   updateSupportStatus,
+  getNextTicketNumber,
+  markSupportTicketAsRead,
 };
