@@ -795,7 +795,10 @@ const Help = () => {
                       <div
                         key={msg._id}
                         className={`helpAccess__chatMessage ${
-                          isAdminMessage(msg.senderRole) ? "admin" : "user"
+                          msg.sender?._id === loggedUser?._id ||
+                          msg.sender === loggedUser?._id
+                            ? "me"
+                            : "other"
                         }`}
                       >
                         <strong>{msg.senderName || "Usuário"}</strong>

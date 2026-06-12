@@ -617,13 +617,13 @@
   border-radius: var(--radius-lg);
 }
 
-.help__chatMessage.user {
+.help__chatMessage.me {
   align-self: flex-end;
   background: var(--color-success-bg);
   border-color: rgba(22, 163, 74, 0.25);
 }
 
-.help__chatMessage.admin {
+.help__chatMessage.other {
   align-self: flex-start;
   background: var(--color-info-bg);
   border-color: rgba(37, 99, 235, 0.25);
@@ -1391,16 +1391,16 @@
   box-shadow: var(--shadow-sm);
 }
 
-.helpAccess__chatMessage.user {
-  align-self: flex-start;
-  background: var(--color-info-bg);
-  border-color: rgba(37, 99, 235, 0.25);
-}
-
-.helpAccess__chatMessage.admin {
+.helpAccess__chatMessage.me {
   align-self: flex-end;
   background: var(--color-success-bg);
   border-color: rgba(22, 163, 74, 0.25);
+}
+
+.helpAccess__chatMessage.other {
+  align-self: flex-start;
+  background: var(--color-info-bg);
+  border-color: rgba(37, 99, 235, 0.25);
 }
 
 .helpAccess__chatMessage strong {

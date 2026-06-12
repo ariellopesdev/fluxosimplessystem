@@ -54,7 +54,10 @@ const SupportChatModal = ({
             <div
               key={msg._id}
               className={`help__chatMessage ${
-                isAdminMessage(msg.senderRole) ? "admin" : "user"
+                msg.sender?._id === selectedTicket.openedBy?._id ||
+                msg.sender === selectedTicket.openedBy?._id
+                  ? "me"
+                  : "other"
               }`}
             >
               <strong>{msg.senderName || "Usuário"}</strong>
