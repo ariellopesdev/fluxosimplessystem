@@ -884,11 +884,7 @@ const Help = () => {
       {error && <Message msg={error} type="error" />}
       {message && <Message msg={message} type="success" />}
 
-      <HelpHero
-        search={search}
-        setSearch={setSearch}
-        openSupportModal={openSupportModal}
-      />
+      <HelpHero openSupportModal={openSupportModal} />
 
       <HelpTickets
         myTickets={myTickets}
@@ -903,6 +899,30 @@ const Help = () => {
         setSelectedCategory={setSelectedCategory}
         setOpenTutorial={setOpenTutorial}
       />
+
+      <div className="help__searchSection">
+        <div className="help__searchInfo">
+          <strong>Pesquisar nos tutoriais</strong>
+          <span>Encontre rapidamente uma dúvida ou instrução do sistema.</span>
+        </div>
+
+        <div className="help__searchField">
+          <span>⌕</span>
+
+          <input
+            type="text"
+            placeholder="Digite uma palavra-chave..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+
+          {search && (
+            <button type="button" onClick={() => setSearch("")}>
+              Limpar
+            </button>
+          )}
+        </div>
+      </div>
 
       <div className="help__content">
         <div className="help__main">
