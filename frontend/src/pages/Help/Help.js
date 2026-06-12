@@ -2,7 +2,7 @@
 import "./Help.css";
 
 // React
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 
 // Redux
 import { useDispatch, useSelector } from "react-redux";
@@ -46,7 +46,6 @@ import {
   translateStatus,
   translateCategory,
   formatTicketNumber,
-  formatDateTime,
   isTicketFinished,
   getTicketStatusTitle,
 } from "../../utils/supportUtils";
@@ -197,6 +196,13 @@ const Help = () => {
     };
   }, [ticketsList]);
 
+  // Close admin ticket details
+  const handleCloseAdminTicketModal = useCallback(() => {
+    closeAdminTicketModal();
+    setSelectedAdminTicket(null);
+    setChatMessage("");
+  }, [closeAdminTicketModal, setChatMessage]);
+
   // Load support tickets based on user role
   useEffect(() => {
     if (isSuperAdmin) {
@@ -228,7 +234,7 @@ const Help = () => {
     window.addEventListener("keydown", handleEsc);
 
     return () => window.removeEventListener("keydown", handleEsc);
-  }, [showAdminTicketModal]);
+  }, [showAdminTicketModal, handleCloseAdminTicketModal]);
 
   // Filter tutorials by search and category
   const filteredTutorials = useMemo(() => {
@@ -266,13 +272,6 @@ const Help = () => {
 
     await dispatch(markSupportTicketAsRead(ticket._id));
     dispatch(getAllSupportTickets());
-  };
-
-  // Close admin ticket details
-  const handleCloseAdminTicketModal = () => {
-    closeAdminTicketModal();
-    setSelectedAdminTicket(null);
-    setChatMessage("");
   };
 
   // Update support ticket status

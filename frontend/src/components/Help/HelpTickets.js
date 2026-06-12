@@ -8,7 +8,9 @@ const HelpTickets = ({
 }) => {
   const [selectedStatus, setSelectedStatus] = useState("ALL");
 
-  const tickets = Array.isArray(myTickets) ? myTickets : [];
+  const tickets = useMemo(() => {
+    return Array.isArray(myTickets) ? myTickets : [];
+  }, [myTickets]);
 
   const totals = useMemo(() => {
     return {

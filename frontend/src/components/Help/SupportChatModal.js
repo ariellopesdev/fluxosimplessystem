@@ -6,7 +6,6 @@ import Message from "../Message/Message";
 
 // Utils
 import {
-  isAdminMessage,
   translatePriority,
   translateStatus,
 } from "../../utils/supportUtils";
