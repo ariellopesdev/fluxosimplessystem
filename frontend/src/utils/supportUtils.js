@@ -38,6 +38,61 @@ export const translateCategory = (category) => {
   return categories[category] || "-";
 };
 
+export const translateDashboardModule = (module) => {
+  const modules = {
+    FINANCIAL: "Financeiro",
+    SALES: "Vendas",
+    PRODUCTS: "Produtos",
+    CLIENTS: "Clientes",
+    APPOINTMENTS: "Agendamentos",
+    SERVICES: "Serviços",
+    REPORTS: "Relatórios",
+    GENERAL: "Geral",
+    SUPPORT: "Suporte",
+  };
+
+  return modules[module] || module || "-";
+};
+
+export const translateActivityAction = (action) => {
+  const actions = {
+    CREATED: "Criado",
+    UPDATED: "Atualizado",
+    DELETED: "Excluído",
+
+    PRODUCT_CREATED: "Produto cadastrado",
+    PRODUCT_UPDATED: "Produto atualizado",
+    PRODUCT_DELETED: "Produto removido",
+
+    CLIENT_CREATED: "Cliente cadastrado",
+    CLIENT_UPDATED: "Cliente atualizado",
+    CLIENT_DELETED: "Cliente removido",
+
+    SERVICE_CREATED: "Serviço cadastrado",
+    SERVICE_UPDATED: "Serviço atualizado",
+    SERVICE_DELETED: "Serviço removido",
+
+    APPOINTMENT_CREATED: "Agendamento criado",
+    APPOINTMENT_UPDATED: "Agendamento atualizado",
+    APPOINTMENT_CANCELED: "Agendamento cancelado",
+    APPOINTMENT_COMPLETED: "Agendamento concluído",
+
+    SALE_CREATED: "Venda registrada",
+    SALE_UPDATED: "Venda atualizada",
+    SALE_DELETED: "Venda removida",
+
+    REPORT_GENERATED: "Relatório gerado",
+
+    SUPPORT_CREATED: "Chamado aberto",
+    SUPPORT_UPDATED: "Chamado atualizado",
+    SUPPORT_ANSWERED: "Chamado respondido",
+    SUPPORT_CLOSED: "Chamado concluído",
+    SUPPORT_CANCELED: "Chamado cancelado",
+  };
+
+  return actions[action] || action || "-";
+};
+
 export const isAdminMessage = (senderRole) => {
   return senderRole === "SUPER_ADMIN" || senderRole === "ADMIN";
 };

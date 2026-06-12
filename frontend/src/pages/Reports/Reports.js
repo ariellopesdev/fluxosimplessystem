@@ -524,7 +524,7 @@ const Reports = () => {
     return `
     <html>
       <head>
-        <title>${reportData?.title || "Relatório"}</title>
+        <title>Relatório ${translateType(reportData?.type)}</title>
         <style>
           * {
             box-sizing: border-box;

@@ -76,6 +76,20 @@ const getReportById = async (req, res) => {
   }
 };
 
+const translateReportType = (type) => {
+  const types = {
+    GENERAL: "Geral",
+    FINANCIAL: "Financeiro",
+    SALES: "Vendas",
+    PRODUCTS: "Produtos",
+    CLIENTS: "Clientes",
+    APPOINTMENTS: "Agendamentos",
+    SERVICES: "Serviços",
+  };
+
+  return types[type] || type;
+};
+
 const generateReport = async (req, res) => {
   const {
     type = "GENERAL",
@@ -346,7 +360,7 @@ const generateReport = async (req, res) => {
     });
 
     const report = await Report.create({
-      title: `Relatório ${type}`,
+      title: `Relatório ${translateReportType(type)}`,
       type,
       period: {
         startDate: start,

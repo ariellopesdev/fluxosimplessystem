@@ -35,6 +35,12 @@ import {
 //Icons
 import { FiHome } from "react-icons/fi";
 
+//Utils
+import {
+  translateDashboardModule,
+  translateActivityAction,
+} from "../../utils/supportUtils";
+
 const Dashboard = () => {
   const dispatch = useDispatch();
 
@@ -113,22 +119,6 @@ const Dashboard = () => {
     };
 
     return periods[period] || "-";
-  };
-
-  const translateModule = (module) => {
-    const modules = {
-      FINANCIAL: "Financeiro",
-      SALES: "Vendas",
-      PRODUCTS: "Produtos",
-      CLIENTS: "Clientes",
-      APPOINTMENTS: "Agendamentos",
-      SERVICES: "Serviços",
-      REPORTS: "Relatórios",
-      GENERAL: "Geral",
-      SUPPORT: "Suporte",
-    };
-
-    return modules[module] || module || "-";
   };
 
   const handleFilterChange = (e) => {
@@ -588,12 +578,12 @@ const Dashboard = () => {
               {activities.map((activity, index) => (
                 <li key={`${activity.referenceId}-${index}`}>
                   <div>
-                    <strong>{activity.action}</strong>
+                    <strong>{translateActivityAction(activity.action)}</strong>
                     <span>{activity.description}</span>
                   </div>
 
                   <small>
-                    {translateModule(activity.module)} •{" "}
+                    {translateDashboardModule(activity.module)} •{" "}
                     {formatDate(activity.date)}
                   </small>
                 </li>
@@ -615,7 +605,7 @@ const Dashboard = () => {
               >
                 <strong>{alert.title}</strong>
                 <span>{alert.message}</span>
-                <small>{translateModule(alert.module)}</small>
+                <small>{translateDashboardModule(alert.module)}</small>
               </div>
             ))}
           </div>
