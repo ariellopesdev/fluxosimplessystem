@@ -41,3 +41,30 @@ export const translateCategory = (category) => {
 export const isAdminMessage = (senderRole) => {
   return senderRole === "SUPER_ADMIN" || senderRole === "ADMIN";
 };
+
+export const formatTicketNumber = (ticket) => {
+  const number = ticket.ticketNumber || ticket._id?.slice(-4) || "0000";
+
+  return `#${String(number).padStart(4, "0")}`;
+};
+
+export const formatDateTime = (date) => {
+  if (!date) return "-";
+
+  return new Date(date).toLocaleString("pt-BR");
+};
+
+export const isTicketFinished = (ticket) => {
+  return ticket?.status === "CLOSED" || ticket?.status === "CANCELED";
+};
+
+export const getTicketStatusTitle = (status) => {
+  const titles = {
+    OPEN: "Chamados aguardando atendimento",
+    IN_PROGRESS: "Chamados em andamento",
+    CLOSED: "Chamados concluídos",
+    CANCELED: "Chamados cancelados",
+  };
+
+  return titles[status] || "Chamados";
+};

@@ -1766,6 +1766,43 @@
   box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.12) !important;
 }
 
+/************ ADMIN TABS ************/
+
+.helpAccess__tabs {
+  display: flex;
+  gap: 12px;
+
+  margin-bottom: 24px;
+}
+
+.helpAccess__tab {
+  border: 1px solid var(--border);
+
+  background: var(--surface);
+  color: var(--text);
+
+  padding: 12px 18px;
+
+  border-radius: 8px;
+
+  cursor: pointer;
+
+  font-size: clamp(0.9rem, 1vw, 1rem);
+  font-weight: 600;
+
+  transition: all 0.2s ease;
+}
+
+.helpAccess__tab:hover {
+  border-color: var(--primary);
+}
+
+.helpAccess__tab.active {
+  background: var(--primary);
+  color: var(--surface);
+  border-color: var(--primary);
+}
+
 /************ ANIMATION ************/
 
 @keyframes modalFade {
