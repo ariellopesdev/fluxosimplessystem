@@ -1,13 +1,21 @@
-const HelpHero = ({ search, setSearch }) => {
+const HelpHero = ({ search, setSearch, openSupportModal }) => {
   return (
     <div className="help__hero">
       <div>
         <span className="help__badge">Central de Ajuda</span>
         <h2>Como podemos ajudar?</h2>
         <p>
-          Encontre instruções rápidas ou abra um chamado de suporte para falar
-          com a administração.
+          Encontre instruções rápidas, acompanhe seus chamados ou fale com o
+          suporte.
         </p>
+
+        <button
+          type="button"
+          className="help__heroSupportBtn"
+          onClick={openSupportModal}
+        >
+          Falar com suporte
+        </button>
       </div>
 
       <div className="help__searchBox">
@@ -17,6 +25,7 @@ const HelpHero = ({ search, setSearch }) => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
+
         {search && (
           <button type="button" onClick={() => setSearch("")}>
             Limpar

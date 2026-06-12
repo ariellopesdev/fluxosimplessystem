@@ -884,7 +884,18 @@ const Help = () => {
       {error && <Message msg={error} type="error" />}
       {message && <Message msg={message} type="success" />}
 
-      <HelpHero search={search} setSearch={setSearch} />
+      <HelpHero
+        search={search}
+        setSearch={setSearch}
+        openSupportModal={openSupportModal}
+      />
+
+      <HelpTickets
+        myTickets={myTickets}
+        translateStatus={translateStatus}
+        translatePriority={translatePriority}
+        handleOpenTicket={handleOpenTicket}
+      />
 
       <HelpCategories
         helpCategories={helpCategories}
@@ -901,13 +912,6 @@ const Help = () => {
             filteredTutorials={filteredTutorials}
             openTutorial={openTutorial}
             setOpenTutorial={setOpenTutorial}
-          />
-
-          <HelpTickets
-            myTickets={myTickets}
-            translateStatus={translateStatus}
-            translatePriority={translatePriority}
-            handleOpenTicket={handleOpenTicket}
           />
         </div>
 
